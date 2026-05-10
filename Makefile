@@ -14,10 +14,13 @@ dev:
 	air
 
 migrate-create:
-	migrate create -ext sql -dir migrations create_users_table
+	migrate create -ext sql -dir migrations -rec 
 
 migrate-up:
 	migrate -path migrations -database $$DATABASE_URL up
 
 migrate-down:
 	migrate -path migrations -database $$DATABASE_URL down
+
+migrate-force:
+	migrate -path migrations -database $$DATABASE_URL force 1
