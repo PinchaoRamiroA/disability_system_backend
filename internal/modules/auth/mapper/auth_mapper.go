@@ -1,11 +1,11 @@
 package mapper
 
 import (
+	"disability_system_backend/internal/modules/auth/domain"
 	"disability_system_backend/internal/modules/auth/dto"
-	usuariosdomain "disability_system_backend/internal/modules/usuarios/domain"
 )
 
-func ToRoleResponse(role *usuariosdomain.Rol) *dto.RoleResponse {
+func ToRoleResponse(role *domain.Role) *dto.RoleResponse {
 	if role == nil {
 		return nil
 	}
@@ -16,7 +16,7 @@ func ToRoleResponse(role *usuariosdomain.Rol) *dto.RoleResponse {
 	}
 }
 
-func ToUserResponse(user *usuariosdomain.Usuario, role *usuariosdomain.Rol) *dto.UserResponse {
+func ToUserResponse(user *domain.User, role *domain.Role) *dto.UserResponse {
 	if user == nil {
 		return nil
 	}
@@ -24,8 +24,6 @@ func ToUserResponse(user *usuariosdomain.Usuario, role *usuariosdomain.Rol) *dto
 		ID:              user.ID,
 		Nombre:          user.Nombre,
 		Correo:          user.Correo,
-		NumeroCelular:   user.NumeroCelular,
-		Direccion:       user.Direccion,
 		NumeroDocumento: user.NumeroDocumento,
 		Estado:          user.Estado,
 		CreatedAt:       user.CreatedAt,
@@ -36,7 +34,7 @@ func ToUserResponse(user *usuariosdomain.Usuario, role *usuariosdomain.Rol) *dto
 	return resp
 }
 
-func ToLoginResponse(user *usuariosdomain.Usuario, role *usuariosdomain.Rol, accessToken, refreshToken string, expiresIn int64) *dto.LoginResponse {
+func ToLoginResponse(user *domain.User, role *domain.Role, accessToken, refreshToken string, expiresIn int64) *dto.LoginResponse {
 	userResp := ToUserResponse(user, role)
 	if userResp == nil {
 		return nil

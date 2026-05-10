@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	usuariosdomain "disability_system_backend/internal/modules/usuarios/domain"
+	"disability_system_backend/internal/modules/auth/domain"
 	"disability_system_backend/internal/modules/auth/ports"
 	apperrors "disability_system_backend/internal/shared/errors"
 )
@@ -33,7 +33,7 @@ func NewLoginUseCase(
 	}
 }
 
-func (uc *LoginUseCase) Execute(ctx context.Context, email, password string) (*ports.TokenPair, *usuariosdomain.Usuario, *usuariosdomain.Rol, error) {
+func (uc *LoginUseCase) Execute(ctx context.Context, email, password string) (*ports.TokenPair, *domain.User, *domain.Role, error) {
 	user, err := uc.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, nil, nil, apperrors.ErrInvalidCredentials.WithError(err)

@@ -3,23 +3,23 @@ package ports
 import (
 	"context"
 
-	usuariosdomain "disability_system_backend/internal/modules/usuarios/domain"
+	"disability_system_backend/internal/modules/auth/domain"
 )
 
 type UserRepository interface {
-	FindByID(ctx context.Context, id uint64) (*usuariosdomain.Usuario, error)
-	FindByEmail(ctx context.Context, email string) (*usuariosdomain.Usuario, error)
-	FindByDocumentNumber(ctx context.Context, docNumber string) (*usuariosdomain.Usuario, error)
-	Create(ctx context.Context, user *usuariosdomain.Usuario) error
-	Update(ctx context.Context, user *usuariosdomain.Usuario) error
+	FindByID(ctx context.Context, id uint64) (*domain.User, error)
+	FindByEmail(ctx context.Context, email string) (*domain.User, error)
+	FindByDocumentNumber(ctx context.Context, docNumber string) (*domain.User, error)
+	Create(ctx context.Context, user *domain.User) error
+	Update(ctx context.Context, user *domain.User) error
 	Delete(ctx context.Context, id uint64) error
 	EmailExists(ctx context.Context, email string) (bool, error)
 	DocumentExists(ctx context.Context, docNumber string) (bool, error)
 }
 
 type RoleRepository interface {
-	FindByID(ctx context.Context, id uint64) (*usuariosdomain.Rol, error)
-	FindByName(ctx context.Context, name string) (*usuariosdomain.Rol, error)
+	FindByID(ctx context.Context, id uint64) (*domain.Role, error)
+	FindByName(ctx context.Context, name string) (*domain.Role, error)
 }
 
 type TokenService interface {

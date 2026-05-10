@@ -1,12 +1,13 @@
-package usecase
+package auth_test
 
 import (
 	"context"
 	"testing"
 	"time"
 
+	"disability_system_backend/internal/modules/auth/domain"
 	"disability_system_backend/internal/modules/auth/ports"
-	usuariosdomain "disability_system_backend/internal/modules/usuarios/domain"
+	"disability_system_backend/internal/modules/auth/usecase"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -16,36 +17,36 @@ type MockUserRepository struct {
 	mock.Mock
 }
 
-func (m *MockUserRepository) FindByID(ctx context.Context, id uint64) (*usuariosdomain.Usuario, error) {
+func (m *MockUserRepository) FindByID(ctx context.Context, id uint64) (*domain.User, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*usuariosdomain.Usuario), args.Error(1)
+	return args.Get(0).(*domain.User), args.Error(1)
 }
 
-func (m *MockUserRepository) FindByEmail(ctx context.Context, email string) (*usuariosdomain.Usuario, error) {
+func (m *MockUserRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	args := m.Called(ctx, email)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*usuariosdomain.Usuario), args.Error(1)
+	return args.Get(0).(*domain.User), args.Error(1)
 }
 
-func (m *MockUserRepository) FindByDocumentNumber(ctx context.Context, docNumber string) (*usuariosdomain.Usuario, error) {
+func (m *MockUserRepository) FindByDocumentNumber(ctx context.Context, docNumber string) (*domain.User, error) {
 	args := m.Called(ctx, docNumber)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*usuariosdomain.Usuario), args.Error(1)
+	return args.Get(0).(*domain.User), args.Error(1)
 }
 
-func (m *MockUserRepository) Create(ctx context.Context, user *usuariosdomain.Usuario) error {
+func (m *MockUserRepository) Create(ctx context.Context, user *domain.User) error {
 	args := m.Called(ctx, user)
 	return args.Error(0)
 }
 
-func (m *MockUserRepository) Update(ctx context.Context, user *usuariosdomain.Usuario) error {
+func (m *MockUserRepository) Update(ctx context.Context, user *domain.User) error {
 	args := m.Called(ctx, user)
 	return args.Error(0)
 }
@@ -69,20 +70,20 @@ type MockRoleRepository struct {
 	mock.Mock
 }
 
-func (m *MockRoleRepository) FindByID(ctx context.Context, id uint64) (*usuariosdomain.Rol, error) {
+func (m *MockRoleRepository) FindByID(ctx context.Context, id uint64) (*domain.Role, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*usuariosdomain.Rol), args.Error(1)
+	return args.Get(0).(*domain.Role), args.Error(1)
 }
 
-func (m *MockRoleRepository) FindByName(ctx context.Context, name string) (*usuariosdomain.Rol, error) {
+func (m *MockRoleRepository) FindByName(ctx context.Context, name string) (*domain.Role, error) {
 	args := m.Called(ctx, name)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*usuariosdomain.Rol), args.Error(1)
+	return args.Get(0).(*domain.Role), args.Error(1)
 }
 
 type MockTokenService struct {
@@ -133,9 +134,9 @@ func TestLoginUseCase_Execute_Success(t *testing.T) {
 	mockTokenSvc := new(MockTokenService)
 	mockHasher := new(MockPasswordHasher)
 
-	uc := NewLoginUseCase(mockUserRepo, mockRoleRepo, mockTokenSvc, mockHasher, time.Hour)
+	uc := usecase.NewLoginUseCase(mockUserRepo, mockRoleRepo, mockTokenSvc, mockHasher, time.Hour)
 
-	testUser := &usuariosdomain.Usuario{
+	testUser := &domain.User{
 		ID:           1,
 		IDRol:        1,
 		Nombre:       "Test User",
@@ -145,7 +146,7 @@ func TestLoginUseCase_Execute_Success(t *testing.T) {
 		IsDeleted:    false,
 	}
 
-	testRole := &usuariosdomain.Rol{
+	testRole := &domain.Role{
 		ID:       1,
 		Nombre:   "admin",
 		Permisos: []string{"admin:read", "admin:write"},
@@ -184,9 +185,9 @@ func TestLoginUseCase_Execute_PasswordMismatch(t *testing.T) {
 	mockTokenSvc := new(MockTokenService)
 	mockHasher := new(MockPasswordHasher)
 
-	uc := NewLoginUseCase(mockUserRepo, mockRoleRepo, mockTokenSvc, mockHasher, time.Hour)
+	uc := usecase.NewLoginUseCase(mockUserRepo, mockRoleRepo, mockTokenSvc, mockHasher, time.Hour)
 
-	testUser := &usuariosdomain.Usuario{
+	testUser := &domain.User{
 		ID:           1,
 		IDRol:        1,
 		Correo:       "test@example.com",
@@ -213,7 +214,7 @@ func TestLoginUseCase_GetExpirationSeconds(t *testing.T) {
 	mockTokenSvc := new(MockTokenService)
 	mockHasher := new(MockPasswordHasher)
 
-	uc := NewLoginUseCase(mockUserRepo, mockRoleRepo, mockTokenSvc, mockHasher, 2*time.Hour)
+	uc := usecase.NewLoginUseCase(mockUserRepo, mockRoleRepo, mockTokenSvc, mockHasher, 2*time.Hour)
 
 	expiration := uc.GetExpirationSeconds()
 

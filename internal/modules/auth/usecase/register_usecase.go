@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	usuariosdomain "disability_system_backend/internal/modules/usuarios/domain"
+	"disability_system_backend/internal/modules/auth/domain"
 	"disability_system_backend/internal/modules/auth/ports"
 	apperrors "disability_system_backend/internal/shared/errors"
 )
@@ -27,7 +27,7 @@ func NewRegisterUseCase(
 func (uc *RegisterUseCase) Execute(
 	ctx context.Context,
 	nombre, email, password, numeroDocumento string,
-) (*usuariosdomain.Usuario, error) {
+) (*domain.User, error) {
 	exists, err := uc.userRepo.EmailExists(ctx, email)
 	if err != nil {
 		return nil, apperrors.ErrDatabase.WithError(err)
@@ -50,7 +50,7 @@ func (uc *RegisterUseCase) Execute(
 	}
 
 	now := time.Now()
-	user := &usuariosdomain.Usuario{
+	user := &domain.User{
 		IDRol:           4,
 		Nombre:          nombre,
 		Correo:          email,
@@ -59,7 +59,6 @@ func (uc *RegisterUseCase) Execute(
 		Estado:          true,
 		IsDeleted:       false,
 		CreatedAt:       now,
-		UpdatedAt:       now,
 	}
 
 	if err := uc.userRepo.Create(ctx, user); err != nil {

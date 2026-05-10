@@ -3,6 +3,7 @@ package router
 import (
 	"disability_system_backend/internal/shared/config"
 	"disability_system_backend/internal/shared/logger"
+	"disability_system_backend/internal/shared/response"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -65,41 +66,30 @@ type healthHandler struct {
 }
 
 func (h *healthHandler) liveness(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"status": "alive",
-	})
+	response.Success(c, gin.H{"status": "alive"}, "service is alive")
 }
 
 func (h *healthHandler) readiness(c *gin.Context) {
 	if h.db == nil {
-		c.JSON(503, gin.H{
-			"status":   "unhealthy",
-			"database": "not initialized",
-		})
+		response.Error(c, 503, "database not initialized", "DB_NOT_INITIALIZED", nil)
 		return
 	}
 
 	sqlDB, err := h.db.DB()
 	if err != nil {
-		c.JSON(503, gin.H{
-			"status":   "unhealthy",
-			"database": "error",
-		})
+		response.Error(c, 503, "database error", "DB_ERROR", nil)
 		return
 	}
 
 	if err := sqlDB.Ping(); err != nil {
-		c.JSON(503, gin.H{
-			"status":   "unhealthy",
-			"database": "down",
-		})
+		response.Error(c, 503, "database down", "DB_DOWN", nil)
 		return
 	}
 
-	c.JSON(200, gin.H{
+	response.Success(c, gin.H{
 		"status":   "ready",
 		"database": "connected",
-	})
+	}, "service is ready")
 }
 
 func (r *Router) Run(port string) error {

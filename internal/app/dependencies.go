@@ -2,6 +2,8 @@ package app
 
 import (
 	authhttp "disability_system_backend/internal/modules/auth/adapters/http"
+	"disability_system_backend/internal/modules/auth/adapters/postgres"
+	"disability_system_backend/internal/modules/auth/usecase"
 	"disability_system_backend/internal/shared/auth"
 	"disability_system_backend/internal/shared/database"
 	"disability_system_backend/internal/shared/middleware"
@@ -49,12 +51,22 @@ func (a *App) InitAuth() *auth.JWTService {
 		a.Config.JWT.RefreshExpiry,
 	)
 
-	authhttp.Register(
-		a.Router.V1(),
-		a.DB,
-		jwtService,
-		a.Config.JWT.Expiration,
-	)
+	// Initialize Repositories
+	userRepo := postgres.NewUserRepository(a.DB)
+	roleRepo := postgres.NewRoleRepository(a.DB)
+	tokenService := postgres.NewTokenService(jwtService)
+	passwordHasher := postgres.NewPasswordHasher()
+
+	// Initialize UseCases
+	loginUseCase := usecase.NewLoginUseCase(userRepo, roleRepo, tokenService, passwordHasher, a.Config.JWT.Expiration)
+	registerUseCase := usecase.NewRegisterUseCase(userRepo, passwordHasher)
+	refreshUseCase := usecase.NewRefreshTokenUseCase(tokenService)
+
+	// Initialize Handler
+	a.AuthHandler = authhttp.NewAuthHandler(loginUseCase, registerUseCase, refreshUseCase)
+
+	// Register Routes
+	a.InitAuthRoutes()
 
 	return jwtService
 }
