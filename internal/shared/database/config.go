@@ -27,7 +27,7 @@ func LoadConfig() Config {
 		Host:            getEnv("DB_HOST", "localhost"),
 		Port:            port,
 		User:            getEnv("DB_USER", "postgres"),
-		Password:        getEnv("DB_PASSWORD", "postgres"),
+		Password:        getEnv("DB_PASSWORD", ""),
 		Name:            getEnv("DB_NAME", "app"),
 		SSLMode:         getEnv("DB_SSLMODE", "disable"),
 		MaxOpenConns:    maxOpen,
