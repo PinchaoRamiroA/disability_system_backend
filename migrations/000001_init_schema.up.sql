@@ -63,7 +63,7 @@ CREATE TABLE tipo_incapacidad (
     nombre VARCHAR(100) UNIQUE NOT NULL,
     documentos_requeridos JSONB,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE entidad (
@@ -75,7 +75,7 @@ CREATE TABLE entidad (
     canal_atencion VARCHAR(150),
     requiere_transcripcion BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE incapacidad (
