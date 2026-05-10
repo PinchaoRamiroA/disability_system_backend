@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -34,6 +35,8 @@ type DBConfig struct {
 	MaxIdleConns    int
 	ConnMaxLifetime int
 	URL             string
+	PoolMode        string
+	PrepareCache    bool
 }
 
 type JWTConfig struct {
@@ -86,6 +89,8 @@ func loadDBConfig() DBConfig {
 		MaxIdleConns:    maxIdle,
 		ConnMaxLifetime: maxLifetime,
 		URL:             getEnv("DATABASE_URL", ""),
+		PoolMode:        getEnv("DB_POOL_MODE", "session"),
+		PrepareCache:    getEnv("DB_PREPARE_CACHE", "false") == "true",
 	}
 }
 
@@ -132,4 +137,12 @@ func (c *Config) DSN() string {
 		c.DB.Name,
 		c.DB.SSLMode,
 	)
+}
+
+func (c *Config) HasURL() bool {
+	return c.DB.URL != ""
+}
+
+func (c *Config) UseSupabase() bool {
+	return c.DB.URL != "" && (strings.Contains(c.DB.URL, "supabase") || strings.Contains(c.DB.URL, "aws"))
 }

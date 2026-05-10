@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"time"
 
 	"disability_system_backend/internal/shared/config"
@@ -10,8 +11,11 @@ import (
 )
 
 func NewConnection(cfg *config.Config) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(cfg.DSN()), &gorm.Config{
+	dsn := buildDSN(cfg)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: NewLogger(),
+		PrepareStmt: cfg.DB.PrepareCache,
 	})
 
 	if err != nil {
@@ -28,4 +32,26 @@ func NewConnection(cfg *config.Config) (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(time.Duration(cfg.DB.ConnMaxLifetime) * time.Minute)
 
 	return db, nil
+}
+
+func buildDSN(cfg *config.Config) string {
+	if cfg.DB.URL != "" {
+		return cfg.DB.URL
+	}
+
+	dsn := fmt.Sprintf(
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		cfg.DB.Host,
+		cfg.DB.Port,
+		cfg.DB.User,
+		cfg.DB.Password,
+		cfg.DB.Name,
+		cfg.DB.SSLMode,
+	)
+
+	if cfg.DB.PoolMode == "transaction" {
+		dsn += " pooler=true"
+	}
+
+	return dsn
 }
