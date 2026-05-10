@@ -31,6 +31,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	jwtService := a.InitAuth()
+	_ = jwtService
+
 	port := fmt.Sprintf(":%s", cfg.Server.Port)
 	log.Info("server listening", "port", cfg.Server.Port)
 

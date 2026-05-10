@@ -15,7 +15,7 @@ type JWTService struct {
 }
 
 type Claims struct {
-	UserID uint   `json:"user_id"`
+	UserID uint64 `json:"user_id"`
 	Email  string `json:"email"`
 	Role   string `json:"role"`
 	jwt.RegisteredClaims
@@ -34,7 +34,7 @@ func NewJWTService(secret string, expiration, refreshExpiry time.Duration) *JWTS
 	}
 }
 
-func (s *JWTService) GenerateToken(userID uint, email, role string) (string, error) {
+func (s *JWTService) GenerateToken(userID uint64, email, role string) (string, error) {
 	claims := Claims{
 		UserID: userID,
 		Email:  email,
@@ -52,7 +52,7 @@ func (s *JWTService) GenerateToken(userID uint, email, role string) (string, err
 	return token.SignedString(s.secret)
 }
 
-func (s *JWTService) GenerateTokenPair(userID uint, email, role string) (*TokenPair, error) {
+func (s *JWTService) GenerateTokenPair(userID uint64, email, role string) (*TokenPair, error) {
 	accessToken, err := s.GenerateToken(userID, email, role)
 	if err != nil {
 		return nil, err
@@ -103,6 +103,10 @@ func (s *JWTService) ValidateToken(tokenString string) (*Claims, error) {
 	}
 
 	return claims, nil
+}
+
+func (s *JWTService) Expiration() time.Duration {
+	return s.expiration
 }
 
 func (s *JWTService) RefreshToken(tokenString string) (*TokenPair, error) {

@@ -1,9 +1,11 @@
 package app
 
 import (
+	authhttp "disability_system_backend/internal/modules/auth/adapters/http"
+	"disability_system_backend/internal/shared/auth"
 	"disability_system_backend/internal/shared/database"
-	"disability_system_backend/internal/shared/router"
 	"disability_system_backend/internal/shared/middleware"
+	"disability_system_backend/internal/shared/router"
 )
 
 func (a *App) InitRouter() error {
@@ -38,4 +40,21 @@ func (a *App) InitDependencies() error {
 
 	a.DB = db
 	return nil
+}
+
+func (a *App) InitAuth() *auth.JWTService {
+	jwtService := auth.NewJWTService(
+		a.Config.JWT.Secret,
+		a.Config.JWT.Expiration,
+		a.Config.JWT.RefreshExpiry,
+	)
+
+	authhttp.Register(
+		a.Router.V1(),
+		a.DB,
+		jwtService,
+		a.Config.JWT.Expiration,
+	)
+
+	return jwtService
 }

@@ -35,6 +35,16 @@ func (e *AppError) WithDetails(details any) *AppError {
 	}
 }
 
+func (e *AppError) WithMessage(message string) *AppError {
+	return &AppError{
+		Code:       e.Code,
+		Message:    message,
+		HTTPStatus: e.HTTPStatus,
+		Details:    e.Details,
+		Err:        e.Err,
+	}
+}
+
 func (e *AppError) WithError(err error) *AppError {
 	return &AppError{
 		Code:       e.Code,

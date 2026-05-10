@@ -5,6 +5,8 @@ import (
 	"disability_system_backend/internal/shared/logger"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -55,6 +57,7 @@ func (r *Router) SetupHealth(db *gorm.DB) {
 	r.engine.GET("/health/live", handler.liveness)
 	r.engine.GET("/health/ready", handler.readiness)
 	r.engine.GET("/health", handler.readiness)
+	r.engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
 
 type healthHandler struct {
