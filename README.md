@@ -1,196 +1,538 @@
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/golang-migrate/migrate/ci.yaml?branch=master)](https://github.com/golang-migrate/migrate/actions/workflows/ci.yaml?query=branch%3Amaster)
-[![GoDoc](https://pkg.go.dev/badge/github.com/golang-migrate/migrate)](https://pkg.go.dev/github.com/golang-migrate/migrate/v4)
-[![Coverage Status](https://img.shields.io/coveralls/github/golang-migrate/migrate/master.svg)](https://coveralls.io/github/golang-migrate/migrate?branch=master)
-[![packagecloud.io](https://img.shields.io/badge/deb-packagecloud.io-844fec.svg)](https://packagecloud.io/golang-migrate/migrate?filter=debs)
-[![Docker Pulls](https://img.shields.io/docker/pulls/migrate/migrate.svg)](https://hub.docker.com/r/migrate/migrate/)
-![Supported Go Versions](https://img.shields.io/badge/Go-1.24%2C%201.25-lightgrey.svg)
-[![GitHub Release](https://img.shields.io/github/release/golang-migrate/migrate.svg)](https://github.com/golang-migrate/migrate/releases)
-[![Go Report Card](https://goreportcard.com/badge/github.com/golang-migrate/migrate/v4)](https://goreportcard.com/report/github.com/golang-migrate/migrate/v4)
+# Backend - Sistema de Gestión de Incapacidades
 
-# migrate
-
-__Database migrations written in Go. Use as [CLI](#cli-usage) or import as [library](#use-in-your-go-project).__
-
-* Migrate reads migrations from [sources](#migration-sources)
-   and applies them in correct order to a [database](#databases).
-* Drivers are "dumb", migrate glues everything together and makes sure the logic is bulletproof.
-   (Keeps the drivers lightweight, too.)
-* Database drivers don't assume things or try to correct user input. When in doubt, fail.
-
-Forked from [mattes/migrate](https://github.com/mattes/migrate)
-
-## Databases
-
-Database drivers run migrations. [Add a new database?](database/driver.go)
-
-* [PostgreSQL](database/postgres)
-* [PGX v4](database/pgx)
-* [PGX v5](database/pgx/v5)
-* [Redshift](database/redshift)
-* [Ql](database/ql)
-* [Cassandra / ScyllaDB](database/cassandra)
-* [SQLite](database/sqlite)
-* [SQLite3](database/sqlite3) ([todo #165](https://github.com/mattes/migrate/issues/165))
-* [SQLCipher](database/sqlcipher)
-* [MySQL / MariaDB](database/mysql)
-* [Neo4j](database/neo4j)
-* [MongoDB](database/mongodb)
-* [CrateDB](database/crate) ([todo #170](https://github.com/mattes/migrate/issues/170))
-* [Shell](database/shell) ([todo #171](https://github.com/mattes/migrate/issues/171))
-* [Google Cloud Spanner](database/spanner)
-* [CockroachDB](database/cockroachdb)
-* [YugabyteDB](database/yugabytedb)
-* [ClickHouse](database/clickhouse)
-* [Firebird](database/firebird)
-* [MS SQL Server](database/sqlserver)
-* [rqlite](database/rqlite)
-
-### Database URLs
-
-Database connection strings are specified via URLs. The URL format is driver dependent but generally has the form: `dbdriver://username:password@host:port/dbname?param1=true&param2=false`
-
-Any [reserved URL characters](https://en.wikipedia.org/wiki/Percent-encoding#Percent-encoding_reserved_characters) need to be escaped. Note, the `%` character also [needs to be escaped](https://en.wikipedia.org/wiki/Percent-encoding#Percent-encoding_the_percent_character)
-
-Explicitly, the following characters need to be escaped:
-`!`, `#`, `$`, `%`, `&`, `'`, `(`, `)`, `*`, `+`, `,`, `/`, `:`, `;`, `=`, `?`, `@`, `[`, `]`
-
-It's easiest to always run the URL parts of your DB connection URL (e.g. username, password, etc) through an URL encoder. See the example Python snippets below:
-
-```bash
-$ python3 -c 'import urllib.parse; print(urllib.parse.quote(input("String to encode: "), ""))'
-String to encode: FAKEpassword!#$%&'()*+,/:;=?@[]
-FAKEpassword%21%23%24%25%26%27%28%29%2A%2B%2C%2F%3A%3B%3D%3F%40%5B%5D
-$ python2 -c 'import urllib; print urllib.quote(raw_input("String to encode: "), "")'
-String to encode: FAKEpassword!#$%&'()*+,/:;=?@[]
-FAKEpassword%21%23%24%25%26%27%28%29%2A%2B%2C%2F%3A%3B%3D%3F%40%5B%5D
-$
-```
-
-## Migration Sources
-
-Source drivers read migrations from local or remote sources. [Add a new source?](source/driver.go)
-
-* [Filesystem](source/file) - read from filesystem
-* [io/fs](source/iofs) - read from a Go [io/fs](https://pkg.go.dev/io/fs#FS)
-* [Go-Bindata](source/go_bindata) - read from embedded binary data ([jteeuwen/go-bindata](https://github.com/jteeuwen/go-bindata))
-* [pkger](source/pkger) - read from embedded binary data ([markbates/pkger](https://github.com/markbates/pkger))
-* [GitHub](source/github) - read from remote GitHub repositories
-* [GitHub Enterprise](source/github_ee) - read from remote GitHub Enterprise repositories
-* [Bitbucket](source/bitbucket) - read from remote Bitbucket repositories
-* [Gitlab](source/gitlab) - read from remote Gitlab repositories
-* [AWS S3](source/aws_s3) - read from Amazon Web Services S3
-* [Google Cloud Storage](source/google_cloud_storage) - read from Google Cloud Platform Storage
-
-## CLI usage
-
-* Simple wrapper around this library.
-* Handles ctrl+c (SIGINT) gracefully.
-* No config search paths, no config files, no magic ENV var injections.
-
-[CLI Documentation](cmd/migrate) (includes CLI install instructions)
-
-### Basic usage
-
-```bash
-$ migrate -source file://path/to/migrations -database postgres://localhost:5432/database up 2
-```
-
-### Docker usage
-
-```bash
-$ docker run -v {{ migration dir }}:/migrations --network host migrate/migrate
-    -path=/migrations/ -database postgres://localhost:5432/database up 2
-```
-
-## Use in your Go project
-
-* API is stable and frozen for this release (v3 & v4).
-* Uses [Go modules](https://golang.org/cmd/go/#hdr-Modules__module_versions__and_more) to manage dependencies.
-* To help prevent database corruptions, it supports graceful stops via `GracefulStop chan bool`.
-* Bring your own logger.
-* Uses `io.Reader` streams internally for low memory overhead.
-* Thread-safe and no goroutine leaks.
-
-__[Go Documentation](https://pkg.go.dev/github.com/golang-migrate/migrate/v4)__
-
-```go
-import (
-    "github.com/golang-migrate/migrate/v4"
-    _ "github.com/golang-migrate/migrate/v4/database/postgres"
-    _ "github.com/golang-migrate/migrate/v4/source/github"
-)
-
-func main() {
-    m, err := migrate.New(
-        "github://mattes:personal-access-token@mattes/migrate_test",
-        "postgres://localhost:5432/database?sslmode=enable")
-    m.Steps(2)
-}
-```
-
-Want to use an existing database client?
-
-```go
-import (
-    "database/sql"
-    _ "github.com/lib/pq"
-    "github.com/golang-migrate/migrate/v4"
-    "github.com/golang-migrate/migrate/v4/database/postgres"
-    _ "github.com/golang-migrate/migrate/v4/source/file"
-)
-
-func main() {
-    db, err := sql.Open("postgres", "postgres://localhost:5432/database?sslmode=enable")
-    driver, err := postgres.WithInstance(db, &postgres.Config{})
-    m, err := migrate.NewWithDatabaseInstance(
-        "file:///migrations",
-        "postgres", driver)
-    m.Up() // or m.Steps(2) if you want to explicitly set the number of migrations to run
-}
-```
-
-## Getting started
-
-Go to [getting started](GETTING_STARTED.md)
-
-## Tutorials
-
-* [CockroachDB](database/cockroachdb/TUTORIAL.md)
-* [PostgreSQL](database/postgres/TUTORIAL.md)
-
-(more tutorials to come)
-
-## Migration files
-
-Each migration has an up and down migration. [Why?](FAQ.md#why-two-separate-files-up-and-down-for-a-migration)
-
-```bash
-1481574547_create_users_table.up.sql
-1481574547_create_users_table.down.sql
-```
-
-[Best practices: How to write migrations.](MIGRATIONS.md)
-
-## Coming from another db migration tool?
-
-Check out [migradaptor](https://github.com/musinit/migradaptor/).
-*Note: migradaptor is not affiliated or supported by this project*
-
-## Versions
-
-Version | Supported? | Import | Notes
---------|------------|--------|------
-**master** | :white_check_mark: | `import "github.com/golang-migrate/migrate/v4"` | New features and bug fixes arrive here first |
-**v4** | :white_check_mark: | `import "github.com/golang-migrate/migrate/v4"` | Used for stable releases |
-**v3** | :x: | `import "github.com/golang-migrate/migrate"` (with package manager) or `import "gopkg.in/golang-migrate/migrate.v3"` (not recommended) | **DO NOT USE** - No longer supported |
-
-## Development and Contributing
-
-Yes, please! [`Makefile`](Makefile) is your friend,
-read the [development guide](CONTRIBUTING.md).
-
-Also have a look at the [FAQ](FAQ.md).
+Backend empresarial desarrollado en Go siguiendo principios de Arquitectura Hexagonal (Ports & Adapters), modularidad y buenas prácticas de ingeniería de software.
 
 ---
 
-Looking for alternatives? [https://awesome-go.com/#database](https://awesome-go.com/#database).
+# 📌 Objetivo del Proyecto
+
+Este sistema tiene como objetivo gestionar de manera centralizada:
+
+- Incapacidades médicas
+- Transcripción y validación documental
+- Gestión de pagos y cobros
+- Seguimiento administrativo
+- Historial de eventos
+- Notificaciones
+- Gestión de usuarios y roles
+
+Diseñado para ser:
+
+- Escalable
+- Mantenible
+- Modular
+- Seguro
+- Performante
+- Preparado para crecimiento futuro
+
+---
+
+# 🏛️ Arquitectura
+
+El proyecto implementa:
+
+## ✅ Arquitectura Hexagonal (Ports & Adapters)
+
+Separando claramente:
+
+| Capa | Responsabilidad |
+|---|---|
+| Domain | Reglas de negocio |
+| UseCases | Casos de uso |
+| Ports | Contratos/interfaces |
+| Adapters | Infraestructura |
+| Shared | Componentes reutilizables |
+
+---
+
+# 📦 Estructura del Proyecto
+
+```text
+/backend
+│
+├── cmd/
+│   └── api/
+│       └── main.go
+│
+├── internal/
+│   │
+│   ├── shared/
+│   │   ├── auth/
+│   │   ├── config/
+│   │   ├── database/
+│   │   ├── errors/
+│   │   ├── logger/
+│   │   ├── middleware/
+│   │   ├── response/
+│   │   └── utils/
+│   │
+│   ├── modules/
+│   │
+│   │   ├── auth/
+│   │   │   ├── domain/
+│   │   │   ├── usecase/
+│   │   │   ├── ports/
+│   │   │   ├── adapters/
+│   │   │   │   ├── http/
+│   │   │   │   └── postgres/
+│   │   │   ├── dto/
+│   │   │   └── mapper/
+│   │   │
+│   │   ├── usuarios/
+│   │   ├── incapacidades/
+│   │   ├── cobros/
+│   │   ├── historial/
+│   │   └── notificaciones/
+│
+├── migrations/
+│
+├── scripts/
+│
+├── tests/
+│
+├── deployments/
+│
+├── docs/
+│
+├── .env
+├── .env.example
+├── Dockerfile
+├── docker-compose.yml
+├── Makefile
+├── go.mod
+└── README.md
+```
+
+---
+
+# 🧠 Principios Arquitectónicos
+
+## ✅ Arquitectura Modular
+
+Cada módulo es independiente y encapsula:
+
+- dominio
+- persistencia
+- casos de uso
+- contratos
+- adaptadores
+
+---
+
+## ✅ Separación de Responsabilidades
+
+El dominio NO conoce:
+
+- GORM
+- PostgreSQL
+- HTTP
+- Frameworks
+- Infraestructura
+
+---
+
+## ✅ Relaciones Cross-Module
+
+Los modelos GORM NO deben tener relaciones entre módulos.
+
+### ✔ Permitido
+
+```text
+usuarios
+ ├── Usuario
+ ├── Rol
+ └── Empleado
+```
+
+### ❌ Evitar
+
+```text
+Incapacidad -> UsuarioModel
+```
+
+En su lugar:
+
+```go
+IDUsuario uint64
+```
+
+Y resolver mediante:
+- repositories
+- usecases
+- joins explícitos
+- DTOs
+
+---
+
+# 🗄️ Base de Datos
+
+## Motor
+
+- PostgreSQL
+
+## ORM
+
+- GORM
+
+## Migraciones
+
+- golang-migrate
+
+---
+
+# ⚠️ Importante
+
+El proyecto NO utiliza:
+
+```go
+AutoMigrate()
+```
+
+como fuente oficial del schema.
+
+---
+
+## Fuente Oficial del Schema
+
+```text
+/migrations
+```
+
+---
+
+# 📁 Organización de Persistencia
+
+## Domain
+
+Entidades puras:
+
+```go
+type Usuario struct {
+    ID uint64
+}
+```
+
+---
+
+## Models GORM
+
+Infraestructura:
+
+```go
+type UsuarioModel struct {
+    IDUsuario uint64 `gorm:"primaryKey"`
+}
+```
+
+Ubicación:
+
+```text
+/adapters/postgres/models
+```
+
+---
+
+# 🚀 Tecnologías Utilizadas
+
+| Tecnología | Uso |
+|---|---|
+| Go | Backend principal |
+| PostgreSQL | Base de datos |
+| GORM | ORM |
+| golang-migrate | Migraciones |
+| Docker | Contenedores |
+| JWT | Autenticación |
+| Gin | HTTP Framework |
+| Makefile | Automatización |
+| Swagger | Documentación API |
+
+---
+
+# 🔐 Autenticación
+
+El sistema utiliza:
+
+- JWT Access Tokens
+- Middleware de autorización
+- Roles y permisos
+- Guards por módulo
+
+---
+
+# 👥 Módulos del Sistema
+
+| Módulo | Responsabilidad |
+|---|---|
+| auth | autenticación/autorización |
+| usuarios | usuarios y roles |
+| incapacidades | gestión de incapacidades |
+| cobros | pagos y seguimiento |
+| historial | auditoría e historial |
+| notificaciones | notificaciones del sistema |
+
+---
+
+# 🧾 Reglas de Negocio
+
+## Usuarios
+
+- Todo usuario debe tener un rol
+- El correo debe ser único
+- El documento debe ser único
+
+---
+
+## Incapacidades
+
+- Toda incapacidad pertenece a un usuario
+- Toda incapacidad tiene estado
+- La fecha final no puede ser menor a la inicial
+- Puede requerir documentos obligatorios
+- Puede tener seguimiento y pagos asociados
+
+---
+
+## Documentos
+
+- Deben estar asociados a una incapacidad
+- Pueden ser validados por Gestión Humana
+- Deben registrar estado y formato
+
+---
+
+## Pagos
+
+- El valor debe ser mayor o igual a 0
+- Deben estar asociados a una entidad
+- Pueden ser conciliados
+
+---
+
+# ⚙️ Variables de Entorno
+
+## `.env`
+
+```env
+APP_PORT=PORT
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=root
+DB_PASSWORD=password
+DB_NAME=disability_system_db
+DB_SSLMODE=disable
+
+DB_MAX_OPEN_CONNS=25
+DB_MAX_IDLE_CONNS=10
+DB_CONN_MAX_LIFETIME=5
+DATABASE_URL=postgres://root:password@localhost:5432/disability_system_db?sslmode=disable
+
+JWT_SECRET=secret
+JWT_EXPIRATION_HOURS=24
+```
+
+---
+
+# 🐳 Docker
+
+## Levantar servicios
+
+```bash
+docker-compose up -d
+```
+
+---
+
+# 📦 Instalación Local
+
+## 1️⃣ Clonar repositorio
+
+```bash
+git clone <repository>
+```
+
+---
+
+## 2️⃣ Entrar al proyecto
+
+```bash
+cd backend
+```
+
+---
+
+## 3️⃣ Instalar dependencias
+
+```bash
+go mod tidy
+```
+
+---
+
+## 4️⃣ Configurar variables de entorno
+
+```bash
+cp .env.example .env
+```
+
+---
+
+## 5️⃣ Ejecutar migraciones
+
+```bash
+make migrate-up
+```
+
+---
+
+## 6️⃣ Ejecutar proyecto
+
+```bash
+go run cmd/api/main.go
+```
+
+---
+
+# 🛠️ Comandos Makefile
+
+```bash
+make run
+make dev
+make test
+make lint
+make migrate-up
+make migrate-down
+make migrate-force
+```
+
+---
+
+# 🧪 Testing
+
+El proyecto debe incluir:
+
+- Unit tests
+- Integration tests
+- Repository tests
+- UseCase tests
+
+---
+
+# 📚 Convenciones del Proyecto
+
+## Naming
+
+### Models
+
+```go
+UsuarioModel
+```
+
+---
+
+### Domain
+
+```go
+Usuario
+```
+
+---
+
+### DTOs
+
+```go
+CreateUsuarioRequest
+UsuarioResponse
+```
+
+---
+
+# 🚫 Reglas Importantes
+
+## ❌ No usar AutoMigrate en producción
+
+---
+
+## ❌ No exponer modelos GORM en APIs
+
+Siempre usar DTOs.
+
+---
+
+## ❌ No usar lógica de negocio en handlers HTTP
+
+---
+
+## ❌ No usar relaciones GORM cross-module
+
+---
+
+## ✅ Mantener módulos desacoplados
+
+---
+
+## ✅ Mantener dominio puro
+
+---
+
+# 📈 Escalabilidad
+
+La arquitectura fue diseñada para permitir:
+
+- Modular Monolith
+- Evolución futura a microservicios
+- Horizontal scaling
+- Nuevos módulos
+- Nuevos adaptadores
+
+---
+
+# 🔍 Health Check
+
+```http
+GET /health
+```
+
+---
+
+# 📖 Documentación API
+
+Swagger/OpenAPI será generado automáticamente.
+
+---
+
+# 🧠 Filosofía del Proyecto
+
+Este backend prioriza:
+
+- claridad
+- mantenibilidad
+- separación de responsabilidades
+- performance
+- consistencia
+- evolución futura
+
+---
+
+# 👨‍💻 Estándares de Desarrollo
+
+- Clean Code
+- SOLID
+- Hexagonal Architecture
+- DDD-inspired modularity
+- Repository Pattern
+- DTO Pattern
+- Explicit Migrations
+- Dependency Injection
+
+---
+
+# 📌 Estado del Proyecto
+
+🚧 En desarrollo activo.
+
+---
+
+# 📄 Licencia
+
+Privado / Uso interno.
