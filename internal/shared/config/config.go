@@ -12,10 +12,10 @@ import (
 )
 
 type Config struct {
-	App      AppConfig
-	DB       DBConfig
-	JWT      JWTConfig
-	Server   ServerConfig
+	App    AppConfig
+	DB     DBConfig
+	JWT    JWTConfig
+	Server ServerConfig
 }
 
 type AppConfig struct {
@@ -40,9 +40,9 @@ type DBConfig struct {
 }
 
 type JWTConfig struct {
-	Secret          string
-	Expiration      time.Duration
-	RefreshExpiry   time.Duration
+	Secret        string
+	Expiration    time.Duration
+	RefreshExpiry time.Duration
 }
 
 type ServerConfig struct {
