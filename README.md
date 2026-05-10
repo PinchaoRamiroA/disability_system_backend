@@ -48,7 +48,7 @@ Separando claramente:
 # 📦 Estructura del Proyecto
 
 ```text
-/backend
+/disability_system_backend
 │
 ├── cmd/
 │   └── api/
@@ -356,7 +356,7 @@ git clone <repository>
 ## 2️⃣ Entrar al proyecto
 
 ```bash
-cd backend
+cd disability_system_backend
 ```
 
 ---

@@ -1,27 +1,16 @@
 package database
 
 import (
-	"fmt"
 	"time"
+
+	"disability_system_backend/internal/shared/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func NewConnection() (*gorm.DB, error) {
-	cfg := LoadConfig()
-
-	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host,
-		cfg.Port,
-		cfg.User,
-		cfg.Password,
-		cfg.Name,
-		cfg.SSLMode,
-	)
-
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+func NewConnection(cfg *config.Config) (*gorm.DB, error) {
+	db, err := gorm.Open(postgres.Open(cfg.DSN()), &gorm.Config{
 		Logger: NewLogger(),
 	})
 
@@ -30,16 +19,13 @@ func NewConnection() (*gorm.DB, error) {
 	}
 
 	sqlDB, err := db.DB()
-
 	if err != nil {
 		return nil, err
 	}
 
-	// Pooling
-
-	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
-	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
-	sqlDB.SetConnMaxLifetime(time.Duration(cfg.ConnMaxLifetime) * time.Minute)
+	sqlDB.SetMaxOpenConns(cfg.DB.MaxOpenConns)
+	sqlDB.SetMaxIdleConns(cfg.DB.MaxIdleConns)
+	sqlDB.SetConnMaxLifetime(time.Duration(cfg.DB.ConnMaxLifetime) * time.Minute)
 
 	return db, nil
 }
