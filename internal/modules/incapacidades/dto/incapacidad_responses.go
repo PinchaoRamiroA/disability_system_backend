@@ -42,3 +42,23 @@ type EntidadResponse struct {
 	CanalesAtencion        []string `json:"canales_atencion,omitempty"`
 	RequiereTranscripcion  bool     `json:"requiere_transcripcion"`
 }
+
+type EstadoDocumentoResponse struct {
+	IDEstadoDocumento uint64  `json:"id_estado_documento"`
+	Nombre            string  `json:"nombre"`
+	Descripcion       *string `json:"descripcion,omitempty"`
+	Color             *string `json:"color,omitempty"`
+}
+
+type TipoDocumentoResponse struct {
+	IDTipoDocumento uint64  `json:"id_tipo_documento"`
+	Nombre          string  `json:"nombre"`
+	Descripcion     *string `json:"descripcion,omitempty"`
+	Requerido       bool    `json:"requerido"`
+}
+
+type TipoPagoResponse struct {
+	IDTipoPago  uint64  `json:"id_tipo_pago"`
+	Nombre      string  `json:"nombre"`
+	Descripcion *string `json:"descripcion,omitempty"`
+}

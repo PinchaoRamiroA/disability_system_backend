@@ -8,6 +8,7 @@ import (
 	"disability_system_backend/internal/modules/auth/usecase"
 	cobroshttp "disability_system_backend/internal/modules/cobros/adapters/http"
 	incapacidadeshttp "disability_system_backend/internal/modules/incapacidades/adapters/http"
+	notificacioneshttp "disability_system_backend/internal/modules/notificaciones/adapters/http"
 	usuarioshttp "disability_system_backend/internal/modules/usuarios/adapters/http"
 	"disability_system_backend/internal/shared/auth"
 	"disability_system_backend/internal/shared/database"
@@ -75,6 +76,7 @@ func (a *App) InitAuth() *auth.JWTService {
 	a.InitAuthRoutes()
 	incapacidadeshttp.Register(a.Router.V1(), a.DB, jwtService, a.StorageService)
 	cobroshttp.Register(a.Router.V1(), a.DB, jwtService)
+	notificacioneshttp.Register(a.Router.V1(), a.DB, jwtService)
 	usuarioshttp.Register(a.Router.V1(), a.DB, jwtService)
 
 	if a.Config.App.Env != "test" {

@@ -238,6 +238,42 @@ func (r *IncapacidadRepository) ListEntidades(ctx context.Context) ([]domain.Ent
 	return items, nil
 }
 
+func (r *IncapacidadRepository) ListEstadosDocumento(ctx context.Context) ([]domain.EstadoDocumento, error) {
+	var models []incmodels.EstadoDocumentoModel
+	if err := r.db.WithContext(ctx).Order("nombre ASC").Find(&models).Error; err != nil {
+		return nil, err
+	}
+	items := make([]domain.EstadoDocumento, 0, len(models))
+	for i := range models {
+		items = append(items, *toEstadoDocumentoDomain(&models[i]))
+	}
+	return items, nil
+}
+
+func (r *IncapacidadRepository) ListTiposDocumento(ctx context.Context) ([]domain.TipoDocumento, error) {
+	var models []incmodels.TipoDocumentoModel
+	if err := r.db.WithContext(ctx).Order("nombre ASC").Find(&models).Error; err != nil {
+		return nil, err
+	}
+	items := make([]domain.TipoDocumento, 0, len(models))
+	for i := range models {
+		items = append(items, *toTipoDocumentoDomain(&models[i]))
+	}
+	return items, nil
+}
+
+func (r *IncapacidadRepository) ListTiposPago(ctx context.Context) ([]domain.TipoPago, error) {
+	var models []incmodels.TipoPagoModel
+	if err := r.db.WithContext(ctx).Order("nombre ASC").Find(&models).Error; err != nil {
+		return nil, err
+	}
+	items := make([]domain.TipoPago, 0, len(models))
+	for i := range models {
+		items = append(items, *toTipoPagoDomain(&models[i]))
+	}
+	return items, nil
+}
+
 func toIncapacidadModel(i *domain.Incapacidad) *incmodels.IncapacidadModel {
 	return &incmodels.IncapacidadModel{
 		IDIncapacidad:   i.IDIncapacidad,
@@ -328,4 +364,49 @@ func toEntidadDomain(m *incmodels.EntidadModel) *domain.Entidad {
 		CreatedAt:              m.CreatedAt,
 		UpdatedAt:              m.UpdatedAt,
 	}
+}
+
+func toEstadoDocumentoDomain(m *incmodels.EstadoDocumentoModel) *domain.EstadoDocumento {
+	return &domain.EstadoDocumento{
+		IDEstadoDocumento: m.IDEstadoDocumento,
+		Nombre:            m.Nombre,
+		Descripcion:       m.Descripcion,
+		Color:             m.Color,
+		CreatedAt:         m.CreatedAt,
+		UpdatedAt:         m.UpdatedAt,
+	}
+}
+
+func toTipoDocumentoDomain(m *incmodels.TipoDocumentoModel) *domain.TipoDocumento {
+	return &domain.TipoDocumento{
+		IDTipoDocumento: m.IDTipoDocumento,
+		Nombre:          m.Nombre,
+		Descripcion:     m.Descripcion,
+		Requerido:       m.Requerido,
+		CreatedAt:       m.CreatedAt,
+		UpdatedAt:       m.UpdatedAt,
+	}
+}
+
+func toTipoPagoDomain(m *incmodels.TipoPagoModel) *domain.TipoPago {
+	return &domain.TipoPago{
+		IDTipoPago:  m.IDTipoPago,
+		Nombre:      m.Nombre,
+		Descripcion: m.Descripcion,
+		CreatedAt:   m.CreatedAt,
+		UpdatedAt:   m.CreatedAt,
+	}
+}
+
+func (r *IncapacidadRepository) FindTiposDocumentoByNombre(ctx context.Context, nombres []string) ([]domain.TipoDocumento, error) {
+	var models []incmodels.TipoDocumentoModel
+	query := r.db.WithContext(ctx).Where("nombre IN (?)", nombres)
+	if err := query.Find(&models).Error; err != nil {
+		return nil, err
+	}
+	items := make([]domain.TipoDocumento, 0, len(models))
+	for i := range models {
+		items = append(items, *toTipoDocumentoDomain(&models[i]))
+	}
+	return items, nil
 }

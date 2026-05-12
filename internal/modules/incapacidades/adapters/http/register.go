@@ -4,11 +4,11 @@ import (
 	"context"
 
 	authhttp "disability_system_backend/internal/modules/auth/adapters/http"
+	historialpostgres "disability_system_backend/internal/modules/historial/adapters/postgres"
+	historialdomain "disability_system_backend/internal/modules/historial/domain"
+	historialuc "disability_system_backend/internal/modules/historial/usecase"
 	inicapapostgres "disability_system_backend/internal/modules/incapacidades/adapters/postgres"
 	"disability_system_backend/internal/modules/incapacidades/usecase"
-	historialdomain "disability_system_backend/internal/modules/historial/domain"
-	historialpostgres "disability_system_backend/internal/modules/historial/adapters/postgres"
-	historialuc "disability_system_backend/internal/modules/historial/usecase"
 	"disability_system_backend/internal/shared/auth"
 	"disability_system_backend/internal/shared/router"
 	"disability_system_backend/internal/shared/storage"
@@ -23,7 +23,12 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 	historialRepo := historialpostgres.NewHistorialRepository(db)
 
 	incapacidadUseCase := usecase.NewIncapacidadUseCase(incapacidadRepo)
+
 	historialService := historialuc.NewHistorialService(historialRepo)
+	incapacidadUseCase.SetHistorialService(func(ctx context.Context, incapacidadID uint64, tipoID uint64, descripcion string, gestorID *uint64) error {
+		return historialService.CreateEntry(ctx, incapacidadID, tipoID, descripcion, gestorID)
+	})
+
 	documentoUseCase := usecase.NewDocumentoUseCase(documentoRepo, historialService)
 
 	incapacidadHandler := NewIncapacidadHandler(incapacidadUseCase)
@@ -49,11 +54,21 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 		group.POST("/:id/documentos", documentoHandler.Subir)
 		group.POST("/:id/documentos/url", documentoHandler.GenerarURLPrefirmada)
 		group.GET("/:id/historial", documentoHandler.ListarHistorial)
+		group.GET("/:id/plazos", incapacidadHandler.ObtenerPlazos)
+
+	group.GET("/tipos/:tipo_id/documentos-requeridos", incapacidadHandler.ObtenerDocumentosRequeridos)
 	}
 
 	docGroup := v1.Group("/documentos", jwtMiddleware.Authenticate(), permissionMiddleware.LoadActor())
 	{
 		docGroup.PATCH("/:id/validar", documentoHandler.Validar)
 		docGroup.DELETE("/:id", documentoHandler.Eliminar)
+	}
+
+	catalogosGroup := v1.Group("/catalogos", jwtMiddleware.Authenticate(), permissionMiddleware.LoadActor())
+	{
+		catalogosGroup.GET("/estados-documento", incapacidadHandler.ListarEstadosDocumento)
+		catalogosGroup.GET("/tipos-documento", incapacidadHandler.ListarTiposDocumento)
+		catalogosGroup.GET("/tipos-pago", incapacidadHandler.ListarTiposPago)
 	}
 }

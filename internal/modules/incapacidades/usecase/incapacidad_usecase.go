@@ -42,11 +42,21 @@ type ActualizarIncapacidadInput struct {
 }
 
 type IncapacidadUseCase struct {
-	repo ports.IncapacidadRepository
+	repo        ports.IncapacidadRepository
+	docService  *IncapacidadDocumentosService
+	historialFn func(ctx context.Context, incapacidadID uint64, tipoID uint64, descripcion string, gestorID *uint64) error
 }
 
 func NewIncapacidadUseCase(repo ports.IncapacidadRepository) *IncapacidadUseCase {
-	return &IncapacidadUseCase{repo: repo}
+	uc := &IncapacidadUseCase{
+		repo:       repo,
+		docService: NewIncapacidadDocumentosService(repo),
+	}
+	return uc
+}
+
+func (uc *IncapacidadUseCase) SetHistorialService(fn func(ctx context.Context, incapacidadID uint64, tipoID uint64, descripcion string, gestorID *uint64) error) {
+	uc.historialFn = fn
 }
 
 func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, input CrearIncapacidadInput) (*domain.Incapacidad, error) {
@@ -112,6 +122,17 @@ func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, inpu
 	if err := uc.repo.Create(ctx, incapacidad); err != nil {
 		return nil, err
 	}
+
+	if uc.historialFn != nil {
+		tipoIncapacidad, _ := uc.repo.FindTipoByID(ctx, input.IDTipo)
+		tipoNombre := ""
+		if tipoIncapacidad != nil {
+			tipoNombre = tipoIncapacidad.Nombre
+		}
+		descripcion := "Incapacidad creada - Tipo: " + tipoNombre
+		_ = uc.historialFn(ctx, incapacidad.IDIncapacidad, 1, descripcion, &actor.UserID)
+	}
+
 	return incapacidad, nil
 }
 
@@ -280,6 +301,93 @@ func (uc *IncapacidadUseCase) ListarEntidades(ctx context.Context, actor ports.A
 		return nil, apperrors.ErrForbidden.WithMessage("no tienes permiso para consultar catálogos")
 	}
 	return uc.repo.ListEntidades(ctx)
+}
+
+func (uc *IncapacidadUseCase) ListarEstadosDocumento(ctx context.Context, actor ports.Actor) ([]domain.EstadoDocumento, error) {
+	if !actor.HasPermission("consultar_incapacidad") {
+		return nil, apperrors.ErrForbidden.WithMessage("no tienes permiso para consultar catálogos")
+	}
+	return uc.repo.ListEstadosDocumento(ctx)
+}
+
+func (uc *IncapacidadUseCase) ListarTiposDocumento(ctx context.Context, actor ports.Actor) ([]domain.TipoDocumento, error) {
+	if !actor.HasPermission("consultar_incapacidad") {
+		return nil, apperrors.ErrForbidden.WithMessage("no tienes permiso para consultar catálogos")
+	}
+	return uc.repo.ListTiposDocumento(ctx)
+}
+
+func (uc *IncapacidadUseCase) ListarTiposPago(ctx context.Context, actor ports.Actor) ([]domain.TipoPago, error) {
+	if !actor.HasPermission("consultar_incapacidad") && !actor.HasPermission("registrar_pago") {
+		return nil, apperrors.ErrForbidden.WithMessage("no tienes permiso para consultar catálogos de pago")
+	}
+	return uc.repo.ListTiposPago(ctx)
+}
+
+func (uc *IncapacidadUseCase) ObtenerDocumentosRequeridos(ctx context.Context, actor ports.Actor, tipoID uint64) ([]domain.TipoDocumento, error) {
+	if !actor.HasPermission("consultar_incapacidad") {
+		return nil, apperrors.ErrForbidden.WithMessage("no tienes permiso para consultar catálogos")
+	}
+	return uc.docService.ObtenerDocumentosRequeridos(ctx, tipoID)
+}
+
+func (uc *IncapacidadUseCase) ObtenerInfoPlazos(ctx context.Context, actor ports.Actor, incapacidadID uint64) (*PlazosInfo, error) {
+	if !actor.HasPermission("consultar_incapacidad") {
+		return nil, apperrors.ErrForbidden.WithMessage("no tienes permiso para consultar incapacidades")
+	}
+	incapacidad, err := uc.repo.FindByID(ctx, incapacidadID)
+	if err != nil {
+		return nil, err
+	}
+
+	tipoIncapacidad, err := uc.repo.FindTipoByID(ctx, incapacidad.IDTipo)
+	if err != nil {
+		return nil, err
+	}
+
+	documentosRequeridos, err := uc.docService.ObtenerDocumentosRequeridos(ctx, incapacidad.IDTipo)
+	if err != nil {
+		return nil, err
+	}
+
+	plazoEntregaDias, _ := uc.docService.ObtenerPlazoEntrega(ctx, incapacidad.IDTipo, incapacidad.CanalRecepcion)
+	fechaLimiteEntrega, _ := uc.docService.ObtenerFechaLimiteEntrega(ctx, incapacidad.CreatedAt, incapacidad.IDTipo, incapacidad.CanalRecepcion)
+
+	plazoTranscripcionDias, _ := uc.docService.ObtenerPlazoTranscripcion(ctx, incapacidad.IDEntidad)
+	fechaLimiteTranscripcion, _ := uc.docService.ObtenerFechaLimiteTranscripcion(ctx, incapacidad.CreatedAt, incapacidad.IDEntidad)
+
+	tiempoMaximoPagoDias, _ := uc.docService.ObtenerTiempoMaximoPago(ctx, incapacidad.IDEntidad)
+	fechaLimitePago := incapacidad.FechaInicio.AddDate(0, 0, tiempoMaximoPagoDias)
+
+	alertas := uc.docService.ObtenerAlertasVencimientos(incapacidad.FechaInicio)
+
+	return &PlazosInfo{
+		IncapacidadID:          incapacidad.IDIncapacidad,
+		TipoIncapacidad:        tipoIncapacidad.Nombre,
+		DocumentosRequeridos:   documentosRequeridos,
+		PlazoEntregaDias:      plazoEntregaDias,
+		FechaLimiteEntrega:    fechaLimiteEntrega,
+		PlazoTranscripcionDias: plazoTranscripcionDias,
+		FechaLimiteTranscripcion: fechaLimiteTranscripcion,
+		TiempoMaximoPagoDias:   tiempoMaximoPagoDias,
+		FechaLimitePago:       fechaLimitePago,
+		DiasTranscurridos:      uc.docService.ObtenerDiasTranscurridos(incapacidad.FechaInicio),
+		AlertasVencimientos:   alertas,
+	}, nil
+}
+
+type PlazosInfo struct {
+	IncapacidadID            uint64
+	TipoIncapacidad          string
+	DocumentosRequeridos     []domain.TipoDocumento
+	PlazoEntregaDias         int
+	FechaLimiteEntrega       time.Time
+	PlazoTranscripcionDias   int
+	FechaLimiteTranscripcion time.Time
+	TiempoMaximoPagoDias     int
+	FechaLimitePago          time.Time
+	DiasTranscurridos        int
+	AlertasVencimientos      []string
 }
 
 func (uc *IncapacidadUseCase) ensureReferences(ctx context.Context, userID, tipoID, entidadID uint64) error {

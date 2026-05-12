@@ -105,6 +105,44 @@ func ToEntidadResponses(items []domain.Entidad) []dto.EntidadResponse {
 	return responses
 }
 
+func ToEstadoDocumentoResponses(items []domain.EstadoDocumento) []dto.EstadoDocumentoResponse {
+	responses := make([]dto.EstadoDocumentoResponse, 0, len(items))
+	for _, item := range items {
+		responses = append(responses, dto.EstadoDocumentoResponse{
+			IDEstadoDocumento: item.IDEstadoDocumento,
+			Nombre:            item.Nombre,
+			Descripcion:       item.Descripcion,
+			Color:             item.Color,
+		})
+	}
+	return responses
+}
+
+func ToTipoDocumentoResponses(items []domain.TipoDocumento) []dto.TipoDocumentoResponse {
+	responses := make([]dto.TipoDocumentoResponse, 0, len(items))
+	for _, item := range items {
+		responses = append(responses, dto.TipoDocumentoResponse{
+			IDTipoDocumento: item.IDTipoDocumento,
+			Nombre:          item.Nombre,
+			Descripcion:     item.Descripcion,
+			Requerido:       item.Requerido,
+		})
+	}
+	return responses
+}
+
+func ToTipoPagoResponses(items []domain.TipoPago) []dto.TipoPagoResponse {
+	responses := make([]dto.TipoPagoResponse, 0, len(items))
+	for _, item := range items {
+		responses = append(responses, dto.TipoPagoResponse{
+			IDTipoPago:  item.IDTipoPago,
+			Nombre:      item.Nombre,
+			Descripcion: item.Descripcion,
+		})
+	}
+	return responses
+}
+
 func formatDatePtr(t *time.Time) *string {
 	if t == nil {
 		return nil

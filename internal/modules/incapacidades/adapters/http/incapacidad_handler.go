@@ -250,6 +250,116 @@ func (h *IncapacidadHandler) ListarEntidades(c *gin.Context) {
 	response.Success(c, mapper.ToEntidadResponses(items), "entidades")
 }
 
+func (h *IncapacidadHandler) ListarEstadosDocumento(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	items, err := h.useCase.ListarEstadosDocumento(c.Request.Context(), actor)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	response.Success(c, mapper.ToEstadoDocumentoResponses(items), "estados de documento")
+}
+
+func (h *IncapacidadHandler) ListarTiposDocumento(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	items, err := h.useCase.ListarTiposDocumento(c.Request.Context(), actor)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	response.Success(c, mapper.ToTipoDocumentoResponses(items), "tipos de documento")
+}
+
+func (h *IncapacidadHandler) ListarTiposPago(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	items, err := h.useCase.ListarTiposPago(c.Request.Context(), actor)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	response.Success(c, mapper.ToTipoPagoResponses(items), "tipos de pago")
+}
+
+func (h *IncapacidadHandler) ObtenerDocumentosRequeridos(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	tipoID, err := parseIDParam(c, "tipo_id")
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	items, err := h.useCase.ObtenerDocumentosRequeridos(c.Request.Context(), actor, tipoID)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	response.Success(c, mapper.ToTipoDocumentoResponses(items), "documentos requeridos")
+}
+
+func (h *IncapacidadHandler) ObtenerPlazos(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	incapacidadID, err := parseIDParam(c, "id")
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	info, err := h.useCase.ObtenerInfoPlazos(c.Request.Context(), actor, incapacidadID)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	var docsRequeridos []dto.TipoDocumentoResponse
+	for _, doc := range info.DocumentosRequeridos {
+		docsRequeridos = append(docsRequeridos, dto.TipoDocumentoResponse{
+			IDTipoDocumento: doc.IDTipoDocumento,
+			Nombre:          doc.Nombre,
+			Descripcion:     doc.Descripcion,
+			Requerido:       doc.Requerido,
+		})
+	}
+
+	var alertas []string
+	if len(info.AlertasVencimientos) > 0 {
+		alertas = info.AlertasVencimientos
+	}
+
+	response.Success(c, gin.H{
+		"id_incapacidad":               info.IncapacidadID,
+		"tipo_incapacidad":             info.TipoIncapacidad,
+		"documentos_requeridos":        docsRequeridos,
+		"plazo_entrega_dias":          info.PlazoEntregaDias,
+		"fecha_limite_entrega":        info.FechaLimiteEntrega.Format("2006-01-02"),
+		"plazo_transcripcion_dias":    info.PlazoTranscripcionDias,
+		"fecha_limite_transcripcion":  info.FechaLimiteTranscripcion.Format("2006-01-02"),
+		"tiempo_maximo_pago_dias":     info.TiempoMaximoPagoDias,
+		"fecha_limite_pago":           info.FechaLimitePago.Format("2006-01-02"),
+		"dias_transcurridos":          info.DiasTranscurridos,
+		"alertas_vencimiento":          alertas,
+	}, "información de plazos obtenida")
+}
+
 func parseIDParam(c *gin.Context, name string) (uint64, error) {
 	id, err := strconv.ParseUint(c.Param(name), 10, 64)
 	if err != nil || id == 0 {

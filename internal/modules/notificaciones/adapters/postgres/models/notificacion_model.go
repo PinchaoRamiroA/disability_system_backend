@@ -9,7 +9,7 @@ type NotificacionModel struct {
 
 	IDIncapacidad *uint64 `gorm:"column:id_incapacidad;index"`
 
-	IDTipoNotificacion uint64 `gorm:"not null;column:id_tipo_notificacion;index"`
+	TipoNotificacion string `gorm:"type:varchar(100);not null;column:tipo_notificacion;index"`
 
 	Mensaje string `gorm:"type:text;not null;column:mensaje"`
 
