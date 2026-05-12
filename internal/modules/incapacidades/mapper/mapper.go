@@ -150,3 +150,18 @@ func formatDatePtr(t *time.Time) *string {
 	formatted := t.Format(dateLayout)
 	return &formatted
 }
+
+func ToIncapacidadTranscripcionResponse(i *domain.Incapacidad, alerta *string) dto.IncapacidadTranscripcionResponse {
+	resp := dto.IncapacidadTranscripcionResponse{
+		IDIncapacidad:              i.IDIncapacidad,
+		Titulo:                    i.Titulo,
+		FechaInicio:               i.FechaInicio.Format(dateLayout),
+		EstadoTranscripcion:       i.EstadoTranscripcion,
+		FechaLimiteTranscripcion:  formatDatePtr(i.FechaLimiteTranscripcion),
+		FechaTranscripcion:        formatDatePtr(i.FechaTranscripcion),
+		TranscritoPor:             i.TranscritoPor,
+		ObservacionesTranscripcion: i.ObservacionesTranscripcion,
+		AlertaVencimiento:         alerta,
+	}
+	return resp
+}

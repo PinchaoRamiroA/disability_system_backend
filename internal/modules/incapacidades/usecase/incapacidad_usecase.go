@@ -123,6 +123,12 @@ func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, inpu
 		FechaPago:       fechaPago,
 		Observaciones:   input.Observaciones,
 		CreatedBy:       &actor.UserID,
+		EstadoTranscripcion: "pendiente",
+	}
+
+	fechaLimiteTrans, err := uc.docService.ObtenerFechaLimiteTranscripcion(ctx, time.Now(), input.IDEntidad)
+	if err == nil {
+		incapacidad.FechaLimiteTranscripcion = &fechaLimiteTrans
 	}
 	if err := uc.repo.Create(ctx, incapacidad); err != nil {
 		return nil, err

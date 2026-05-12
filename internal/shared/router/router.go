@@ -11,6 +11,12 @@ import (
 	"gorm.io/gorm"
 )
 
+// @title Sistema de Gestión de Incapacidades
+// @version 1.0
+// @description API REST para la gestión de incapacidades médicas, cobro a EPS/ARL y seguimiento documental
+// @BasePath /api/v1
+// @schemes http https
+
 type Router struct {
 	engine *gin.Engine
 	config *config.Config

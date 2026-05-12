@@ -62,3 +62,15 @@ type TipoPagoResponse struct {
 	Nombre      string  `json:"nombre"`
 	Descripcion *string `json:"descripcion,omitempty"`
 }
+
+type IncapacidadTranscripcionResponse struct {
+	IDIncapacidad              uint64  `json:"id_incapacidad"`
+	Titulo                    string  `json:"titulo"`
+	FechaInicio               string  `json:"fecha_inicio"`
+	EstadoTranscripcion       string  `json:"estado_transcripcion"`
+	FechaLimiteTranscripcion  *string `json:"fecha_limite_transcripcion,omitempty"`
+	FechaTranscripcion         *string `json:"fecha_transcripcion,omitempty"`
+	TranscritoPor              *uint64 `json:"transcrito_por,omitempty"`
+	ObservacionesTranscripcion *string `json:"observaciones_transcripcion,omitempty"`
+	AlertaVencimiento         *string `json:"alerta_vencimiento,omitempty"`
+}

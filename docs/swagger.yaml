@@ -1,0 +1,351 @@
+definitions:
+  disability_system_backend_internal_modules_auth_dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  disability_system_backend_internal_modules_auth_dto.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+      user:
+        $ref: '#/definitions/disability_system_backend_internal_modules_auth_dto.UserResponse'
+    type: object
+  disability_system_backend_internal_modules_auth_dto.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  disability_system_backend_internal_modules_auth_dto.RegisterRequest:
+    properties:
+      direccion:
+        type: string
+      email:
+        type: string
+      nombre:
+        maxLength: 150
+        minLength: 2
+        type: string
+      numero_celular:
+        type: string
+      numero_documento:
+        minLength: 5
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - nombre
+    - numero_documento
+    - password
+    type: object
+  disability_system_backend_internal_modules_auth_dto.RoleResponse:
+    properties:
+      id:
+        type: integer
+      nombre:
+        type: string
+      permisos:
+        items:
+          type: string
+        type: array
+    type: object
+  disability_system_backend_internal_modules_auth_dto.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+    type: object
+  disability_system_backend_internal_modules_auth_dto.UserResponse:
+    properties:
+      correo:
+        type: string
+      created_at:
+        type: string
+      direccion:
+        type: string
+      estado:
+        type: boolean
+      id:
+        type: integer
+      nombre:
+        type: string
+      numero_celular:
+        type: string
+      numero_documento:
+        type: string
+      rol:
+        $ref: '#/definitions/disability_system_backend_internal_modules_auth_dto.RoleResponse'
+    type: object
+  disability_system_backend_internal_modules_incapacidades_dto.MarcarTranscripcionRequest:
+    properties:
+      estado:
+        enum:
+        - en_proceso
+        - completado
+        type: string
+    required:
+    - estado
+    type: object
+  disability_system_backend_internal_modules_incapacidades_dto.TranscribirIncapacidadRequest:
+    properties:
+      observaciones_transcripcion:
+        type: string
+    type: object
+  disability_system_backend_internal_shared_response.ErrorInfo:
+    properties:
+      code:
+        type: string
+      details: {}
+    type: object
+  disability_system_backend_internal_shared_response.Response:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/disability_system_backend_internal_shared_response.ErrorInfo'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica un usuario y devuelve tokens de acceso
+      parameters:
+      - description: Credenciales de login
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_auth_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/disability_system_backend_internal_modules_auth_dto.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+      summary: Iniciar sesión
+      tags:
+      - auth
+  /api/v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Obtiene nuevos tokens usando un refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_auth_dto.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/disability_system_backend_internal_modules_auth_dto.TokenResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+      summary: Renovar token
+      tags:
+      - auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo usuario en el sistema
+      parameters:
+      - description: Datos del usuario
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_auth_dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/disability_system_backend_internal_modules_auth_dto.UserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+      summary: Registrar usuario
+      tags:
+      - auth
+  /incapacidades/{id}/transcribir:
+    post:
+      consumes:
+      - application/json
+      description: Registra la transcripción de una incapacidad ante la EPS/ARL
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos de transcripción
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_incapacidades_dto.TranscribirIncapacidadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: transcripción registrada exitosamente
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+      security:
+      - BearerAuth: []
+      summary: Registrar transcripción EPS/ARL
+      tags:
+      - incapacidades
+  /incapacidades/{id}/transcripcion:
+    patch:
+      consumes:
+      - application/json
+      description: Marca el estado de transcripción de una incapacidad como 'en_proceso'
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Estado de transcripción
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_incapacidades_dto.MarcarTranscripcionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: estado actualizado
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/disability_system_backend_internal_shared_response.Response'
+      security:
+      - BearerAuth: []
+      summary: Marcar transcripción en proceso
+      tags:
+      - incapacidades
+  /incapacidades/transcripciones/pendientes:
+    get:
+      consumes:
+      - application/json
+      description: Lista las incapacidades con transcripción pendiente
+      parameters:
+      - description: Estado de transcripción (pendiente, en_proceso, completado, vencida)
+        in: query
+        name: estado
+        type: string
+      - default: 1
+        description: Número de página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite de resultados
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar transcripciones pendientes
+      tags:
+      - incapacidades
+swagger: "2.0"

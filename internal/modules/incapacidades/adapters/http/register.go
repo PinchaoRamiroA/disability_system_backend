@@ -41,6 +41,8 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 	documentoHandler := NewDocumentoHandler(documentoUseCase, func(incapacidadID uint64, tipoID *uint64, page, limit int) ([]historialdomain.Historial, int64, error) {
 		return historialService.List(context.Background(), incapacidadID, tipoID, page, limit)
 	}, storageService)
+	transcripcionUseCase := usecase.NewTranscripcionUseCase(incapacidadRepo)
+	transcripcionHandler := NewTranscripcionHandler(transcripcionUseCase)
 
 	jwtMiddleware := authhttp.NewJWTMiddleware(jwtService)
 	permissionMiddleware := NewPermissionMiddleware(permissionRepo)
@@ -63,6 +65,10 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 		group.GET("/:id/plazos", incapacidadHandler.ObtenerPlazos)
 
 		group.GET("/tipos/:tipo_id/documentos-requeridos", incapacidadHandler.ObtenerDocumentosRequeridos)
+
+		group.POST("/:id/transcribir", transcripcionHandler.Transcribir)
+		group.PATCH("/:id/transcripcion", transcripcionHandler.MarcarEnProceso)
+		group.GET("/transcripciones/pendientes", transcripcionHandler.ListarPendientes)
 	}
 
 	docGroup := v1.Group("/documentos", jwtMiddleware.Authenticate(), permissionMiddleware.LoadActor())
