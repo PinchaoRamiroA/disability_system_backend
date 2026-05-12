@@ -42,9 +42,10 @@ type ActualizarIncapacidadInput struct {
 }
 
 type IncapacidadUseCase struct {
-	repo        ports.IncapacidadRepository
-	docService  *IncapacidadDocumentosService
-	historialFn func(ctx context.Context, incapacidadID uint64, tipoID uint64, descripcion string, gestorID *uint64) error
+	repo             ports.IncapacidadRepository
+	docService       *IncapacidadDocumentosService
+	historialFn      func(ctx context.Context, incapacidadID uint64, tipoID uint64, descripcion string, gestorID *uint64) error
+	faltanteNotifier ports.DocumentoFaltanteNotifier
 }
 
 func NewIncapacidadUseCase(repo ports.IncapacidadRepository) *IncapacidadUseCase {
@@ -57,6 +58,10 @@ func NewIncapacidadUseCase(repo ports.IncapacidadRepository) *IncapacidadUseCase
 
 func (uc *IncapacidadUseCase) SetHistorialService(fn func(ctx context.Context, incapacidadID uint64, tipoID uint64, descripcion string, gestorID *uint64) error) {
 	uc.historialFn = fn
+}
+
+func (uc *IncapacidadUseCase) SetDocumentoFaltanteNotifier(notifier ports.DocumentoFaltanteNotifier) {
+	uc.faltanteNotifier = notifier
 }
 
 func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, input CrearIncapacidadInput) (*domain.Incapacidad, error) {
@@ -132,8 +137,29 @@ func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, inpu
 		descripcion := "Incapacidad creada - Tipo: " + tipoNombre
 		_ = uc.historialFn(ctx, incapacidad.IDIncapacidad, 1, descripcion, &actor.UserID)
 	}
+	uc.notificarDocumentosFaltantesIniciales(ctx, incapacidad)
 
 	return incapacidad, nil
+}
+
+func (uc *IncapacidadUseCase) notificarDocumentosFaltantesIniciales(ctx context.Context, incapacidad *domain.Incapacidad) {
+	if uc.faltanteNotifier == nil || uc.docService == nil {
+		return
+	}
+	requeridos, err := uc.docService.ObtenerDocumentosRequeridos(ctx, incapacidad.IDTipo)
+	if err != nil {
+		return
+	}
+	faltantes := make([]domain.TipoDocumento, 0, len(requeridos))
+	for _, documento := range requeridos {
+		if documento.Requerido {
+			faltantes = append(faltantes, documento)
+		}
+	}
+	if len(faltantes) == 0 {
+		return
+	}
+	_ = uc.faltanteNotifier.NotificarDocumentosFaltantes(ctx, incapacidad.IDUsuario, incapacidad.IDIncapacidad, faltantes)
 }
 
 func (uc *IncapacidadUseCase) Obtener(ctx context.Context, actor ports.Actor, id uint64) (*domain.Incapacidad, error) {
@@ -362,17 +388,17 @@ func (uc *IncapacidadUseCase) ObtenerInfoPlazos(ctx context.Context, actor ports
 	alertas := uc.docService.ObtenerAlertasVencimientos(incapacidad.FechaInicio)
 
 	return &PlazosInfo{
-		IncapacidadID:          incapacidad.IDIncapacidad,
-		TipoIncapacidad:        tipoIncapacidad.Nombre,
-		DocumentosRequeridos:   documentosRequeridos,
-		PlazoEntregaDias:      plazoEntregaDias,
-		FechaLimiteEntrega:    fechaLimiteEntrega,
-		PlazoTranscripcionDias: plazoTranscripcionDias,
+		IncapacidadID:            incapacidad.IDIncapacidad,
+		TipoIncapacidad:          tipoIncapacidad.Nombre,
+		DocumentosRequeridos:     documentosRequeridos,
+		PlazoEntregaDias:         plazoEntregaDias,
+		FechaLimiteEntrega:       fechaLimiteEntrega,
+		PlazoTranscripcionDias:   plazoTranscripcionDias,
 		FechaLimiteTranscripcion: fechaLimiteTranscripcion,
-		TiempoMaximoPagoDias:   tiempoMaximoPagoDias,
-		FechaLimitePago:       fechaLimitePago,
-		DiasTranscurridos:      uc.docService.ObtenerDiasTranscurridos(incapacidad.FechaInicio),
-		AlertasVencimientos:   alertas,
+		TiempoMaximoPagoDias:     tiempoMaximoPagoDias,
+		FechaLimitePago:          fechaLimitePago,
+		DiasTranscurridos:        uc.docService.ObtenerDiasTranscurridos(incapacidad.FechaInicio),
+		AlertasVencimientos:      alertas,
 	}, nil
 }
 

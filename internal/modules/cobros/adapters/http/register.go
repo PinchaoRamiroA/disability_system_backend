@@ -33,4 +33,13 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService) {
 		group.GET("/seguimientos/:id", cobroHandler.ObtenerSeguimiento)
 		group.PUT("/seguimientos/:id", cobroHandler.ActualizarSeguimiento)
 	}
+
+	carteraGroup := v1.Group("/cartera", jwtMiddleware.Authenticate(), permissionMiddleware.LoadActor())
+	{
+		carteraGroup.GET("/estadisticas", cobroHandler.ObtenerEstadisticas)
+		carteraGroup.GET("/resumen-entidad", cobroHandler.ObtenerResumenEntidad)
+		carteraGroup.GET("/alertas-vencimiento", cobroHandler.ObtenerAlertasVencimiento)
+		carteraGroup.GET("/vencida", cobroHandler.ObtenerCarteraVencida)
+		carteraGroup.GET("/incapacidades/:id/proximo-estado", cobroHandler.ObtenerProximoEstado)
+	}
 }

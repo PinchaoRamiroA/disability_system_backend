@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
 
 	incmodels "disability_system_backend/internal/modules/incapacidades/adapters/postgres/models"
 	"disability_system_backend/internal/modules/incapacidades/domain"
@@ -394,19 +395,47 @@ func toTipoPagoDomain(m *incmodels.TipoPagoModel) *domain.TipoPago {
 		Nombre:      m.Nombre,
 		Descripcion: m.Descripcion,
 		CreatedAt:   m.CreatedAt,
-		UpdatedAt:   m.CreatedAt,
+		UpdatedAt:   m.UpdatedAt,
 	}
 }
 
 func (r *IncapacidadRepository) FindTiposDocumentoByNombre(ctx context.Context, nombres []string) ([]domain.TipoDocumento, error) {
+	if len(nombres) == 0 {
+		return []domain.TipoDocumento{}, nil
+	}
 	var models []incmodels.TipoDocumentoModel
-	query := r.db.WithContext(ctx).Where("nombre IN (?)", nombres)
-	if err := query.Find(&models).Error; err != nil {
+	if err := r.db.WithContext(ctx).Find(&models).Error; err != nil {
 		return nil, err
+	}
+	required := make(map[string]bool, len(nombres))
+	for _, nombre := range nombres {
+		required[normalizeDocumentName(nombre)] = true
 	}
 	items := make([]domain.TipoDocumento, 0, len(models))
 	for i := range models {
-		items = append(items, *toTipoDocumentoDomain(&models[i]))
+		if required[normalizeDocumentName(models[i].Nombre)] {
+			items = append(items, *toTipoDocumentoDomain(&models[i]))
+		}
 	}
 	return items, nil
+}
+
+func normalizeDocumentName(value string) string {
+	normalized := strings.ToLower(strings.TrimSpace(value))
+	replacements := map[string]string{
+		"á": "a",
+		"é": "e",
+		"í": "i",
+		"ó": "o",
+		"ú": "u",
+		"ñ": "n",
+	}
+	for old, newValue := range replacements {
+		normalized = strings.ReplaceAll(normalized, old, newValue)
+	}
+	normalized = strings.ReplaceAll(normalized, " de ", " ")
+	normalized = strings.ReplaceAll(normalized, "-", " ")
+	normalized = strings.ReplaceAll(normalized, "_", " ")
+	normalized = strings.Join(strings.Fields(normalized), "_")
+	return normalized
 }

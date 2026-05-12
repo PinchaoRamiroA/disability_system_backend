@@ -9,6 +9,8 @@ import (
 	historialuc "disability_system_backend/internal/modules/historial/usecase"
 	inicapapostgres "disability_system_backend/internal/modules/incapacidades/adapters/postgres"
 	"disability_system_backend/internal/modules/incapacidades/usecase"
+	notificacionespostgres "disability_system_backend/internal/modules/notificaciones/adapters/postgres"
+	notificacionesuc "disability_system_backend/internal/modules/notificaciones/usecase"
 	"disability_system_backend/internal/shared/auth"
 	"disability_system_backend/internal/shared/router"
 	"disability_system_backend/internal/shared/storage"
@@ -21,8 +23,11 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 	documentoRepo := inicapapostgres.NewDocumentoRepository(db)
 	permissionRepo := inicapapostgres.NewPermissionRepository(db)
 	historialRepo := historialpostgres.NewHistorialRepository(db)
+	notificacionRepo := notificacionespostgres.NewNotificacionRepository(db)
+	documentoFaltanteNotifier := notificacionesuc.NewDocumentoFaltanteNotifier(notificacionRepo)
 
 	incapacidadUseCase := usecase.NewIncapacidadUseCase(incapacidadRepo)
+	incapacidadUseCase.SetDocumentoFaltanteNotifier(documentoFaltanteNotifier)
 
 	historialService := historialuc.NewHistorialService(historialRepo)
 	incapacidadUseCase.SetHistorialService(func(ctx context.Context, incapacidadID uint64, tipoID uint64, descripcion string, gestorID *uint64) error {
@@ -30,6 +35,7 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 	})
 
 	documentoUseCase := usecase.NewDocumentoUseCase(documentoRepo, historialService)
+	documentoUseCase.SetDocumentoFaltanteNotifier(incapacidadRepo, documentoFaltanteNotifier)
 
 	incapacidadHandler := NewIncapacidadHandler(incapacidadUseCase)
 	documentoHandler := NewDocumentoHandler(documentoUseCase, func(incapacidadID uint64, tipoID *uint64, page, limit int) ([]historialdomain.Historial, int64, error) {
@@ -56,7 +62,7 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 		group.GET("/:id/historial", documentoHandler.ListarHistorial)
 		group.GET("/:id/plazos", incapacidadHandler.ObtenerPlazos)
 
-	group.GET("/tipos/:tipo_id/documentos-requeridos", incapacidadHandler.ObtenerDocumentosRequeridos)
+		group.GET("/tipos/:tipo_id/documentos-requeridos", incapacidadHandler.ObtenerDocumentosRequeridos)
 	}
 
 	docGroup := v1.Group("/documentos", jwtMiddleware.Authenticate(), permissionMiddleware.LoadActor())

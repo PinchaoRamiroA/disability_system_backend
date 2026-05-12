@@ -267,6 +267,95 @@ func (h *CobroHandler) ActualizarSeguimiento(c *gin.Context) {
 	response.Success(c, mapper.ToSeguimientoResponse(seguimiento), "seguimiento actualizado")
 }
 
+func (h *CobroHandler) ObtenerEstadisticas(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	estadisticas, err := h.useCase.ObtenerEstadisticasGenerales(c.Request.Context(), actor)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	response.Success(c, estadisticas, "estadísticas de cartera")
+}
+
+func (h *CobroHandler) ObtenerResumenEntidad(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	resumen, err := h.useCase.ObtenerResumenPorEntidad(c.Request.Context(), actor)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	response.Success(c, resumen, "resumen por entidad")
+}
+
+func (h *CobroHandler) ObtenerAlertasVencimiento(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	var query struct {
+		DiasMinimos int `form:"dias_minimos,default=0"`
+	}
+	if err := c.ShouldBindQuery(&query); err != nil {
+		response.ValidationError(c, "parámetros inválidos", err.Error())
+		return
+	}
+	alertas, err := h.useCase.ObtenerAlertasVencimiento(c.Request.Context(), actor, query.DiasMinimos)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	response.Success(c, alertas, "alertas de vencimiento")
+}
+
+func (h *CobroHandler) ObtenerCarteraVencida(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	pagos, err := h.useCase.ObtenerCarteraVencida(c.Request.Context(), actor)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	response.Success(c, mapper.ToPagoResponses(pagos), "cartera vencida")
+}
+
+func (h *CobroHandler) ObtenerProximoEstado(c *gin.Context) {
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	incapacidadID, err := parseIDParam(c, "id")
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	var req struct {
+		Accion string `json:"accion" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.ValidationError(c, "datos inválidos", err.Error())
+		return
+	}
+	estado, err := h.useCase.ObtenerProximoEstadoIncapacidad(c.Request.Context(), actor, incapacidadID, req.Accion)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	response.Success(c, gin.H{"proximo_estado": estado}, "próximo estado sugerido")
+}
+
 func actorFromGin(c *gin.Context) (ports.Actor, error) {
 	actorValue, exists := c.Get("actor")
 	if !exists {

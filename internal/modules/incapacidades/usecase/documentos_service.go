@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"disability_system_backend/internal/modules/incapacidades/domain"
@@ -14,11 +15,11 @@ const (
 )
 
 type DocumentosRequeridosResult struct {
-	Requeridos        []domain.TipoDocumento
-	Faltantes        []domain.TipoDocumento
-	TodosPresentes   bool
+	Requeridos         []domain.TipoDocumento
+	Faltantes          []domain.TipoDocumento
+	TodosPresentes     bool
 	FechaLimiteEntrega time.Time
-	DiasRestantes    int
+	DiasRestantes      int
 }
 
 type IncapacidadDocumentosService struct {
@@ -60,20 +61,20 @@ func (s *IncapacidadDocumentosService) ValidarDocumentosRequeridos(ctx context.C
 
 	cargadosMap := make(map[string]bool)
 	for _, doc := range documentosCargados {
-		cargadosMap[doc.Tipo] = true
+		cargadosMap[normalizeDocumentKey(doc.Tipo)] = true
 	}
 
 	var faltantes []domain.TipoDocumento
 	for _, req := range requeridos {
-		if req.Requerido && !cargadosMap[req.Nombre] {
+		if req.Requerido && !cargadosMap[normalizeDocumentKey(req.Nombre)] {
 			faltantes = append(faltantes, req)
 		}
 	}
 
 	result := &DocumentosRequeridosResult{
-		Requeridos:      requeridos,
-		Faltantes:       faltantes,
-		TodosPresentes:  len(faltantes) == 0,
+		Requeridos:     requeridos,
+		Faltantes:      faltantes,
+		TodosPresentes: len(faltantes) == 0,
 	}
 
 	return result, nil
@@ -137,18 +138,18 @@ func (s *IncapacidadDocumentosService) VerificarEstadoTransicion(ctx context.Con
 	validTransitions := map[string][]string{
 		"Recibida":                 {"En validación documental", "Pendiente transcripción", "Documentación incompleta", "Archivada"},
 		"En validación documental": {"Documentación incompleta", "Pendiente transcripción", "Rechazada", "Archivada"},
-		"Documentación incompleta":  {"En validación documental", "Pendiente transcripción", "Rechazada", "Archivada"},
+		"Documentación incompleta": {"En validación documental", "Pendiente transcripción", "Rechazada", "Archivada"},
 		"Pendiente transcripción":  {"Transcrita", "Rechazada", "Archivada"},
-		"Transcrita":              {"En verificación EPS", "Rechazada", "Archivada"},
-		"En verificación EPS":     {"Aprobada", "Rechazada", "Archivada"},
-		"Aprobada":                {"Cobrada", "Rechazada", "Archivada"},
-		"Cobrada":                 {"Pendiente pago", "Rechazada", "Archivada"},
-		"Pendiente pago":          {"Pagada", "Cobro persuasivo", "Cobro jurídico", "Rechazada", "Archivada"},
-		"Pagada":                  {"En conciliación", "Archivada"},
-		"En conciliación":         {"Conciliada", "Archivada"},
-		"Conciliada":              {"Archivada", "Cerrada"},
-		"Cobro persuasivo":        {"Cobro jurídico", "Pagada", "Archivada"},
-		"Cobro jurídico":          {"Pagada", "Rechazada", "Archivada"},
+		"Transcrita":               {"En verificación EPS", "Rechazada", "Archivada"},
+		"En verificación EPS":      {"Aprobada", "Rechazada", "Archivada"},
+		"Aprobada":                 {"Cobrada", "Rechazada", "Archivada"},
+		"Cobrada":                  {"Pendiente pago", "Rechazada", "Archivada"},
+		"Pendiente pago":           {"Pagada", "Cobro persuasivo", "Cobro jurídico", "Rechazada", "Archivada"},
+		"Pagada":                   {"En conciliación", "Archivada"},
+		"En conciliación":          {"Conciliada", "Archivada"},
+		"Conciliada":               {"Archivada", "Cerrada"},
+		"Cobro persuasivo":         {"Cobro jurídico", "Pagada", "Archivada"},
+		"Cobro jurídico":           {"Pagada", "Rechazada", "Archivada"},
 	}
 
 	if currentState, ok := validTransitions[incapacidad.Estado.Nombre]; ok {
@@ -177,7 +178,7 @@ func (s *IncapacidadDocumentosService) ObtenerAlertasVencimientos(fechaInicio ti
 	dias := s.ObtenerDiasTranscurridos(fechaInicio)
 
 	limites := []struct {
-		dias   int
+		dias    int
 		mensaje string
 	}{
 		{90, "Alerta: Incapacidad supera 90 días"},
@@ -193,4 +194,24 @@ func (s *IncapacidadDocumentosService) ObtenerAlertasVencimientos(fechaInicio ti
 	}
 
 	return alertas
+}
+
+func normalizeDocumentKey(value string) string {
+	normalized := strings.ToLower(strings.TrimSpace(value))
+	replacements := map[string]string{
+		"á": "a",
+		"é": "e",
+		"í": "i",
+		"ó": "o",
+		"ú": "u",
+		"ñ": "n",
+	}
+	for old, newValue := range replacements {
+		normalized = strings.ReplaceAll(normalized, old, newValue)
+	}
+	normalized = strings.ReplaceAll(normalized, " de ", " ")
+	normalized = strings.ReplaceAll(normalized, "-", " ")
+	normalized = strings.ReplaceAll(normalized, "_", " ")
+	normalized = strings.Join(strings.Fields(normalized), "_")
+	return normalized
 }

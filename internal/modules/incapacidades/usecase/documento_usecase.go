@@ -10,12 +10,21 @@ import (
 )
 
 type DocumentoUseCase struct {
-	repo          ports.DocumentoRepository
-	historialSvc  ports.HistorialService
+	repo             ports.DocumentoRepository
+	historialSvc     ports.HistorialService
+	incapacidadRepo  ports.IncapacidadRepository
+	docService       *IncapacidadDocumentosService
+	faltanteNotifier ports.DocumentoFaltanteNotifier
 }
 
 func NewDocumentoUseCase(repo ports.DocumentoRepository, historialSvc ports.HistorialService) *DocumentoUseCase {
 	return &DocumentoUseCase{repo: repo, historialSvc: historialSvc}
+}
+
+func (uc *DocumentoUseCase) SetDocumentoFaltanteNotifier(incapacidadRepo ports.IncapacidadRepository, notifier ports.DocumentoFaltanteNotifier) {
+	uc.incapacidadRepo = incapacidadRepo
+	uc.docService = NewIncapacidadDocumentosService(incapacidadRepo)
+	uc.faltanteNotifier = notifier
 }
 
 func (uc *DocumentoUseCase) Subir(ctx context.Context, actor ports.Actor, input struct {
@@ -52,6 +61,7 @@ func (uc *DocumentoUseCase) Subir(ctx context.Context, actor ports.Actor, input 
 
 	descripcion := "Documento '" + input.Nombre + "' subido al sistema"
 	uc.historialSvc.CreateEntry(ctx, input.IDIncapacidad, 1, descripcion, &actor.UserID)
+	uc.notificarDocumentosFaltantes(ctx, input.IDIncapacidad)
 
 	return documento, nil
 }
@@ -86,6 +96,7 @@ func (uc *DocumentoUseCase) Validar(ctx context.Context, actor ports.Actor, id u
 		descripcion += ": " + comentario
 	}
 	uc.historialSvc.CreateEntry(ctx, documento.IDIncapacidad, 1, descripcion, &actor.UserID)
+	uc.notificarDocumentosFaltantes(ctx, documento.IDIncapacidad)
 
 	return documento, nil
 }
@@ -101,5 +112,32 @@ func (uc *DocumentoUseCase) Eliminar(ctx context.Context, actor ports.Actor, id 
 	if !actor.HasPermission("editar_incapacidad") {
 		return apperrors.ErrForbidden.WithMessage("no tienes permiso para eliminar documentos")
 	}
-	return uc.repo.Delete(ctx, id)
+	documento, err := uc.repo.FindByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if err := uc.repo.Delete(ctx, id); err != nil {
+		return err
+	}
+	uc.notificarDocumentosFaltantes(ctx, documento.IDIncapacidad)
+	return nil
+}
+
+func (uc *DocumentoUseCase) notificarDocumentosFaltantes(ctx context.Context, incapacidadID uint64) {
+	if uc.incapacidadRepo == nil || uc.docService == nil || uc.faltanteNotifier == nil {
+		return
+	}
+	incapacidad, err := uc.incapacidadRepo.FindByID(ctx, incapacidadID)
+	if err != nil {
+		return
+	}
+	documentos, _, err := uc.repo.List(ctx, incapacidadID, "", "", 1, 100)
+	if err != nil {
+		return
+	}
+	result, err := uc.docService.ValidarDocumentosRequeridos(ctx, incapacidad.IDTipo, documentos)
+	if err != nil || result == nil || len(result.Faltantes) == 0 {
+		return
+	}
+	_ = uc.faltanteNotifier.NotificarDocumentosFaltantes(ctx, incapacidad.IDUsuario, incapacidad.IDIncapacidad, result.Faltantes)
 }

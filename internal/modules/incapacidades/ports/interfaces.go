@@ -67,3 +67,7 @@ type IncapacidadRepository interface {
 type PermissionRepository interface {
 	FindPermissionsByRoleName(ctx context.Context, role string) ([]string, error)
 }
+
+type DocumentoFaltanteNotifier interface {
+	NotificarDocumentosFaltantes(ctx context.Context, userID, incapacidadID uint64, documentos []domain.TipoDocumento) error
+}
