@@ -60,6 +60,7 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 		group.DELETE("/:id", incapacidadHandler.Archivar)
 		group.GET("/:id/documentos", documentoHandler.Listar)
 		group.POST("/:id/documentos", documentoHandler.Subir)
+		group.POST("/:id/documentos/upload", documentoHandler.SubirBinario)
 		group.POST("/:id/documentos/url", documentoHandler.GenerarURLPrefirmada)
 		group.GET("/:id/historial", documentoHandler.ListarHistorial)
 		group.GET("/:id/plazos", incapacidadHandler.ObtenerPlazos)

@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"io"
+	"mime/multipart"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
@@ -37,6 +39,26 @@ func NewStorageService(ctx context.Context, cfg R2Config) (*StorageService, erro
 }
 
 func (s *StorageService) Upload(ctx context.Context, data []byte, filename string, contentType string, incapacidadID uint64) (*UploadResult, error) {
+	return s.client.Upload(ctx, data, filename, contentType, incapacidadID)
+}
+
+func (s *StorageService) UploadFile(ctx context.Context, fileHeader *multipart.FileHeader, filename string, contentType string, incapacidadID uint64) (*UploadResult, error) {
+	src, err := fileHeader.Open()
+	if err != nil {
+		return nil, ErrUploadFailed.WithError(err)
+	}
+	defer src.Close()
+
+	data, err := io.ReadAll(src)
+	if err != nil {
+		return nil, ErrUploadFailed.WithError(err)
+	}
+
+	size := fileHeader.Size
+	if err := s.validator.Validate(contentType, size); err != nil {
+		return nil, err
+	}
+
 	return s.client.Upload(ctx, data, filename, contentType, incapacidadID)
 }
 

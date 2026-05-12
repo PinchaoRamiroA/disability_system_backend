@@ -387,6 +387,87 @@ func (h *DocumentoHandler) GenerarURLPrefirmada(c *gin.Context) {
 	}, "URL prefirmada generada")
 }
 
+// SubirBinario godoc
+// @Summary Subir documento (binario)
+// @Description Sube un archivo directamente al bucket R2
+// @Tags documentos
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Param file formData file true "Archivo PDF/JPG/PNG (max 10MB)"
+// @Param tipo formData string true "Tipo de documento"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 413 {object} map[string]interface{}
+// @Router /incapacidades/{id}/documentos/upload [post]
+func (h *DocumentoHandler) SubirBinario(c *gin.Context) {
+	if h.storageService == nil {
+		response.InternalError(c, "servicio de almacenamiento no disponible", "STORAGE_NOT_CONFIGURED")
+		return
+	}
+
+	actor, err := actorFromGin(c)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	idStr := c.Param("id")
+	incapacidadID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil || incapacidadID == 0 {
+		response.BadRequest(c, "id de incapacidad inválido", "BAD_REQUEST", nil)
+		return
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		response.BadRequest(c, "archivo requerido", "FILE_REQUIRED", nil)
+		return
+	}
+
+	tipo := c.PostForm("tipo")
+	if tipo == "" {
+		response.BadRequest(c, "tipo de documento requerido", "TIPO_REQUIRED", nil)
+		return
+	}
+
+	contentType := file.Header.Get("Content-Type")
+	if err := h.storageService.Validate(contentType, h.storageService.GetMaxFileSize()); err != nil {
+		handleStorageError(c, err)
+		return
+	}
+
+	filename := file.Filename
+	result, err := h.storageService.UploadFile(c.Request.Context(), file, filename, contentType, incapacidadID)
+	if err != nil {
+		handleStorageError(c, err)
+		return
+	}
+
+	ext := getExtensionFromFilename(filename)
+	documento, err := h.useCase.Subir(c.Request.Context(), actor, struct {
+		IDIncapacidad uint64
+		Nombre        string
+		Tipo          string
+		URL           string
+		Formato       string
+	}{
+		IDIncapacidad: incapacidadID,
+		Nombre:        filename,
+		Tipo:          tipo,
+		URL:           result.URL,
+		Formato:       ext,
+	})
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	response.Created(c, toDocumentoResponse(documento), "documento subido exitosamente")
+}
+
 func getContentTypeFromExtension(ext string) string {
 	switch ext {
 	case ".pdf":
@@ -398,6 +479,17 @@ func getContentTypeFromExtension(ext string) string {
 	default:
 		return "application/octet-stream"
 	}
+}
+
+func getExtensionFromFilename(filename string) string {
+	ext := ""
+	if len(filename) > 4 {
+		ext = filename[len(filename)-4:]
+		if ext[0] != '.' {
+			ext = filename[len(filename)-5:]
+		}
+	}
+	return ext
 }
 
 func handleStorageError(c *gin.Context, err error) {
@@ -416,6 +508,7 @@ type DocumentoHandlerInterface interface {
 	Eliminar(c *gin.Context)
 	ListarHistorial(c *gin.Context)
 	GenerarURLPrefirmada(c *gin.Context)
+	SubirBinario(c *gin.Context)
 }
 
 var _ DocumentoHandlerInterface = (*DocumentoHandler)(nil)

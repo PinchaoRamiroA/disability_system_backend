@@ -411,7 +411,6 @@ definitions:
       success:
         type: boolean
     type: object
-basePath: /api/v1
 info:
   contact: {}
 paths:
@@ -1484,6 +1483,55 @@ paths:
       security:
       - BearerAuth: []
       summary: Subir documento
+      tags:
+      - documentos
+  /incapacidades/{id}/documentos/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Sube un archivo directamente al bucket R2
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Archivo PDF/JPG/PNG (max 10MB)
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Tipo de documento
+        in: formData
+        name: tipo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "413":
+          description: Request Entity Too Large
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Subir documento (binario)
       tags:
       - documentos
   /incapacidades/{id}/documentos/url:
