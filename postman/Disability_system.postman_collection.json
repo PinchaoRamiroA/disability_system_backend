@@ -70,7 +70,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6Imp1YW5AZWplbXBsby5jb20iLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlzcyI6ImRpc2FiaWxpdHlfc3lzdGVtIiwic3ViIjoianVhbkBlamVtcGxvLmNvbSIsImV4cCI6MTc3OTA0Nzg0MywiaWF0IjoxNzc4NDQzMDQzfQ.EAsWPMXyqxGJPGxIykcM8dZc_ItG-hUeFoP-zYWQXfo\"\n}",
+              "raw": "{\n  \"refresh_token\": \"\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
