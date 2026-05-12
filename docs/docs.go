@@ -308,6 +308,107 @@ const docTemplate = `{
                     "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
                 }
             }
+        },
+        "/api/v1/incapacidades/{id}/documentos": {
+            "get": {
+                "description": "Lista los documentos de una incapacidad. Requiere permiso 'consultar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["documentos"],
+                "summary": "Listar documentos de incapacidad",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer", "description": "ID de la incapacidad"},
+                    {"name": "estado", "in": "query", "type": "string", "description": "Filtrar por estado (Pendiente, Validado, Rechazado, Incompleto)"},
+                    {"name": "tipo", "in": "query", "type": "string", "description": "Filtrar por tipo de documento"},
+                    {"name": "page", "in": "query", "type": "integer", "default": 1, "description": "Número de página"},
+                    {"name": "limit", "in": "query", "type": "integer", "default": 20, "description": "Cantidad de resultados"}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/PaginatedDocumentosResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            },
+            "post": {
+                "description": "Sube un documento para una incapacidad. Requiere permiso 'crear_incapacidad' o 'editar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["documentos"],
+                "summary": "Subir documento",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer", "description": "ID de la incapacidad"},
+                    {"description": "Datos del documento", "name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/SubirDocumentoRequest"}}
+                ],
+                "responses": {
+                    "201": {"description": "Created", "schema": {"$ref": "#/definitions/DocumentoResponse"}},
+                    "400": {"description": "Bad Request", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
+        },
+        "/api/v1/documentos/{id}/validar": {
+            "patch": {
+                "description": "Valida o rechaza un documento. Requiere permiso 'validar_documentos' o 'editar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["documentos"],
+                "summary": "Validar documento",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer", "description": "ID del documento"},
+                    {"description": "Datos de validación", "name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/ValidarDocumentoRequest"}}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/DocumentoResponse"}},
+                    "400": {"description": "Bad Request", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "404": {"description": "Not Found", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
+        },
+        "/api/v1/documentos/{id}": {
+            "delete": {
+                "description": "Elimina un documento (soft delete). Requiere permiso 'editar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["documentos"],
+                "summary": "Eliminar documento",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer", "description": "ID del documento"}
+                ],
+                "responses": {
+                    "204": {"description": "No Content"},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "404": {"description": "Not Found", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
+        },
+        "/api/v1/incapacidades/{id}/historial": {
+            "get": {
+                "description": "Lista el historial de cambios de una incapacidad. Requiere permiso 'consultar_incapacidad' o 'consultar_historial'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["historial"],
+                "summary": "Listar historial de incapacidad",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer", "description": "ID de la incapacidad"},
+                    {"name": "id_tipo_historial", "in": "query", "type": "integer", "description": "Filtrar por tipo de historial"},
+                    {"name": "page", "in": "query", "type": "integer", "default": 1, "description": "Número de página"},
+                    {"name": "limit", "in": "query", "type": "integer", "default": 20, "description": "Cantidad de resultados"}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/PaginatedHistorialResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
         }
     },
     "definitions": {
@@ -551,6 +652,88 @@ const docTemplate = `{
                 "success": {"type": "boolean"},
                 "message": {"type": "string"},
                 "data": {"type": "array", "items": {"$ref": "#/definitions/EntidadResponse"}}
+            }
+        },
+        "SubirDocumentoRequest": {
+            "type": "object",
+            "required": ["id_incapacidad", "nombre", "tipo", "url", "formato"],
+            "properties": {
+                "id_incapacidad": {"type": "integer", "example": 1, "description": "ID de la incapacidad"},
+                "nombre": {"type": "string", "example": "Certificado médico.pdf", "description": "Nombre del documento"},
+                "tipo": {"type": "string", "example": "Certificado de incapacidad", "description": "Tipo de documento"},
+                "url": {"type": "string", "example": "https://storage.com/docs/123.pdf", "description": "URL del documento"},
+                "formato": {"type": "string", "example": "pdf", "description": "Formato del archivo (pdf, jpg, png)"}
+            }
+        },
+        "ValidarDocumentoRequest": {
+            "type": "object",
+            "required": ["estado"],
+            "properties": {
+                "estado": {"type": "string", "example": "Validado", "description": "Estado: Validado, Rechazado o Incompleto"},
+                "comentario": {"type": "string", "description": "Comentario de validación"}
+            }
+        },
+        "DocumentoResponse": {
+            "type": "object",
+            "properties": {
+                "id_documento": {"type": "integer"},
+                "id_incapacidad": {"type": "integer"},
+                "nombre": {"type": "string"},
+                "tipo": {"type": "string"},
+                "url": {"type": "string"},
+                "formato": {"type": "string"},
+                "estado": {"type": "string"},
+                "comentario": {"type": "string"},
+                "fecha_carga": {"type": "string"},
+                "validado_por": {"type": "integer"},
+                "fecha_validacion": {"type": "string"},
+                "created_at": {"type": "string", "format": "date-time"}
+            }
+        },
+        "PaginatedDocumentosResponse": {
+            "type": "object",
+            "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "items": {"type": "array", "items": {"$ref": "#/definitions/DocumentoResponse"}},
+                        "total": {"type": "integer"},
+                        "page": {"type": "integer"},
+                        "limit": {"type": "integer"},
+                        "total_pages": {"type": "integer"}
+                    }
+                }
+            }
+        },
+        "HistorialResponse": {
+            "type": "object",
+            "properties": {
+                "id_historial": {"type": "integer"},
+                "id_incapacidad": {"type": "integer"},
+                "id_tipo_historial": {"type": "integer"},
+                "nombre_tipo": {"type": "string"},
+                "descripcion": {"type": "string"},
+                "fecha": {"type": "string"},
+                "gestor_id": {"type": "integer"}
+            }
+        },
+        "PaginatedHistorialResponse": {
+            "type": "object",
+            "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "items": {"type": "array", "items": {"$ref": "#/definitions/HistorialResponse"}},
+                        "total": {"type": "integer"},
+                        "page": {"type": "integer"},
+                        "limit": {"type": "integer"},
+                        "total_pages": {"type": "integer"}
+                    }
+                }
             }
         }
     }
