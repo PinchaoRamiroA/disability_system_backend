@@ -411,10 +411,11 @@ definitions:
       success:
         type: boolean
     type: object
+basePath: /api/v1
 info:
   contact: {}
 paths:
-  /api/v1/auth/login:
+  /auth/login:
     post:
       consumes:
       - application/json
@@ -449,7 +450,7 @@ paths:
       summary: Iniciar sesión
       tags:
       - auth
-  /api/v1/auth/refresh:
+  /auth/refresh:
     post:
       consumes:
       - application/json
@@ -480,7 +481,7 @@ paths:
       summary: Renovar token
       tags:
       - auth
-  /api/v1/auth/register:
+  /auth/register:
     post:
       consumes:
       - application/json

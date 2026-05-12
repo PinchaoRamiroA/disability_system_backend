@@ -1,0 +1,215 @@
+{
+  "info": {
+    "_postman_id": "01ca9425-c3b9-46f7-b0e5-42bea1e7f8d1",
+    "name": "Disability_system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "36756699"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "registrar",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan3@ejemplo.com\",\n  \"password\": \"123456\",\n  \"numero_documento\": \"123456\",\n  \"numero_celular\": \"+573001234567\",\n  \"direccion\": \"Calle 123 #45-67\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/auth/register",
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan3@ejemplo.com\",\n  \"password\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/auth/login",
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "refresh",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6Imp1YW5AZWplbXBsby5jb20iLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlzcyI6ImRpc2FiaWxpdHlfc3lzdGVtIiwic3ViIjoianVhbkBlamVtcGxvLmNvbSIsImV4cCI6MTc3OTA0Nzg0MywiaWF0IjoxNzc4NDQzMDQzfQ.EAsWPMXyqxGJPGxIykcM8dZc_ItG-hUeFoP-zYWQXfo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/auth/refresh",
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Incapacidades",
+      "item": [
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_usuario\": 1,\n  \"id_estado\": 1,\n  \"id_tipo\": 1,\n  \"id_entidad\": 1,\n  \"canal_recepcion\": \"presencial\",\n  \"titulo\": \"Incapacidad por enfermedad general\",\n  \"fecha_inicio\": \"2024-01-15\",\n  \"fecha_fin\": \"2024-01-30\",\n  \"origen\": \"laboral\",\n  \"fecha_radicacion\": \"2024-01-20\",\n  \"fecha_pago\": \"2024-02-15\",\n  \"observaciones\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/incapacidades",
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar estados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/estados",
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "estados"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/roles",
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "url",
+      "value": ""
+    },
+    {
+      "key": "url_local",
+      "value": ""
+    }
+  ]
+}

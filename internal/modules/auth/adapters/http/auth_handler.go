@@ -41,7 +41,7 @@ func NewAuthHandler(
 // @Success 200 {object} response.Response{data=dto.LoginResponse}
 // @Failure 400 {object} response.Response
 // @Failure 401 {object} response.Response
-// @Router /api/v1/auth/login [post]
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -69,7 +69,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Success 201 {object} response.Response{data=dto.UserResponse}
 // @Failure 400 {object} response.Response
 // @Failure 409 {object} response.Response
-// @Router /api/v1/auth/register [post]
+// @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req dto.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -102,7 +102,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 // @Param request body dto.RefreshTokenRequest true "Refresh token"
 // @Success 200 {object} response.Response{data=dto.TokenResponse}
 // @Failure 401 {object} response.Response
-// @Router /api/v1/auth/refresh [post]
+// @Router /auth/refresh [post]
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	var req dto.RefreshTokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
