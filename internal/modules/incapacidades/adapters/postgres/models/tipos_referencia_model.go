@@ -5,12 +5,12 @@ import (
 )
 
 type TipoDocumentoModel struct {
-	IDTipoDocumento uint64 `gorm:"primaryKey;autoIncrement;column:id_tipo_documento"`
-	Nombre string `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
-	Descripcion *string `gorm:"type:text;column:descripcion"`
-	Requerido bool `gorm:"default:true;column:requerido"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`
+	IDTipoDocumento uint64    `gorm:"primaryKey;autoIncrement;column:id_tipo_documento"`
+	Nombre          string    `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
+	Descripcion     *string   `gorm:"type:text;column:descripcion"`
+	Requerido       bool      `gorm:"default:true;column:requerido"`
+	CreatedAt       time.Time `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt       time.Time `gorm:"autoUpdateTime;column:updated_at"`
 }
 
 func (TipoDocumentoModel) TableName() string {
@@ -18,12 +18,12 @@ func (TipoDocumentoModel) TableName() string {
 }
 
 type EstadoDocumentoModel struct {
-	IDEstadoDocumento uint64 `gorm:"primaryKey;autoIncrement;column:id_estado_documento"`
-	Nombre string `gorm:"type:varchar(50);uniqueIndex;not null;column:nombre"`
-	Descripcion *string `gorm:"type:text;column:descripcion"`
-	Color *string `gorm:"type:varchar(20);column:color"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`
+	IDEstadoDocumento uint64    `gorm:"primaryKey;autoIncrement;column:id_estado_documento"`
+	Nombre            string    `gorm:"type:varchar(50);uniqueIndex;not null;column:nombre"`
+	Descripcion       *string   `gorm:"type:text;column:descripcion"`
+	Color             *string   `gorm:"type:varchar(20);column:color"`
+	CreatedAt         time.Time `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt         time.Time `gorm:"autoUpdateTime;column:updated_at"`
 }
 
 func (EstadoDocumentoModel) TableName() string {
@@ -31,11 +31,11 @@ func (EstadoDocumentoModel) TableName() string {
 }
 
 type TipoEntidadModel struct {
-	IDTipoEntidad uint64 `gorm:"primaryKey;autoIncrement;column:id_tipo_entidad"`
-	Nombre string `gorm:"type:varchar(50);uniqueIndex;not null;column:nombre"`
-	Descripcion *string `gorm:"type:text;column:descripcion"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`
+	IDTipoEntidad uint64    `gorm:"primaryKey;autoIncrement;column:id_tipo_entidad"`
+	Nombre        string    `gorm:"type:varchar(50);uniqueIndex;not null;column:nombre"`
+	Descripcion   *string   `gorm:"type:text;column:descripcion"`
+	CreatedAt     time.Time `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt     time.Time `gorm:"autoUpdateTime;column:updated_at"`
 }
 
 func (TipoEntidadModel) TableName() string {
@@ -43,12 +43,12 @@ func (TipoEntidadModel) TableName() string {
 }
 
 type CanalRecepcionModel struct {
-	IDCanalRecepcion uint64 `gorm:"primaryKey;autoIncrement;column:id_canal_recepcion"`
-	Nombre string `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
-	Descripcion *string `gorm:"type:text;column:descripcion"`
-	Activo bool `gorm:"default:true;column:activo"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`
+	IDCanalRecepcion uint64    `gorm:"primaryKey;autoIncrement;column:id_canal_recepcion"`
+	Nombre           string    `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
+	Descripcion      *string   `gorm:"type:text;column:descripcion"`
+	Activo           bool      `gorm:"default:true;column:activo"`
+	CreatedAt        time.Time `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt        time.Time `gorm:"autoUpdateTime;column:updated_at"`
 }
 
 func (CanalRecepcionModel) TableName() string {
@@ -56,11 +56,11 @@ func (CanalRecepcionModel) TableName() string {
 }
 
 type CanalAtencionEntidadModel struct {
-	IDCanalAtencion uint64 `gorm:"primaryKey;autoIncrement;column:id_canal_atencion"`
-	Nombre string `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
-	Descripcion *string `gorm:"type:text;column:descripcion"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`
+	IDCanalAtencion uint64    `gorm:"primaryKey;autoIncrement;column:id_canal_atencion"`
+	Nombre          string    `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
+	Descripcion     *string   `gorm:"type:text;column:descripcion"`
+	CreatedAt       time.Time `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt       time.Time `gorm:"autoUpdateTime;column:updated_at"`
 }
 
 func (CanalAtencionEntidadModel) TableName() string {
@@ -68,11 +68,11 @@ func (CanalAtencionEntidadModel) TableName() string {
 }
 
 type TipoPagoModel struct {
-	IDTipoPago uint64 `gorm:"primaryKey;autoIncrement;column:id_tipo_pago"`
-	Nombre string `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
-	Descripcion *string `gorm:"type:text;column:descripcion"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`
+	IDTipoPago  uint64    `gorm:"primaryKey;autoIncrement;column:id_tipo_pago"`
+	Nombre      string    `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
+	Descripcion *string   `gorm:"type:text;column:descripcion"`
+	CreatedAt   time.Time `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt   time.Time `gorm:"autoUpdateTime;column:updated_at"`
 }
 
 func (TipoPagoModel) TableName() string {
@@ -80,12 +80,12 @@ func (TipoPagoModel) TableName() string {
 }
 
 type EstadoPagoModel struct {
-	IDEstadoPago uint64 `gorm:"primaryKey;autoIncrement;column:id_estado_pago"`
-	Nombre string `gorm:"type:varchar(50);uniqueIndex;not null;column:nombre"`
-	Descripcion *string `gorm:"type:text;column:descripcion"`
-	Color *string `gorm:"type:varchar(20);column:color"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`
+	IDEstadoPago uint64    `gorm:"primaryKey;autoIncrement;column:id_estado_pago"`
+	Nombre       string    `gorm:"type:varchar(50);uniqueIndex;not null;column:nombre"`
+	Descripcion  *string   `gorm:"type:text;column:descripcion"`
+	Color        *string   `gorm:"type:varchar(20);column:color"`
+	CreatedAt    time.Time `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt    time.Time `gorm:"autoUpdateTime;column:updated_at"`
 }
 
 func (EstadoPagoModel) TableName() string {
@@ -93,12 +93,12 @@ func (EstadoPagoModel) TableName() string {
 }
 
 type PeriodicidadReporteModel struct {
-	IDPeriodicidad uint64 `gorm:"primaryKey;autoIncrement;column:id_periodicidad"`
-	Nombre string `gorm:"type:varchar(50);uniqueIndex;not null;column:nombre"`
-	Dias *int `gorm:"column:dias"`
-	Descripcion *string `gorm:"type:text;column:descripcion"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`
+	IDPeriodicidad uint64    `gorm:"primaryKey;autoIncrement;column:id_periodicidad"`
+	Nombre         string    `gorm:"type:varchar(50);uniqueIndex;not null;column:nombre"`
+	Dias           *int      `gorm:"column:dias"`
+	Descripcion    *string   `gorm:"type:text;column:descripcion"`
+	CreatedAt      time.Time `gorm:"autoCreateTime;column:created_at"`
+	UpdatedAt      time.Time `gorm:"autoUpdateTime;column:updated_at"`
 }
 
 func (PeriodicidadReporteModel) TableName() string {

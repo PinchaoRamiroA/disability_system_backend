@@ -4,6 +4,7 @@ import (
 	authhttp "disability_system_backend/internal/modules/auth/adapters/http"
 	"disability_system_backend/internal/modules/auth/adapters/postgres"
 	"disability_system_backend/internal/modules/auth/usecase"
+	incapacidadeshttp "disability_system_backend/internal/modules/incapacidades/adapters/http"
 	"disability_system_backend/internal/shared/auth"
 	"disability_system_backend/internal/shared/database"
 	"disability_system_backend/internal/shared/middleware"
@@ -67,6 +68,7 @@ func (a *App) InitAuth() *auth.JWTService {
 
 	// Register Routes
 	a.InitAuthRoutes()
+	incapacidadeshttp.Register(a.Router.V1(), a.DB, jwtService)
 
 	return jwtService
 }

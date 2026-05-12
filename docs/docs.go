@@ -128,6 +128,186 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/incapacidades": {
+            "get": {
+                "description": "Lista incapacidades con filtros y paginación. Requiere permiso 'consultar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["incapacidades"],
+                "summary": "Listar incapacidades",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id_usuario", "in": "query", "type": "integer", "description": "Filtrar por usuario"},
+                    {"name": "id_estado", "in": "query", "type": "integer", "description": "Filtrar por estado"},
+                    {"name": "id_tipo", "in": "query", "type": "integer", "description": "Filtrar por tipo"},
+                    {"name": "id_entidad", "in": "query", "type": "integer", "description": "Filtrar por entidad"},
+                    {"name": "origen", "in": "query", "type": "string", "description": "Filtrar por origen"},
+                    {"name": "canal_recepcion", "in": "query", "type": "string", "description": "Filtrar por canal de recepción"},
+                    {"name": "page", "in": "query", "type": "integer", "default": 1, "description": "Número de página"},
+                    {"name": "limit", "in": "query", "type": "integer", "default": 20, "description": "Cantidad de resultados (max: 100)"}
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/PaginatedIncapacidadesResponse"
+                        }
+                    },
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            },
+            "post": {
+                "description": "Crea una nueva incapacidad. Requiere permiso 'crear_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["incapacidades"],
+                "summary": "Crear incapacidad",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {
+                        "description": "Datos de la incapacidad",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {"$ref": "#/definitions/CrearIncapacidadRequest"}
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/IncapacidadResponse"
+                        }
+                    },
+                    "400": {"description": "Bad Request", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
+        },
+        "/api/v1/incapacidades/{id}": {
+            "get": {
+                "description": "Obtiene una incapacidad por ID. Requiere permiso 'consultar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["incapacidades"],
+                "summary": "Obtener incapacidad",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer", "description": "ID de la incapacidad"}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/IncapacidadResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "404": {"description": "Not Found", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            },
+            "put": {
+                "description": "Actualiza una incapacidad. Requiere permiso 'editar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["incapacidades"],
+                "summary": "Actualizar incapacidad",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer", "description": "ID de la incapacidad"},
+                    {"description": "Datos a actualizar", "name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/ActualizarIncapacidadRequest"}}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/IncapacidadResponse"}},
+                    "400": {"description": "Bad Request", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "404": {"description": "Not Found", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            },
+            "delete": {
+                "description": "Archiva una incapacidad (soft delete). Requiere permiso 'archivar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["incapacidades"],
+                "summary": "Archivar incapacidad",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer", "description": "ID de la incapacidad"}
+                ],
+                "responses": {
+                    "204": {"description": "No Content"},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "404": {"description": "Not Found", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
+        },
+        "/api/v1/incapacidades/{id}/estado": {
+            "patch": {
+                "description": "Cambia el estado de una incapacidad. Requiere permiso 'editar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["incapacidades"],
+                "summary": "Cambiar estado de incapacidad",
+                "security": [{"Bearer": []}],
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer", "description": "ID de la incapacidad"},
+                    {"description": "Nuevo estado", "name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/CambiarEstadoRequest"}}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/IncapacidadResponse"}},
+                    "400": {"description": "Bad Request", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "404": {"description": "Not Found", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "409": {"description": "Conflict - Estado no permite transición", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
+        },
+        "/api/v1/incapacidades/estados": {
+            "get": {
+                "description": "Lista los estados disponibles para incapacidades. Requiere permiso 'consultar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["incapacidades"],
+                "summary": "Listar estados de incapacidad",
+                "security": [{"Bearer": []}],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/ListaEstadoIncapacidadResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
+        },
+        "/api/v1/incapacidades/tipos": {
+            "get": {
+                "description": "Lista los tipos de incapacidad disponibles. Requiere permiso 'consultar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["incapacidades"],
+                "summary": "Listar tipos de incapacidad",
+                "security": [{"Bearer": []}],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/ListaTipoIncapacidadResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
+        },
+        "/api/v1/incapacidades/entidades": {
+            "get": {
+                "description": "Lista las entidades responsables del pago (EPS, ARL, etc.). Requiere permiso 'consultar_incapacidad'",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["incapacidades"],
+                "summary": "Listar entidades",
+                "security": [{"Bearer": []}],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/ListaEntidadResponse"}},
+                    "401": {"description": "Unauthorized", "schema": {"$ref": "#/definitions/ErrorResponse"}},
+                    "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
+                }
+            }
         }
     },
     "definitions": {
@@ -238,6 +418,139 @@ const docTemplate = `{
                         "details": {}
                     }
                 }
+            }
+        },
+        "IncapacidadResponse": {
+            "type": "object",
+            "properties": {
+                "id_incapacidad": {"type": "integer"},
+                "id_usuario": {"type": "integer"},
+                "canal_recepcion": {"type": "string"},
+                "titulo": {"type": "string"},
+                "fecha_inicio": {"type": "string", "example": "2024-01-15"},
+                "fecha_fin": {"type": "string", "example": "2024-01-30"},
+                "origen": {"type": "string"},
+                "fecha_radicacion": {"type": "string", "example": "2024-01-20"},
+                "fecha_pago": {"type": "string", "example": "2024-02-15"},
+                "observaciones": {"type": "string"},
+                "estado": {"$ref": "#/definitions/EstadoIncapacidadResponse"},
+                "tipo": {"$ref": "#/definitions/TipoIncapacidadResponse"},
+                "entidad": {"$ref": "#/definitions/EntidadResponse"},
+                "created_by": {"type": "integer"},
+                "created_at": {"type": "string", "format": "date-time"},
+                "updated_at": {"type": "string", "format": "date-time"}
+            }
+        },
+        "EstadoIncapacidadResponse": {
+            "type": "object",
+            "properties": {
+                "id_estado": {"type": "integer"},
+                "nombre": {"type": "string"},
+                "descripcion": {"type": "string"},
+                "permite_transicion": {"type": "boolean"}
+            }
+        },
+        "TipoIncapacidadResponse": {
+            "type": "object",
+            "properties": {
+                "id_tipo": {"type": "integer"},
+                "nombre": {"type": "string"},
+                "documentos_requeridos": {"type": "array", "items": {"type": "string"}}
+            }
+        },
+        "EntidadResponse": {
+            "type": "object",
+            "properties": {
+                "id_entidad": {"type": "integer"},
+                "nombre": {"type": "string"},
+                "tipo": {"type": "string", "example": "EPS"},
+                "plazo_transcripcion_dias": {"type": "integer"},
+                "tiempo_maximo_pago_dias": {"type": "integer"},
+                "canal_atencion": {"type": "string"},
+                "canales_atencion": {"type": "array", "items": {"type": "string"}},
+                "requiere_transcripcion": {"type": "boolean"}
+            }
+        },
+        "CrearIncapacidadRequest": {
+            "type": "object",
+            "required": ["id_tipo", "id_entidad", "titulo", "fecha_inicio", "origen"],
+            "properties": {
+                "id_usuario": {"type": "integer", "description": "ID del usuario titular de la incapacidad (propietario)"},
+                "id_estado": {"type": "integer", "description": "ID del estado inicial (opcional)"},
+                "id_tipo": {"type": "integer", "example": 1, "description": "Tipo de incapacidad"},
+                "id_entidad": {"type": "integer", "example": 1, "description": "Entidad responsable del pago"},
+                "canal_recepcion": {"type": "string", "example": "Recepción física", "description": "Canal de recepción"},
+                "titulo": {"type": "string", "example": "Incapacidad por enfermedad general", "description": "Título o descripción breve"},
+                "fecha_inicio": {"type": "string", "example": "2024-01-15", "description": "Fecha de inicio (YYYY-MM-DD)"},
+                "fecha_fin": {"type": "string", "example": "2024-01-30", "description": "Fecha de fin (YYYY-MM-DD)"},
+                "origen": {"type": "string", "example": "laboral", "description": "Origen (laboral, comun, etc.)"},
+                "fecha_radicacion": {"type": "string", "example": "2024-01-20", "description": "Fecha de radicación ante la entidad"},
+                "fecha_pago": {"type": "string", "example": "2024-02-15", "description": "Fecha de pago"},
+                "observaciones": {"type": "string", "description": "Notas adicionales"}
+            }
+        },
+        "ActualizarIncapacidadRequest": {
+            "type": "object",
+            "properties": {
+                "id_tipo": {"type": "integer"},
+                "id_entidad": {"type": "integer"},
+                "canal_recepcion": {"type": "string"},
+                "titulo": {"type": "string"},
+                "fecha_inicio": {"type": "string"},
+                "fecha_fin": {"type": "string"},
+                "origen": {"type": "string"},
+                "fecha_radicacion": {"type": "string"},
+                "fecha_pago": {"type": "string"},
+                "observaciones": {"type": "string"}
+            }
+        },
+        "CambiarEstadoRequest": {
+            "type": "object",
+            "required": ["id_estado"],
+            "properties": {
+                "id_estado": {"type": "integer", "example": 2, "description": "ID del nuevo estado"},
+                "observaciones": {"type": "string", "description": "Observaciones del cambio de estado"}
+            }
+        },
+        "PaginatedIncapacidadesResponse": {
+            "type": "object",
+            "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "items": {"type": "array", "items": {"$ref": "#/definitions/IncapacidadResponse"}},
+                        "total": {"type": "integer"},
+                        "page": {"type": "integer"},
+                        "limit": {"type": "integer"},
+                        "total_pages": {"type": "integer"}
+                    }
+                }
+            }
+        },
+        "ListaEstadoIncapacidadResponse": {
+            "type": "object",
+            "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "data": {"type": "array", "items": {"$ref": "#/definitions/EstadoIncapacidadResponse"}}
+            }
+        },
+        "ListaTipoIncapacidadResponse": {
+            "type": "object",
+            "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "data": {"type": "array", "items": {"$ref": "#/definitions/TipoIncapacidadResponse"}}
+            }
+        },
+        "ListaEntidadResponse": {
+            "type": "object",
+            "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "data": {"type": "array", "items": {"$ref": "#/definitions/EntidadResponse"}}
             }
         }
     }

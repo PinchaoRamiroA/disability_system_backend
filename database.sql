@@ -194,7 +194,7 @@ CREATE TABLE incapacidad (
     FOREIGN KEY (id_estado) REFERENCES estado_incapacidad(id_estado) ON DELETE RESTRICT,
     FOREIGN KEY (id_tipo) REFERENCES tipo_incapacidad(id_tipo) ON DELETE RESTRICT,
     FOREIGN KEY (id_entidad) REFERENCES entidad(id_entidad) ON DELETE RESTRICT,
-    FOREIGN KEY (created_by) REFERENCES gestion_humana(id_usuario) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES usuario(id_usuario) ON DELETE SET NULL,
     CHECK (fecha_fin IS NULL OR fecha_fin >= fecha_inicio)
 );
 
@@ -218,7 +218,7 @@ CREATE TABLE documento (
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (id_incapacidad) REFERENCES incapacidad(id_incapacidad) ON DELETE CASCADE,
-    FOREIGN KEY (validado_por) REFERENCES gestion_humana(id_usuario) ON DELETE SET NULL
+    FOREIGN KEY (validado_por) REFERENCES usuario(id_usuario) ON DELETE SET NULL
 );
 
 -- =====================================================
@@ -242,7 +242,7 @@ CREATE TABLE pago (
     is_deleted BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_incapacidad) REFERENCES incapacidad(id_incapacidad) ON DELETE CASCADE,
     FOREIGN KEY (id_entidad) REFERENCES entidad(id_entidad) ON DELETE RESTRICT,
-    FOREIGN KEY (registrado_por) REFERENCES gestion_humana(id_usuario) ON DELETE SET NULL,
+    FOREIGN KEY (registrado_por) REFERENCES usuario(id_usuario) ON DELETE SET NULL,
     CHECK (valor >= 0)
 );
 
@@ -256,7 +256,7 @@ CREATE TABLE seguimiento_cobro (
     gestionado_por BIGINT,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (id_incapacidad) REFERENCES incapacidad(id_incapacidad) ON DELETE CASCADE,
-    FOREIGN KEY (gestionado_por) REFERENCES gestion_humana(id_usuario) ON DELETE SET NULL
+    FOREIGN KEY (gestionado_por) REFERENCES usuario(id_usuario) ON DELETE SET NULL
 );
 
 -- =====================================================

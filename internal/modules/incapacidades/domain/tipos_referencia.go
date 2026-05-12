@@ -23,9 +23,9 @@ type EstadoDocumento struct {
 type TipoEntidad struct {
 	IDTipoEntidad uint64
 	Nombre        string
-	Descripcion    *string
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	Descripcion   *string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 type CanalRecepcion struct {
@@ -46,11 +46,11 @@ type CanalAtencionEntidad struct {
 }
 
 type TipoPago struct {
-	IDTipoPago    uint64
-	Nombre        string
-	Descripcion   *string
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	IDTipoPago  uint64
+	Nombre      string
+	Descripcion *string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type EstadoPago struct {
