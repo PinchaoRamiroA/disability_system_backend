@@ -5,16 +5,18 @@ import (
 	"disability_system_backend/internal/shared/config"
 	"disability_system_backend/internal/shared/logger"
 	"disability_system_backend/internal/shared/router"
+	"disability_system_backend/internal/shared/storage"
 
 	"gorm.io/gorm"
 )
 
 type App struct {
-	Config      *config.Config
-	Logger      *logger.Logger
-	DB          *gorm.DB
-	Router      *router.Router
-	AuthHandler *authhttp.AuthHandler
+	Config          *config.Config
+	Logger          *logger.Logger
+	DB              *gorm.DB
+	Router          *router.Router
+	AuthHandler     *authhttp.AuthHandler
+	StorageService  *storage.StorageService
 }
 
 func New(cfg *config.Config, log *logger.Logger) *App {

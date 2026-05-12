@@ -409,9 +409,312 @@ const docTemplate = `{
                     "403": {"description": "Forbidden", "schema": {"$ref": "#/definitions/ErrorResponse"}}
                 }
             }
+        },
+        "/api/v1/usuarios": {
+            "get": {
+                "description": "Lista usuarios con paginación y filtros",
+                "produces": ["application/json"],
+                "tags": ["usuarios"],
+                "summary": "Listar usuarios",
+                "parameters": [
+                    {"name": "estado", "in": "query", "type": "boolean"},
+                    {"name": "id_rol", "in": "query", "type": "integer"},
+                    {"name": "page", "in": "query", "type": "integer", "default": 1},
+                    {"name": "limit", "in": "query", "type": "integer", "default": 20}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/PaginatedUsuariosResponse"}}
+                }
+            },
+            "post": {
+                "description": "Crea un nuevo usuario",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["usuarios"],
+                "summary": "Crear usuario",
+                "parameters": [
+                    {"name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/CrearUsuarioRequest"}}
+                ],
+                "responses": {
+                    "201": {"description": "Created", "schema": {"$ref": "#/definitions/UsuarioResponse"}}
+                }
+            }
+        },
+        "/api/v1/usuarios/{id}": {
+            "get": {
+                "description": "Obtiene un usuario por ID",
+                "produces": ["application/json"],
+                "tags": ["usuarios"],
+                "summary": "Obtener usuario",
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer"}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/UsuarioResponse"}}
+                }
+            },
+            "put": {
+                "description": "Actualiza un usuario",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["usuarios"],
+                "summary": "Actualizar usuario",
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer"},
+                    {"name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/ActualizarUsuarioRequest"}}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/UsuarioResponse"}}
+                }
+            },
+            "delete": {
+                "description": "Elimina un usuario (soft delete)",
+                "tags": ["usuarios"],
+                "summary": "Eliminar usuario",
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer"}
+                ],
+                "responses": {
+                    "200": {"description": "OK"}
+                }
+            }
+        },
+        "/api/v1/usuarios/{id}/estado": {
+            "patch": {
+                "description": "Cambia el estado de un usuario",
+                "consumes": ["application/json"],
+                "tags": ["usuarios"],
+                "summary": "Cambiar estado",
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer"},
+                    {"name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/CambiarEstadoUsuarioRequest"}}
+                ],
+                "responses": {
+                    "200": {"description": "OK"}
+                }
+            }
+        },
+        "/api/v1/usuarios/{id}/rol": {
+            "post": {
+                "description": "Asigna un rol a un usuario",
+                "consumes": ["application/json"],
+                "tags": ["usuarios"],
+                "summary": "Asignar rol",
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer"},
+                    {"name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/AsignarRolRequest"}}
+                ],
+                "responses": {
+                    "200": {"description": "OK"}
+                }
+            }
+        },
+        "/api/v1/usuarios/{id}/password": {
+            "post": {
+                "description": "Cambia la contraseña del usuario",
+                "consumes": ["application/json"],
+                "tags": ["usuarios"],
+                "summary": "Cambiar contraseña",
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer"},
+                    {"name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/CambiarPasswordRequest"}}
+                ],
+                "responses": {
+                    "200": {"description": "OK"}
+                }
+            }
+        },
+        "/api/v1/roles": {
+            "get": {
+                "description": "Lista roles con paginación",
+                "produces": ["application/json"],
+                "tags": ["roles"],
+                "summary": "Listar roles",
+                "parameters": [
+                    {"name": "page", "in": "query", "type": "integer", "default": 1},
+                    {"name": "limit", "in": "query", "type": "integer", "default": 20}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/PaginatedRolesResponse"}}
+                }
+            },
+            "post": {
+                "description": "Crea un nuevo rol",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["roles"],
+                "summary": "Crear rol",
+                "parameters": [
+                    {"name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/CrearRolRequest"}}
+                ],
+                "responses": {
+                    "201": {"description": "Created", "schema": {"$ref": "#/definitions/RolResponse"}}
+                }
+            }
+        },
+        "/api/v1/roles/{id}": {
+            "get": {
+                "description": "Obtiene un rol por ID",
+                "produces": ["application/json"],
+                "tags": ["roles"],
+                "summary": "Obtener rol",
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer"}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/RolResponse"}}
+                }
+            },
+            "put": {
+                "description": "Actualiza un rol",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "tags": ["roles"],
+                "summary": "Actualizar rol",
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer"},
+                    {"name": "request", "in": "body", "required": true, "schema": {"$ref": "#/definitions/ActualizarRolRequest"}}
+                ],
+                "responses": {
+                    "200": {"description": "OK", "schema": {"$ref": "#/definitions/RolResponse"}}
+                }
+            },
+            "delete": {
+                "description": "Elimina un rol",
+                "tags": ["roles"],
+                "summary": "Eliminar rol",
+                "parameters": [
+                    {"name": "id", "in": "path", "required": true, "type": "integer"}
+                ],
+                "responses": {
+                    "200": {"description": "OK"}
+                }
+            }
         }
     },
     "definitions": {
+        "UsuarioResponse": {
+            "type": "object",
+            "properties": {
+                "id_usuario": {"type": "integer"},
+                "id_rol": {"type": "integer"},
+                "nombre_rol": {"type": "string"},
+                "nombre": {"type": "string"},
+                "correo": {"type": "string"},
+                "numero_celular": {"type": "string"},
+                "direccion": {"type": "string"},
+                "numero_documento": {"type": "string"},
+                "numero_acudiente": {"type": "string"},
+                "estado": {"type": "boolean"},
+                "created_at": {"type": "string", "format": "date-time"},
+                "updated_at": {"type": "string", "format": "date-time"}
+            }
+        },
+        "CrearUsuarioRequest": {
+            "type": "object",
+            "required": ["id_rol", "nombre", "correo", "password", "numero_documento"],
+            "properties": {
+                "id_rol": {"type": "integer", "example": 1},
+                "nombre": {"type": "string", "example": "Juan Pérez"},
+                "correo": {"type": "string", "example": "juan@ejemplo.com"},
+                "numero_celular": {"type": "string", "example": "+573001234567"},
+                "direccion": {"type": "string", "example": "Calle 123 #45-67"},
+                "password": {"type": "string", "example": "contraseña123"},
+                "numero_documento": {"type": "string", "example": "12345678"},
+                "numero_acudiente": {"type": "string"}
+            }
+        },
+        "ActualizarUsuarioRequest": {
+            "type": "object",
+            "required": ["id_rol", "nombre", "correo"],
+            "properties": {
+                "id_rol": {"type": "integer"},
+                "nombre": {"type": "string"},
+                "correo": {"type": "string"},
+                "numero_celular": {"type": "string"},
+                "direccion": {"type": "string"}
+            }
+        },
+        "CambiarPasswordRequest": {
+            "type": "object",
+            "required": ["password_actual", "password_nuevo"],
+            "properties": {
+                "password_actual": {"type": "string"},
+                "password_nuevo": {"type": "string"}
+            }
+        },
+        "CambiarEstadoUsuarioRequest": {
+            "type": "object",
+            "required": ["estado"],
+            "properties": {
+                "estado": {"type": "boolean"}
+            }
+        },
+        "AsignarRolRequest": {
+            "type": "object",
+            "required": ["id_rol"],
+            "properties": {
+                "id_rol": {"type": "integer"}
+            }
+        },
+        "PaginatedUsuariosResponse": {
+            "type": "object",
+            "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "items": {"type": "array", "items": {"$ref": "#/definitions/UsuarioResponse"}},
+                        "total": {"type": "integer"},
+                        "page": {"type": "integer"},
+                        "limit": {"type": "integer"},
+                        "total_pages": {"type": "integer"}
+                    }
+                }
+            }
+        },
+        "RolResponse": {
+            "type": "object",
+            "properties": {
+                "id_rol": {"type": "integer"},
+                "nombre": {"type": "string"},
+                "permisos": {"type": "array", "items": {"type": "string"}}
+            }
+        },
+        "CrearRolRequest": {
+            "type": "object",
+            "required": ["nombre", "permisos"],
+            "properties": {
+                "nombre": {"type": "string", "example": "Gestor"},
+                "permisos": {"type": "array", "items": {"type": "string"}, "example": ["incapacidades.crear", "incapacidades.ver"]}
+            }
+        },
+        "ActualizarRolRequest": {
+            "type": "object",
+            "required": ["nombre", "permisos"],
+            "properties": {
+                "nombre": {"type": "string"},
+                "permisos": {"type": "array", "items": {"type": "string"}}
+            }
+        },
+        "PaginatedRolesResponse": {
+            "type": "object",
+            "properties": {
+                "success": {"type": "boolean"},
+                "message": {"type": "string"},
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "items": {"type": "array", "items": {"$ref": "#/definitions/RolResponse"}},
+                        "total": {"type": "integer"},
+                        "page": {"type": "integer"},
+                        "limit": {"type": "integer"},
+                        "total_pages": {"type": "integer"}
+                    }
+                }
+            }
+        },
         "LoginRequest": {
             "type": "object",
             "required": ["email", "password"],

@@ -1,14 +1,19 @@
 package app
 
 import (
+	"context"
+
 	authhttp "disability_system_backend/internal/modules/auth/adapters/http"
 	"disability_system_backend/internal/modules/auth/adapters/postgres"
 	"disability_system_backend/internal/modules/auth/usecase"
+	cobroshttp "disability_system_backend/internal/modules/cobros/adapters/http"
 	incapacidadeshttp "disability_system_backend/internal/modules/incapacidades/adapters/http"
+	usuarioshttp "disability_system_backend/internal/modules/usuarios/adapters/http"
 	"disability_system_backend/internal/shared/auth"
 	"disability_system_backend/internal/shared/database"
 	"disability_system_backend/internal/shared/middleware"
 	"disability_system_backend/internal/shared/router"
+	"disability_system_backend/internal/shared/storage"
 )
 
 func (a *App) InitRouter() error {
@@ -68,7 +73,18 @@ func (a *App) InitAuth() *auth.JWTService {
 
 	// Register Routes
 	a.InitAuthRoutes()
-	incapacidadeshttp.Register(a.Router.V1(), a.DB, jwtService)
+	incapacidadeshttp.Register(a.Router.V1(), a.DB, jwtService, a.StorageService)
+	cobroshttp.Register(a.Router.V1(), a.DB, jwtService)
+	usuarioshttp.Register(a.Router.V1(), a.DB, jwtService)
+
+	if a.Config.App.Env != "test" {
+		storageService, err := storage.NewStorageService(context.Background(), storage.LoadR2Config())
+		if err != nil {
+			a.Logger.Warn("storage service not configured", "error", err)
+		} else {
+			a.StorageService = storageService
+		}
+	}
 
 	return jwtService
 }

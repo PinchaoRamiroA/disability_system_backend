@@ -11,11 +11,12 @@ import (
 	historialuc "disability_system_backend/internal/modules/historial/usecase"
 	"disability_system_backend/internal/shared/auth"
 	"disability_system_backend/internal/shared/router"
+	"disability_system_backend/internal/shared/storage"
 
 	"gorm.io/gorm"
 )
 
-func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService) {
+func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, storageService *storage.StorageService) {
 	incapacidadRepo := inicapapostgres.NewIncapacidadRepository(db)
 	documentoRepo := inicapapostgres.NewDocumentoRepository(db)
 	permissionRepo := inicapapostgres.NewPermissionRepository(db)
@@ -28,7 +29,7 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService) {
 	incapacidadHandler := NewIncapacidadHandler(incapacidadUseCase)
 	documentoHandler := NewDocumentoHandler(documentoUseCase, func(incapacidadID uint64, tipoID *uint64, page, limit int) ([]historialdomain.Historial, int64, error) {
 		return historialService.List(context.Background(), incapacidadID, tipoID, page, limit)
-	})
+	}, storageService)
 
 	jwtMiddleware := authhttp.NewJWTMiddleware(jwtService)
 	permissionMiddleware := NewPermissionMiddleware(permissionRepo)
@@ -46,6 +47,7 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService) {
 		group.DELETE("/:id", incapacidadHandler.Archivar)
 		group.GET("/:id/documentos", documentoHandler.Listar)
 		group.POST("/:id/documentos", documentoHandler.Subir)
+		group.POST("/:id/documentos/url", documentoHandler.GenerarURLPrefirmada)
 		group.GET("/:id/historial", documentoHandler.ListarHistorial)
 	}
 

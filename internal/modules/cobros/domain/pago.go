@@ -10,6 +10,8 @@ type Pago struct {
 	IDPago          uint64
 	IDIncapacidad   uint64
 	IDEntidad       uint64
+	TipoPago        string
+	EstadoPago      string
 	Descripcion     *string
 	Valor           decimal.Decimal
 	FechaPago       time.Time

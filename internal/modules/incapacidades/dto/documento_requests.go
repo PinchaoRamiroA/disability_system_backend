@@ -8,9 +8,14 @@ type SubirDocumentoRequest struct {
 	Formato       string `json:"formato" binding:"required"`
 }
 
+type SubirDocumentoMultipartRequest struct {
+	IDIncapacidad uint64 `form:"id_incapacidad" binding:"required"`
+	Tipo          string `form:"tipo" binding:"required"`
+}
+
 type ValidarDocumentoRequest struct {
-	Estado      string  `json:"estado" binding:"required"`
-	Comentario  *string `json:"comentario,omitempty"`
+	Estado     string  `json:"estado" binding:"required"`
+	Comentario *string `json:"comentario,omitempty"`
 }
 
 type ListarDocumentosQuery struct {

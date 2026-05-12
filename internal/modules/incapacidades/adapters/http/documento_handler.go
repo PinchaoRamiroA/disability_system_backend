@@ -11,17 +11,23 @@ import (
 	"disability_system_backend/internal/modules/incapacidades/usecase"
 	apperrors "disability_system_backend/internal/shared/errors"
 	"disability_system_backend/internal/shared/response"
+	"disability_system_backend/internal/shared/storage"
 
 	"github.com/gin-gonic/gin"
 )
 
 type DocumentoHandler struct {
-	useCase         *usecase.DocumentoUseCase
-	historialListFn func(incapacidadID uint64, tipoID *uint64, page, limit int) ([]domain.Historial, int64, error)
+	useCase          *usecase.DocumentoUseCase
+	historialListFn  func(incapacidadID uint64, tipoID *uint64, page, limit int) ([]domain.Historial, int64, error)
+	storageService   *storage.StorageService
 }
 
-func NewDocumentoHandler(useCase *usecase.DocumentoUseCase, historialListFn func(uint64, *uint64, int, int) ([]domain.Historial, int64, error)) *DocumentoHandler {
-	return &DocumentoHandler{useCase: useCase, historialListFn: historialListFn}
+func NewDocumentoHandler(useCase *usecase.DocumentoUseCase, historialListFn func(uint64, *uint64, int, int) ([]domain.Historial, int64, error), storageService *storage.StorageService) *DocumentoHandler {
+	return &DocumentoHandler{
+		useCase:         useCase,
+		historialListFn: historialListFn,
+		storageService:  storageService,
+	}
 }
 
 func (h *DocumentoHandler) Subir(c *gin.Context) {
@@ -249,7 +255,76 @@ func stringPtr(s string) *string {
 	return &s
 }
 
-var _ DocumentoHandlerInterface = (*DocumentoHandler)(nil)
+func (h *DocumentoHandler) GenerarURLPrefirmada(c *gin.Context) {
+	if h.storageService == nil {
+		response.InternalError(c, "servicio de almacenamiento no disponible", "STORAGE_NOT_CONFIGURED")
+		return
+	}
+
+	idStr := c.Param("id")
+	incapacidadID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil || incapacidadID == 0 {
+		response.BadRequest(c, "id de incapacidad inválido", "BAD_REQUEST", nil)
+		return
+	}
+
+	var req struct {
+		Nombre  string `json:"nombre" binding:"required"`
+		Formato string `json:"formato" binding:"required"`
+		Tipo    string `json:"tipo" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.ValidationError(c, "datos inválidos", err.Error())
+		return
+	}
+
+	contentType := h.storageService.GetValidator().GetMimeTypeFromExtension(req.Nombre)
+	if contentType == "" {
+		ext := "." + req.Formato
+		contentType = getContentTypeFromExtension(ext)
+	}
+
+	if err := h.storageService.Validate(contentType, h.storageService.GetMaxFileSize()); err != nil {
+		handleStorageError(c, err)
+		return
+	}
+
+	filename := req.Nombre + "." + req.Formato
+	result, err := h.storageService.GenerateUploadURL(c.Request.Context(), filename, contentType, incapacidadID)
+	if err != nil {
+		handleStorageError(c, err)
+		return
+	}
+
+	response.Success(c, gin.H{
+		"upload_url": result.URL,
+		"key":       result.Key,
+		"expires_at": result.ExpiresAt.Format(time.RFC3339),
+	}, "URL prefirmada generada")
+}
+
+func getContentTypeFromExtension(ext string) string {
+	switch ext {
+	case ".pdf":
+		return "application/pdf"
+	case ".jpg", ".jpeg":
+		return "image/jpeg"
+	case ".png":
+		return "image/png"
+	default:
+		return "application/octet-stream"
+	}
+}
+
+func handleStorageError(c *gin.Context, err error) {
+	var storageErr *storage.StorageError
+	if errors.As(err, &storageErr) {
+		response.Error(c, storageErr.HTTPStatus, storageErr.Message, storageErr.Code, nil)
+		return
+	}
+	response.InternalError(c, "error interno", "INTERNAL_ERROR")
+}
 
 type DocumentoHandlerInterface interface {
 	Subir(c *gin.Context)
@@ -257,4 +332,7 @@ type DocumentoHandlerInterface interface {
 	Listar(c *gin.Context)
 	Eliminar(c *gin.Context)
 	ListarHistorial(c *gin.Context)
+	GenerarURLPrefirmada(c *gin.Context)
 }
+
+var _ DocumentoHandlerInterface = (*DocumentoHandler)(nil)

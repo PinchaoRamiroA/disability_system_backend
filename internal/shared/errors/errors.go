@@ -104,6 +104,12 @@ var (
 		HTTPStatus: http.StatusNotFound,
 	}
 
+	ErrRolNotFound = &AppError{
+		Code:       "ROL_NOT_FOUND",
+		Message:    "Rol no encontrado",
+		HTTPStatus: http.StatusNotFound,
+	}
+
 	ErrConflict = &AppError{
 		Code:       "CONFLICT",
 		Message:    "Conflicto de datos",
