@@ -97,6 +97,147 @@ definitions:
       rol:
         $ref: '#/definitions/disability_system_backend_internal_modules_auth_dto.RoleResponse'
     type: object
+  disability_system_backend_internal_modules_cobros_dto.ActualizarPagoRequest:
+    properties:
+      descripcion:
+        type: string
+      estado_pago:
+        type: string
+      fecha_pago:
+        type: string
+      id_entidad:
+        type: integer
+      periodo_contable:
+        type: string
+      tipo_pago:
+        type: string
+      valor:
+        type: string
+    type: object
+  disability_system_backend_internal_modules_cobros_dto.ActualizarSeguimientoRequest:
+    properties:
+      descripcion:
+        type: string
+      resultado:
+        type: string
+      tipo_seguimiento:
+        type: string
+    type: object
+  disability_system_backend_internal_modules_cobros_dto.ConciliarPagoRequest:
+    properties:
+      conciliado:
+        type: boolean
+      descripcion:
+        type: string
+      estado_pago:
+        type: string
+    type: object
+  disability_system_backend_internal_modules_cobros_dto.CrearPagoRequest:
+    properties:
+      descripcion:
+        type: string
+      estado_pago:
+        type: string
+      fecha_pago:
+        type: string
+      id_entidad:
+        type: integer
+      id_incapacidad:
+        type: integer
+      periodo_contable:
+        type: string
+      tipo_pago:
+        type: string
+      valor:
+        type: string
+    required:
+    - fecha_pago
+    - id_entidad
+    - id_incapacidad
+    - tipo_pago
+    - valor
+    type: object
+  disability_system_backend_internal_modules_cobros_dto.CrearSeguimientoRequest:
+    properties:
+      descripcion:
+        type: string
+      id_incapacidad:
+        type: integer
+      resultado:
+        type: string
+      tipo_seguimiento:
+        type: string
+    required:
+    - id_incapacidad
+    - tipo_seguimiento
+    type: object
+  disability_system_backend_internal_modules_incapacidades_dto.ActualizarIncapacidadRequest:
+    properties:
+      canal_recepcion:
+        type: string
+      fecha_fin:
+        type: string
+      fecha_inicio:
+        type: string
+      fecha_pago:
+        type: string
+      fecha_radicacion:
+        type: string
+      id_entidad:
+        type: integer
+      id_tipo:
+        type: integer
+      id_usuario:
+        type: integer
+      observaciones:
+        type: string
+      origen:
+        type: string
+      titulo:
+        type: string
+    type: object
+  disability_system_backend_internal_modules_incapacidades_dto.CambiarEstadoRequest:
+    properties:
+      id_estado:
+        type: integer
+      observaciones:
+        type: string
+    required:
+    - id_estado
+    type: object
+  disability_system_backend_internal_modules_incapacidades_dto.CrearIncapacidadRequest:
+    properties:
+      canal_recepcion:
+        type: string
+      fecha_fin:
+        type: string
+      fecha_inicio:
+        type: string
+      fecha_pago:
+        type: string
+      fecha_radicacion:
+        type: string
+      id_entidad:
+        type: integer
+      id_estado:
+        type: integer
+      id_tipo:
+        type: integer
+      id_usuario:
+        type: integer
+      observaciones:
+        type: string
+      origen:
+        type: string
+      titulo:
+        type: string
+    required:
+    - fecha_inicio
+    - id_entidad
+    - id_tipo
+    - origen
+    - titulo
+    type: object
   disability_system_backend_internal_modules_incapacidades_dto.MarcarTranscripcionRequest:
     properties:
       estado:
@@ -107,10 +248,152 @@ definitions:
     required:
     - estado
     type: object
+  disability_system_backend_internal_modules_incapacidades_dto.SubirDocumentoRequest:
+    properties:
+      formato:
+        type: string
+      id_incapacidad:
+        type: integer
+      nombre:
+        type: string
+      tipo:
+        type: string
+      url:
+        type: string
+    required:
+    - formato
+    - id_incapacidad
+    - nombre
+    - tipo
+    - url
+    type: object
   disability_system_backend_internal_modules_incapacidades_dto.TranscribirIncapacidadRequest:
     properties:
       observaciones_transcripcion:
         type: string
+    type: object
+  disability_system_backend_internal_modules_incapacidades_dto.ValidarDocumentoRequest:
+    properties:
+      comentario:
+        type: string
+      estado:
+        type: string
+    required:
+    - estado
+    type: object
+  disability_system_backend_internal_modules_notificaciones_dto.CrearNotificacionRequest:
+    properties:
+      id_incapacidad:
+        type: integer
+      id_usuario:
+        type: integer
+      mensaje:
+        type: string
+      tipo_notificacion:
+        type: string
+    required:
+    - id_usuario
+    - mensaje
+    - tipo_notificacion
+    type: object
+  disability_system_backend_internal_modules_reportes_dto.GenerarReporteRequest:
+    properties:
+      fecha_fin:
+        type: string
+      fecha_inicio:
+        type: string
+      id_empleado:
+        type: integer
+      id_entidad:
+        type: integer
+      id_estado:
+        type: integer
+      id_tipo:
+        type: integer
+      origen:
+        type: string
+      periodo:
+        type: string
+      tipo:
+        type: string
+    required:
+    - tipo
+    type: object
+  disability_system_backend_internal_modules_usuarios_dto.ActualizarUsuarioRequest:
+    properties:
+      correo:
+        maxLength: 150
+        type: string
+      direccion:
+        type: string
+      id_rol:
+        type: integer
+      nombre:
+        maxLength: 150
+        minLength: 3
+        type: string
+      numero_celular:
+        type: string
+    required:
+    - correo
+    - id_rol
+    - nombre
+    type: object
+  disability_system_backend_internal_modules_usuarios_dto.AsignarRolRequest:
+    properties:
+      id_rol:
+        type: integer
+    required:
+    - id_rol
+    type: object
+  disability_system_backend_internal_modules_usuarios_dto.CambiarEstadoUsuarioRequest:
+    properties:
+      estado:
+        type: boolean
+    type: object
+  disability_system_backend_internal_modules_usuarios_dto.CambiarPasswordRequest:
+    properties:
+      password_actual:
+        type: string
+      password_nuevo:
+        maxLength: 100
+        minLength: 8
+        type: string
+    required:
+    - password_actual
+    - password_nuevo
+    type: object
+  disability_system_backend_internal_modules_usuarios_dto.CrearUsuarioRequest:
+    properties:
+      correo:
+        maxLength: 150
+        type: string
+      direccion:
+        type: string
+      id_rol:
+        type: integer
+      nombre:
+        maxLength: 150
+        minLength: 3
+        type: string
+      numero_acudiente:
+        type: string
+      numero_celular:
+        type: string
+      numero_documento:
+        maxLength: 30
+        minLength: 5
+        type: string
+      password:
+        maxLength: 100
+        minLength: 8
+        type: string
+    required:
+    - correo
+    - id_rol
+    - nombre
+    - numero_documento
+    - password
     type: object
   disability_system_backend_internal_shared_response.ErrorInfo:
     properties:
@@ -232,6 +515,1143 @@ paths:
       summary: Registrar usuario
       tags:
       - auth
+  /cartera/alertas-vencimiento:
+    get:
+      consumes:
+      - application/json
+      description: Lista las alertas de vencimiento de pagos
+      parameters:
+      - default: 0
+        description: Días mínimos de vencimiento
+        in: query
+        name: dias_minimos
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener alertas de vencimiento
+      tags:
+      - cartera
+  /cartera/estadisticas:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene estadísticas generales de la cartera de cobros
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener estadísticas de cartera
+      tags:
+      - cartera
+  /cartera/incapacidades/{id}/proximo-estado:
+    get:
+      consumes:
+      - application/json
+      description: Sugiere el próximo estado basado en acciones de cobro
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Acción a realizar
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener próximo estado de incapacidad
+      tags:
+      - cartera
+  /cartera/resumen-entidad:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene el resumen de cobros agrupado por entidad
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener resumen por entidad
+      tags:
+      - cartera
+  /cartera/vencida:
+    get:
+      consumes:
+      - application/json
+      description: Lista los pagos vencidos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener cartera vencida
+      tags:
+      - cartera
+  /catalogos/estados-documento:
+    get:
+      consumes:
+      - application/json
+      description: Lista todos los estados de documento
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar estados de documento
+      tags:
+      - catalogos
+  /catalogos/tipos-documento:
+    get:
+      consumes:
+      - application/json
+      description: Lista todos los tipos de documento
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar tipos de documento
+      tags:
+      - catalogos
+  /catalogos/tipos-pago:
+    get:
+      consumes:
+      - application/json
+      description: Lista todos los tipos de pago
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar tipos de pago
+      tags:
+      - catalogos
+  /cobros/pagos:
+    get:
+      consumes:
+      - application/json
+      description: Lista los pagos con filtros
+      parameters:
+      - description: Filtrar por incapacidad
+        in: query
+        name: id_incapacidad
+        type: integer
+      - description: Filtrar por entidad
+        in: query
+        name: id_entidad
+        type: integer
+      - description: Filtrar por tipo
+        in: query
+        name: tipo_pago
+        type: string
+      - description: Filtrar por estado
+        in: query
+        name: estado_pago
+        type: string
+      - description: Filtrar por conciliación
+        in: query
+        name: conciliado
+        type: boolean
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar pagos
+      tags:
+      - cobros
+    post:
+      consumes:
+      - application/json
+      description: Registra un nuevo pago de EPS/ARL
+      parameters:
+      - description: Datos del pago
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_cobros_dto.CrearPagoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Registrar pago
+      tags:
+      - cobros
+  /cobros/pagos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un pago del sistema
+      parameters:
+      - description: ID del pago
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Eliminar pago
+      tags:
+      - cobros
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un pago específico
+      parameters:
+      - description: ID del pago
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener pago por ID
+      tags:
+      - cobros
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un pago
+      parameters:
+      - description: ID del pago
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos del pago
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_cobros_dto.ActualizarPagoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Actualizar pago
+      tags:
+      - cobros
+  /cobros/pagos/{id}/conciliar:
+    patch:
+      consumes:
+      - application/json
+      description: Concilia un pago para contabilidad
+      parameters:
+      - description: ID del pago
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos de conciliación
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_cobros_dto.ConciliarPagoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Conciliar pago
+      tags:
+      - cobros
+  /cobros/seguimientos:
+    get:
+      consumes:
+      - application/json
+      description: Lista los seguimientos de cobro
+      parameters:
+      - description: Filtrar por incapacidad
+        in: query
+        name: id_incapacidad
+        type: integer
+      - description: Filtrar por tipo
+        in: query
+        name: tipo_seguimiento
+        type: string
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar seguimientos
+      tags:
+      - cobros
+    post:
+      consumes:
+      - application/json
+      description: Registra un seguimiento de cobro persuasivo o jurídico
+      parameters:
+      - description: Datos del seguimiento
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_cobros_dto.CrearSeguimientoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Registrar seguimiento de cobro
+      tags:
+      - cobros
+  /cobros/seguimientos/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un seguimiento
+      parameters:
+      - description: ID del seguimiento
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener seguimiento por ID
+      tags:
+      - cobros
+    put:
+      consumes:
+      - application/json
+      description: Actualiza un seguimiento de cobro
+      parameters:
+      - description: ID del seguimiento
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos del seguimiento
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_cobros_dto.ActualizarSeguimientoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Actualizar seguimiento
+      tags:
+      - cobros
+  /documentos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un documento del sistema
+      parameters:
+      - description: ID del documento
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Eliminar documento
+      tags:
+      - documentos
+  /documentos/{id}/validar:
+    patch:
+      consumes:
+      - application/json
+      description: Valida o rechaza un documento
+      parameters:
+      - description: ID del documento
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Estado de validación
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_incapacidades_dto.ValidarDocumentoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Validar documento
+      tags:
+      - documentos
+  /incapacidades:
+    get:
+      consumes:
+      - application/json
+      description: Lista las incapacidades con filtros y paginación
+      parameters:
+      - description: Filtrar por usuario
+        in: query
+        name: id_usuario
+        type: integer
+      - description: Filtrar por estado
+        in: query
+        name: id_estado
+        type: integer
+      - description: Filtrar por tipo
+        in: query
+        name: id_tipo
+        type: integer
+      - description: Filtrar por entidad
+        in: query
+        name: id_entidad
+        type: integer
+      - description: Filtrar por origen
+        in: query
+        name: origen
+        type: string
+      - description: Filtrar por canal
+        in: query
+        name: canal_recepcion
+        type: string
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar incapacidades
+      tags:
+      - incapacidades
+    post:
+      consumes:
+      - application/json
+      description: Registra una nueva incapacidad médica
+      parameters:
+      - description: Datos de la incapacidad
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_incapacidades_dto.CrearIncapacidadRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Crear incapacidad
+      tags:
+      - incapacidades
+  /incapacidades/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Archiva una incapacidad (soft delete)
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Archivar incapacidad
+      tags:
+      - incapacidades
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de una incapacidad específica
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener incapacidad por ID
+      tags:
+      - incapacidades
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una incapacidad
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos a actualizar
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_incapacidades_dto.ActualizarIncapacidadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Actualizar incapacidad
+      tags:
+      - incapacidades
+  /incapacidades/{id}/documentos:
+    get:
+      consumes:
+      - application/json
+      description: Lista los documentos de una incapacidad
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID de la incapacidad
+        in: query
+        name: id_incapacidad
+        required: true
+        type: integer
+      - description: Filtrar por estado
+        in: query
+        name: estado
+        type: string
+      - description: Filtrar por tipo
+        in: query
+        name: tipo
+        type: string
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar documentos
+      tags:
+      - documentos
+    post:
+      consumes:
+      - application/json
+      description: Registra un documento asociado a una incapacidad
+      parameters:
+      - description: Datos del documento
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_incapacidades_dto.SubirDocumentoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Subir documento
+      tags:
+      - documentos
+  /incapacidades/{id}/documentos/url:
+    post:
+      consumes:
+      - application/json
+      description: Genera una URL prefirmada para subir documentos a R2
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos del archivo (nombre, formato, tipo)
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generar URL prefirmada para upload
+      tags:
+      - documentos
+  /incapacidades/{id}/estado:
+    patch:
+      consumes:
+      - application/json
+      description: Actualiza el estado de una incapacidad
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Nuevo estado
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_incapacidades_dto.CambiarEstadoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cambiar estado de incapacidad
+      tags:
+      - incapacidades
+  /incapacidades/{id}/historial:
+    get:
+      consumes:
+      - application/json
+      description: Lista el historial de cambios de una incapacidad
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID de la incapacidad
+        in: query
+        name: id_incapacidad
+        type: integer
+      - description: Filtrar por tipo de evento
+        in: query
+        name: id_tipo_historial
+        type: integer
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar historial de incapacidad
+      tags:
+      - incapacidades
+  /incapacidades/{id}/plazos:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los plazos y alertas de vencimiento para una incapacidad
+      parameters:
+      - description: ID de la incapacidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener información de plazos
+      tags:
+      - incapacidades
   /incapacidades/{id}/transcribir:
     post:
       consumes:
@@ -310,6 +1730,94 @@ paths:
       summary: Marcar transcripción en proceso
       tags:
       - incapacidades
+  /incapacidades/entidades:
+    get:
+      consumes:
+      - application/json
+      description: Lista todas las EPS y ARL registradas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar entidades
+      tags:
+      - catalogos
+  /incapacidades/estados:
+    get:
+      consumes:
+      - application/json
+      description: Lista todos los estados disponibles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar estados de incapacidad
+      tags:
+      - catalogos
+  /incapacidades/tipos:
+    get:
+      consumes:
+      - application/json
+      description: Lista todos los tipos de incapacidad
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar tipos de incapacidad
+      tags:
+      - catalogos
+  /incapacidades/tipos/{tipo_id}/documentos-requeridos:
+    get:
+      consumes:
+      - application/json
+      description: Lista los documentos requeridos para un tipo de incapacidad
+      parameters:
+      - description: ID del tipo de incapacidad
+        in: path
+        name: tipo_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener documentos requeridos
+      tags:
+      - incapacidades
   /incapacidades/transcripciones/pendientes:
     get:
       consumes:
@@ -348,4 +1856,876 @@ paths:
       summary: Listar transcripciones pendientes
       tags:
       - incapacidades
+  /notificaciones:
+    get:
+      consumes:
+      - application/json
+      description: Lista las notificaciones del usuario
+      parameters:
+      - description: Filtrar por usuario
+        in: query
+        name: id_usuario
+        type: integer
+      - description: Filtrar por incapacidad
+        in: query
+        name: id_incapacidad
+        type: integer
+      - description: Filtrar por tipo
+        in: query
+        name: tipo_notificacion
+        type: string
+      - description: Filtrar por estado de lectura
+        in: query
+        name: leida
+        type: boolean
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar notificaciones
+      tags:
+      - notificaciones
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva notificación
+      parameters:
+      - description: Datos de la notificación
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_notificaciones_dto.CrearNotificacionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Crear notificación
+      tags:
+      - notificaciones
+  /notificaciones/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una notificación
+      parameters:
+      - description: ID de la notificación
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Eliminar notificación
+      tags:
+      - notificaciones
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de una notificación
+      parameters:
+      - description: ID de la notificación
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener notificación por ID
+      tags:
+      - notificaciones
+  /notificaciones/{id}/leida:
+    patch:
+      consumes:
+      - application/json
+      description: Marca una notificación específica como leída
+      parameters:
+      - description: ID de la notificación
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Marcar notificación como leída
+      tags:
+      - notificaciones
+  /notificaciones/marcar-todas-leidas:
+    patch:
+      consumes:
+      - application/json
+      description: Marca todas las notificaciones como leídas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Marcar todas como leídas
+      tags:
+      - notificaciones
+  /notificaciones/no-leidas/count:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene el conteo de notificaciones no leídas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Contar notificaciones no leídas
+      tags:
+      - notificaciones
+  /reportes:
+    post:
+      consumes:
+      - application/json
+      description: Genera un reporte de incapacidades, ausentismo o cartera
+      parameters:
+      - description: Parámetros del reporte
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_reportes_dto.GenerarReporteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generar reporte
+      tags:
+      - reportes
+  /reportes/entidades/{entidad_id}:
+    get:
+      consumes:
+      - application/json
+      description: Genera un reporte específico para una entidad (EPS/ARL)
+      parameters:
+      - description: ID de la entidad
+        in: path
+        name: entidad_id
+        required: true
+        type: integer
+      - description: Filtros del reporte
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_reportes_dto.GenerarReporteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generar reporte por entidad
+      tags:
+      - reportes
+  /reportes/resumen-ejecutivo:
+    get:
+      consumes:
+      - application/json
+      description: Genera un resumen ejecutivo con métricas generales
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener resumen ejecutivo
+      tags:
+      - reportes
+  /reportes/vencimientos:
+    get:
+      consumes:
+      - application/json
+      description: Genera un reporte de incapacidades vencidas
+      parameters:
+      - default: 0
+        description: Días mínimos de vencimiento
+        in: query
+        name: dias_minimos
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generar reporte de vencimientos
+      tags:
+      - reportes
+  /roles:
+    get:
+      consumes:
+      - application/json
+      description: Lista todos los roles disponibles
+      parameters:
+      - default: 1
+        description: Número de página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite de resultados
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar roles
+      tags:
+      - roles
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo rol con permisos
+      parameters:
+      - description: Datos del rol
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Crear rol
+      tags:
+      - roles
+  /roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un rol del sistema
+      parameters:
+      - description: ID del rol
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Eliminar rol
+      tags:
+      - roles
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un rol específico
+      parameters:
+      - description: ID del rol
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener rol por ID
+      tags:
+      - roles
+    put:
+      consumes:
+      - application/json
+      description: Actualiza un rol existente
+      parameters:
+      - description: ID del rol
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos del rol
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Actualizar rol
+      tags:
+      - roles
+  /usuarios:
+    get:
+      consumes:
+      - application/json
+      description: Lista todos los usuarios con paginación
+      parameters:
+      - default: 1
+        description: Número de página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite de resultados
+        in: query
+        name: limit
+        type: integer
+      - description: Filtrar por estado
+        in: query
+        name: estado
+        type: boolean
+      - description: Filtrar por rol
+        in: query
+        name: id_rol
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar usuarios
+      tags:
+      - usuarios
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo usuario en el sistema
+      parameters:
+      - description: Datos del usuario
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_usuarios_dto.CrearUsuarioRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Crear usuario
+      tags:
+      - usuarios
+  /usuarios/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un usuario del sistema (soft delete)
+      parameters:
+      - description: ID del usuario
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Eliminar usuario
+      tags:
+      - usuarios
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un usuario específico
+      parameters:
+      - description: ID del usuario
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Obtener usuario por ID
+      tags:
+      - usuarios
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un usuario existente
+      parameters:
+      - description: ID del usuario
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos a actualizar
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_usuarios_dto.ActualizarUsuarioRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Actualizar usuario
+      tags:
+      - usuarios
+  /usuarios/{id}/estado:
+    patch:
+      consumes:
+      - application/json
+      description: Activa o desactiva un usuario
+      parameters:
+      - description: ID del usuario
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Nuevo estado
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_usuarios_dto.CambiarEstadoUsuarioRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cambiar estado de usuario
+      tags:
+      - usuarios
+  /usuarios/{id}/password:
+    post:
+      consumes:
+      - application/json
+      description: Cambia la contraseña del usuario autenticado
+      parameters:
+      - description: Contraseñas
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_usuarios_dto.CambiarPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cambiar contraseña
+      tags:
+      - usuarios
+  /usuarios/{id}/rol:
+    post:
+      consumes:
+      - application/json
+      description: Asigna un rol diferente a un usuario
+      parameters:
+      - description: ID del usuario
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID del rol
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/disability_system_backend_internal_modules_usuarios_dto.AsignarRolRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Asignar rol a usuario
+      tags:
+      - usuarios
 swagger: "2.0"

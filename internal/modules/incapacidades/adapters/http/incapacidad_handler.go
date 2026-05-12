@@ -22,6 +22,19 @@ func NewIncapacidadHandler(useCase *usecase.IncapacidadUseCase) *IncapacidadHand
 	return &IncapacidadHandler{useCase: useCase}
 }
 
+// Crear godoc
+// @Summary Crear incapacidad
+// @Description Registra una nueva incapacidad médica
+// @Tags incapacidades
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CrearIncapacidadRequest true "Datos de la incapacidad"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 403 {object} map[string]interface{}
+// @Router /incapacidades [post]
 func (h *IncapacidadHandler) Crear(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -62,6 +75,18 @@ func (h *IncapacidadHandler) Crear(c *gin.Context) {
 	response.Created(c, mapper.ToIncapacidadResponse(incapacidad), "incapacidad creada exitosamente")
 }
 
+// Obtener godoc
+// @Summary Obtener incapacidad por ID
+// @Description Obtiene los detalles de una incapacidad específica
+// @Tags incapacidades
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/{id} [get]
 func (h *IncapacidadHandler) Obtener(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -82,6 +107,25 @@ func (h *IncapacidadHandler) Obtener(c *gin.Context) {
 	response.Success(c, mapper.ToIncapacidadResponse(incapacidad), "incapacidad encontrada")
 }
 
+// Listar godoc
+// @Summary Listar incapacidades
+// @Description Lista las incapacidades con filtros y paginación
+// @Tags incapacidades
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id_usuario query int false "Filtrar por usuario"
+// @Param id_estado query int false "Filtrar por estado"
+// @Param id_tipo query int false "Filtrar por tipo"
+// @Param id_entidad query int false "Filtrar por entidad"
+// @Param origen query string false "Filtrar por origen"
+// @Param canal_recepcion query string false "Filtrar por canal"
+// @Param page query int false "Página" default(1)
+// @Param limit query int false "Límite" default(20)
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades [get]
 func (h *IncapacidadHandler) Listar(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -124,6 +168,19 @@ func (h *IncapacidadHandler) Listar(c *gin.Context) {
 	response.Paginated(c, mapper.ToIncapacidadResponses(items), total, int64(page), int64(limit))
 }
 
+// Actualizar godoc
+// @Summary Actualizar incapacidad
+// @Description Actualiza los datos de una incapacidad
+// @Tags incapacidades
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Param request body dto.ActualizarIncapacidadRequest true "Datos a actualizar"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/{id} [put]
 func (h *IncapacidadHandler) Actualizar(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -163,6 +220,19 @@ func (h *IncapacidadHandler) Actualizar(c *gin.Context) {
 	response.Success(c, mapper.ToIncapacidadResponse(incapacidad), "incapacidad actualizada")
 }
 
+// CambiarEstado godoc
+// @Summary Cambiar estado de incapacidad
+// @Description Actualiza el estado de una incapacidad
+// @Tags incapacidades
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Param request body dto.CambiarEstadoRequest true "Nuevo estado"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/{id}/estado [patch]
 func (h *IncapacidadHandler) CambiarEstado(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -189,6 +259,18 @@ func (h *IncapacidadHandler) CambiarEstado(c *gin.Context) {
 	response.Success(c, mapper.ToIncapacidadResponse(incapacidad), "estado de incapacidad actualizado")
 }
 
+// Archivar godoc
+// @Summary Archivar incapacidad
+// @Description Archiva una incapacidad (soft delete)
+// @Tags incapacidades
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Success 204
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/{id} [delete]
 func (h *IncapacidadHandler) Archivar(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -208,6 +290,15 @@ func (h *IncapacidadHandler) Archivar(c *gin.Context) {
 	response.NoContent(c)
 }
 
+// ListarEstados godoc
+// @Summary Listar estados de incapacidad
+// @Description Lista todos los estados disponibles
+// @Tags catalogos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /incapacidades/estados [get]
 func (h *IncapacidadHandler) ListarEstados(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -222,6 +313,15 @@ func (h *IncapacidadHandler) ListarEstados(c *gin.Context) {
 	response.Success(c, mapper.ToEstadoResponses(items), "estados de incapacidad")
 }
 
+// ListarTipos godoc
+// @Summary Listar tipos de incapacidad
+// @Description Lista todos los tipos de incapacidad
+// @Tags catalogos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /incapacidades/tipos [get]
 func (h *IncapacidadHandler) ListarTipos(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -236,6 +336,15 @@ func (h *IncapacidadHandler) ListarTipos(c *gin.Context) {
 	response.Success(c, mapper.ToTipoResponses(items), "tipos de incapacidad")
 }
 
+// ListarEntidades godoc
+// @Summary Listar entidades
+// @Description Lista todas las EPS y ARL registradas
+// @Tags catalogos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /incapacidades/entidades [get]
 func (h *IncapacidadHandler) ListarEntidades(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -250,6 +359,15 @@ func (h *IncapacidadHandler) ListarEntidades(c *gin.Context) {
 	response.Success(c, mapper.ToEntidadResponses(items), "entidades")
 }
 
+// ListarEstadosDocumento godoc
+// @Summary Listar estados de documento
+// @Description Lista todos los estados de documento
+// @Tags catalogos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /catalogos/estados-documento [get]
 func (h *IncapacidadHandler) ListarEstadosDocumento(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -264,6 +382,15 @@ func (h *IncapacidadHandler) ListarEstadosDocumento(c *gin.Context) {
 	response.Success(c, mapper.ToEstadoDocumentoResponses(items), "estados de documento")
 }
 
+// ListarTiposDocumento godoc
+// @Summary Listar tipos de documento
+// @Description Lista todos los tipos de documento
+// @Tags catalogos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /catalogos/tipos-documento [get]
 func (h *IncapacidadHandler) ListarTiposDocumento(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -278,6 +405,15 @@ func (h *IncapacidadHandler) ListarTiposDocumento(c *gin.Context) {
 	response.Success(c, mapper.ToTipoDocumentoResponses(items), "tipos de documento")
 }
 
+// ListarTiposPago godoc
+// @Summary Listar tipos de pago
+// @Description Lista todos los tipos de pago
+// @Tags catalogos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Router /catalogos/tipos-pago [get]
 func (h *IncapacidadHandler) ListarTiposPago(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -292,6 +428,18 @@ func (h *IncapacidadHandler) ListarTiposPago(c *gin.Context) {
 	response.Success(c, mapper.ToTipoPagoResponses(items), "tipos de pago")
 }
 
+// ObtenerDocumentosRequeridos godoc
+// @Summary Obtener documentos requeridos
+// @Description Lista los documentos requeridos para un tipo de incapacidad
+// @Tags incapacidades
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param tipo_id path int true "ID del tipo de incapacidad"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/tipos/{tipo_id}/documentos-requeridos [get]
 func (h *IncapacidadHandler) ObtenerDocumentosRequeridos(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -312,6 +460,18 @@ func (h *IncapacidadHandler) ObtenerDocumentosRequeridos(c *gin.Context) {
 	response.Success(c, mapper.ToTipoDocumentoResponses(items), "documentos requeridos")
 }
 
+// ObtenerPlazos godoc
+// @Summary Obtener información de plazos
+// @Description Obtiene los plazos y alertas de vencimiento para una incapacidad
+// @Tags incapacidades
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/{id}/plazos [get]
 func (h *IncapacidadHandler) ObtenerPlazos(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {

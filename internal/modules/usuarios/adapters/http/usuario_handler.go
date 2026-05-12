@@ -20,6 +20,20 @@ func NewUsuarioHandler(usecase *usecase.UsuarioUseCase) *UsuarioHandler {
 	return &UsuarioHandler{usecase: usecase}
 }
 
+// Listar godoc
+// @Summary Listar usuarios
+// @Description Lista todos los usuarios con paginación
+// @Tags usuarios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param page query int false "Número de página" default(1)
+// @Param limit query int false "Límite de resultados" default(20)
+// @Param estado query bool false "Filtrar por estado"
+// @Param id_rol query int false "Filtrar por rol"
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /usuarios [get]
 func (h *UsuarioHandler) Listar(c *gin.Context) {
 	query := usuariosdto.ListarUsuariosQuery{}
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -54,6 +68,18 @@ func (h *UsuarioHandler) Listar(c *gin.Context) {
 	response.Paginated(c, items, total, int64(query.Page), int64(query.Limit))
 }
 
+// Obtener godoc
+// @Summary Obtener usuario por ID
+// @Description Obtiene los detalles de un usuario específico
+// @Tags usuarios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del usuario"
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Router /usuarios/{id} [get]
 func (h *UsuarioHandler) Obtener(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
@@ -72,6 +98,18 @@ func (h *UsuarioHandler) Obtener(c *gin.Context) {
 	response.Success(c, resp, "Usuario obtenido correctamente")
 }
 
+// Crear godoc
+// @Summary Crear usuario
+// @Description Crea un nuevo usuario en el sistema
+// @Tags usuarios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body usuariosdto.CrearUsuarioRequest true "Datos del usuario"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /usuarios [post]
 func (h *UsuarioHandler) Crear(c *gin.Context) {
 	var req usuariosdto.CrearUsuarioRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -113,6 +151,19 @@ func (h *UsuarioHandler) Crear(c *gin.Context) {
 	response.Created(c, resp, "Usuario creado correctamente")
 }
 
+// Actualizar godoc
+// @Summary Actualizar usuario
+// @Description Actualiza los datos de un usuario existente
+// @Tags usuarios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del usuario"
+// @Param request body usuariosdto.ActualizarUsuarioRequest true "Datos a actualizar"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /usuarios/{id} [put]
 func (h *UsuarioHandler) Actualizar(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
@@ -155,6 +206,19 @@ func (h *UsuarioHandler) Actualizar(c *gin.Context) {
 	response.Success(c, resp, "Usuario actualizado correctamente")
 }
 
+// CambiarEstado godoc
+// @Summary Cambiar estado de usuario
+// @Description Activa o desactiva un usuario
+// @Tags usuarios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del usuario"
+// @Param request body usuariosdto.CambiarEstadoUsuarioRequest true "Nuevo estado"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /usuarios/{id}/estado [patch]
 func (h *UsuarioHandler) CambiarEstado(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
@@ -177,6 +241,18 @@ func (h *UsuarioHandler) CambiarEstado(c *gin.Context) {
 	response.Success(c, nil, "Estado actualizado correctamente")
 }
 
+// CambiarPassword godoc
+// @Summary Cambiar contraseña
+// @Description Cambia la contraseña del usuario autenticado
+// @Tags usuarios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body usuariosdto.CambiarPasswordRequest true "Contraseñas"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /usuarios/{id}/password [post]
 func (h *UsuarioHandler) CambiarPassword(c *gin.Context) {
 	var req usuariosdto.CambiarPasswordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -194,6 +270,19 @@ func (h *UsuarioHandler) CambiarPassword(c *gin.Context) {
 	response.Success(c, nil, "Contraseña actualizada correctamente")
 }
 
+// AsignarRol godoc
+// @Summary Asignar rol a usuario
+// @Description Asigna un rol diferente a un usuario
+// @Tags usuarios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del usuario"
+// @Param request body usuariosdto.AsignarRolRequest true "ID del rol"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /usuarios/{id}/rol [post]
 func (h *UsuarioHandler) AsignarRol(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
@@ -216,6 +305,18 @@ func (h *UsuarioHandler) AsignarRol(c *gin.Context) {
 	response.Success(c, nil, "Rol asignado correctamente")
 }
 
+// Eliminar godoc
+// @Summary Eliminar usuario
+// @Description Elimina un usuario del sistema (soft delete)
+// @Tags usuarios
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del usuario"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /usuarios/{id} [delete]
 func (h *UsuarioHandler) Eliminar(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)

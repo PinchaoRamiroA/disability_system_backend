@@ -23,6 +23,19 @@ func NewReportesHandler(useCase *usecase.ReportesUseCase) *ReportesHandler {
 	return &ReportesHandler{useCase: useCase}
 }
 
+// GenerarReporte godoc
+// @Summary Generar reporte
+// @Description Genera un reporte de incapacidades, ausentismo o cartera
+// @Tags reportes
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.GenerarReporteRequest true "Parámetros del reporte"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 403 {object} map[string]interface{}
+// @Router /reportes [post]
 func (h *ReportesHandler) GenerarReporte(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -59,6 +72,20 @@ func (h *ReportesHandler) GenerarReporte(c *gin.Context) {
 	response.Success(c, result, "reporte generado")
 }
 
+// GenerarReporteEntidad godoc
+// @Summary Generar reporte por entidad
+// @Description Genera un reporte específico para una entidad (EPS/ARL)
+// @Tags reportes
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param entidad_id path int true "ID de la entidad"
+// @Param request body dto.GenerarReporteRequest false "Filtros del reporte"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 403 {object} map[string]interface{}
+// @Router /reportes/entidades/{entidad_id} [get]
 func (h *ReportesHandler) GenerarReporteEntidad(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -89,6 +116,19 @@ func (h *ReportesHandler) GenerarReporteEntidad(c *gin.Context) {
 	response.Success(c, result, "reporte de entidad generado")
 }
 
+// GenerarReporteVencimientos godoc
+// @Summary Generar reporte de vencimientos
+// @Description Genera un reporte de incapacidades vencidas
+// @Tags reportes
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param dias_minimos query int false "Días mínimos de vencimiento" default(0)
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 403 {object} map[string]interface{}
+// @Router /reportes/vencimientos [get]
 func (h *ReportesHandler) GenerarReporteVencimientos(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -113,6 +153,18 @@ func (h *ReportesHandler) GenerarReporteVencimientos(c *gin.Context) {
 	response.Success(c, result, "reporte de vencimientos generado")
 }
 
+// ObtenerResumenEjecutivo godoc
+// @Summary Obtener resumen ejecutivo
+// @Description Genera un resumen ejecutivo con métricas generales
+// @Tags reportes
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Failure 403 {object} map[string]interface{}
+// @Router /reportes/resumen-ejecutivo [get]
 func (h *ReportesHandler) ObtenerResumenEjecutivo(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {

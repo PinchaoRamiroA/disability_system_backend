@@ -22,6 +22,18 @@ func NewNotificacionHandler(useCase *usecase.NotificacionUseCase) *NotificacionH
 	return &NotificacionHandler{useCase: useCase}
 }
 
+// Crear godoc
+// @Summary Crear notificación
+// @Description Crea una nueva notificación
+// @Tags notificaciones
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CrearNotificacionRequest true "Datos de la notificación"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /notificaciones [post]
 func (h *NotificacionHandler) Crear(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -46,6 +58,23 @@ func (h *NotificacionHandler) Crear(c *gin.Context) {
 	response.Created(c, mapper.ToNotificacionResponse(notificacion), "notificación creada")
 }
 
+// Listar godoc
+// @Summary Listar notificaciones
+// @Description Lista las notificaciones del usuario
+// @Tags notificaciones
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id_usuario query int false "Filtrar por usuario"
+// @Param id_incapacidad query int false "Filtrar por incapacidad"
+// @Param tipo_notificacion query string false "Filtrar por tipo"
+// @Param leida query bool false "Filtrar por estado de lectura"
+// @Param page query int false "Página" default(1)
+// @Param limit query int false "Límite" default(20)
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /notificaciones [get]
 func (h *NotificacionHandler) Listar(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -73,6 +102,18 @@ func (h *NotificacionHandler) Listar(c *gin.Context) {
 	response.Paginated(c, mapper.ToNotificacionResponses(items), total, int64(page), int64(limit))
 }
 
+// Obtener godoc
+// @Summary Obtener notificación por ID
+// @Description Obtiene los detalles de una notificación
+// @Tags notificaciones
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la notificación"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /notificaciones/{id} [get]
 func (h *NotificacionHandler) Obtener(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -92,6 +133,17 @@ func (h *NotificacionHandler) Obtener(c *gin.Context) {
 	response.Success(c, mapper.ToNotificacionResponse(notificacion), "notificación encontrada")
 }
 
+// ContarNoLeidas godoc
+// @Summary Contar notificaciones no leídas
+// @Description Obtiene el conteo de notificaciones no leídas
+// @Tags notificaciones
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /notificaciones/no-leidas/count [get]
 func (h *NotificacionHandler) ContarNoLeidas(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -106,6 +158,18 @@ func (h *NotificacionHandler) ContarNoLeidas(c *gin.Context) {
 	response.Success(c, dto.ConteoNoLeidasResponse{Total: total}, "notificaciones no leídas")
 }
 
+// MarcarLeida godoc
+// @Summary Marcar notificación como leída
+// @Description Marca una notificación específica como leída
+// @Tags notificaciones
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la notificación"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /notificaciones/{id}/leida [patch]
 func (h *NotificacionHandler) MarcarLeida(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -125,6 +189,17 @@ func (h *NotificacionHandler) MarcarLeida(c *gin.Context) {
 	response.Success(c, mapper.ToNotificacionResponse(notificacion), "notificación marcada como leída")
 }
 
+// MarcarTodasLeidas godoc
+// @Summary Marcar todas como leídas
+// @Description Marca todas las notificaciones como leídas
+// @Tags notificaciones
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /notificaciones/marcar-todas-leidas [patch]
 func (h *NotificacionHandler) MarcarTodasLeidas(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -138,6 +213,18 @@ func (h *NotificacionHandler) MarcarTodasLeidas(c *gin.Context) {
 	response.Success(c, gin.H{"leida": true}, "notificaciones marcadas como leídas")
 }
 
+// Eliminar godoc
+// @Summary Eliminar notificación
+// @Description Elimina una notificación
+// @Tags notificaciones
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la notificación"
+// @Success 204
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /notificaciones/{id} [delete]
 func (h *NotificacionHandler) Eliminar(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {

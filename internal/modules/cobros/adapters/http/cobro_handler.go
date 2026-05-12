@@ -22,6 +22,18 @@ func NewCobroHandler(useCase *usecase.CobroUseCase) *CobroHandler {
 	return &CobroHandler{useCase: useCase}
 }
 
+// CrearPago godoc
+// @Summary Registrar pago
+// @Description Registra un nuevo pago de EPS/ARL
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CrearPagoRequest true "Datos del pago"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/pagos [post]
 func (h *CobroHandler) CrearPago(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -50,6 +62,18 @@ func (h *CobroHandler) CrearPago(c *gin.Context) {
 	response.Created(c, mapper.ToPagoResponse(pago), "pago registrado")
 }
 
+// ObtenerPago godoc
+// @Summary Obtener pago por ID
+// @Description Obtiene los detalles de un pago específico
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del pago"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/pagos/{id} [get]
 func (h *CobroHandler) ObtenerPago(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -69,6 +93,24 @@ func (h *CobroHandler) ObtenerPago(c *gin.Context) {
 	response.Success(c, mapper.ToPagoResponse(pago), "pago encontrado")
 }
 
+// ListarPagos godoc
+// @Summary Listar pagos
+// @Description Lista los pagos con filtros
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id_incapacidad query int false "Filtrar por incapacidad"
+// @Param id_entidad query int false "Filtrar por entidad"
+// @Param tipo_pago query string false "Filtrar por tipo"
+// @Param estado_pago query string false "Filtrar por estado"
+// @Param conciliado query bool false "Filtrar por conciliación"
+// @Param page query int false "Página" default(1)
+// @Param limit query int false "Límite" default(20)
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/pagos [get]
 func (h *CobroHandler) ListarPagos(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -97,6 +139,19 @@ func (h *CobroHandler) ListarPagos(c *gin.Context) {
 	response.Paginated(c, mapper.ToPagoResponses(items), total, int64(page), int64(limit))
 }
 
+// ActualizarPago godoc
+// @Summary Actualizar pago
+// @Description Actualiza los datos de un pago
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del pago"
+// @Param request body dto.ActualizarPagoRequest true "Datos del pago"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/pagos/{id} [put]
 func (h *CobroHandler) ActualizarPago(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -129,6 +184,18 @@ func (h *CobroHandler) ActualizarPago(c *gin.Context) {
 	response.Success(c, mapper.ToPagoResponse(pago), "pago actualizado")
 }
 
+// EliminarPago godoc
+// @Summary Eliminar pago
+// @Description Elimina un pago del sistema
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del pago"
+// @Success 204
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/pagos/{id} [delete]
 func (h *CobroHandler) EliminarPago(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -147,6 +214,19 @@ func (h *CobroHandler) EliminarPago(c *gin.Context) {
 	response.NoContent(c)
 }
 
+// ConciliarPago godoc
+// @Summary Conciliar pago
+// @Description Concilia un pago para contabilidad
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del pago"
+// @Param request body dto.ConciliarPagoRequest true "Datos de conciliación"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/pagos/{id}/conciliar [patch]
 func (h *CobroHandler) ConciliarPago(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -171,6 +251,18 @@ func (h *CobroHandler) ConciliarPago(c *gin.Context) {
 	response.Success(c, mapper.ToPagoResponse(pago), "pago conciliado")
 }
 
+// CrearSeguimiento godoc
+// @Summary Registrar seguimiento de cobro
+// @Description Registra un seguimiento de cobro persuasivo o jurídico
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CrearSeguimientoRequest true "Datos del seguimiento"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/seguimientos [post]
 func (h *CobroHandler) CrearSeguimiento(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -195,6 +287,18 @@ func (h *CobroHandler) CrearSeguimiento(c *gin.Context) {
 	response.Created(c, mapper.ToSeguimientoResponse(seguimiento), "seguimiento registrado")
 }
 
+// ObtenerSeguimiento godoc
+// @Summary Obtener seguimiento por ID
+// @Description Obtiene los detalles de un seguimiento
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del seguimiento"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/seguimientos/{id} [get]
 func (h *CobroHandler) ObtenerSeguimiento(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -214,6 +318,21 @@ func (h *CobroHandler) ObtenerSeguimiento(c *gin.Context) {
 	response.Success(c, mapper.ToSeguimientoResponse(seguimiento), "seguimiento encontrado")
 }
 
+// ListarSeguimientos godoc
+// @Summary Listar seguimientos
+// @Description Lista los seguimientos de cobro
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id_incapacidad query int false "Filtrar por incapacidad"
+// @Param tipo_seguimiento query string false "Filtrar por tipo"
+// @Param page query int false "Página" default(1)
+// @Param limit query int false "Límite" default(20)
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/seguimientos [get]
 func (h *CobroHandler) ListarSeguimientos(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -239,6 +358,19 @@ func (h *CobroHandler) ListarSeguimientos(c *gin.Context) {
 	response.Paginated(c, mapper.ToSeguimientoResponses(items), total, int64(page), int64(limit))
 }
 
+// ActualizarSeguimiento godoc
+// @Summary Actualizar seguimiento
+// @Description Actualiza un seguimiento de cobro
+// @Tags cobros
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del seguimiento"
+// @Param request body dto.ActualizarSeguimientoRequest true "Datos del seguimiento"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cobros/seguimientos/{id} [put]
 func (h *CobroHandler) ActualizarSeguimiento(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -267,6 +399,17 @@ func (h *CobroHandler) ActualizarSeguimiento(c *gin.Context) {
 	response.Success(c, mapper.ToSeguimientoResponse(seguimiento), "seguimiento actualizado")
 }
 
+// ObtenerEstadisticas godoc
+// @Summary Obtener estadísticas de cartera
+// @Description Obtiene estadísticas generales de la cartera de cobros
+// @Tags cartera
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cartera/estadisticas [get]
 func (h *CobroHandler) ObtenerEstadisticas(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -281,6 +424,17 @@ func (h *CobroHandler) ObtenerEstadisticas(c *gin.Context) {
 	response.Success(c, estadisticas, "estadísticas de cartera")
 }
 
+// ObtenerResumenEntidad godoc
+// @Summary Obtener resumen por entidad
+// @Description Obtiene el resumen de cobros agrupado por entidad
+// @Tags cartera
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cartera/resumen-entidad [get]
 func (h *CobroHandler) ObtenerResumenEntidad(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -295,6 +449,18 @@ func (h *CobroHandler) ObtenerResumenEntidad(c *gin.Context) {
 	response.Success(c, resumen, "resumen por entidad")
 }
 
+// ObtenerAlertasVencimiento godoc
+// @Summary Obtener alertas de vencimiento
+// @Description Lista las alertas de vencimiento de pagos
+// @Tags cartera
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param dias_minimos query int false "Días mínimos de vencimiento" default(0)
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cartera/alertas-vencimiento [get]
 func (h *CobroHandler) ObtenerAlertasVencimiento(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -316,6 +482,17 @@ func (h *CobroHandler) ObtenerAlertasVencimiento(c *gin.Context) {
 	response.Success(c, alertas, "alertas de vencimiento")
 }
 
+// ObtenerCarteraVencida godoc
+// @Summary Obtener cartera vencida
+// @Description Lista los pagos vencidos
+// @Tags cartera
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cartera/vencida [get]
 func (h *CobroHandler) ObtenerCarteraVencida(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -330,6 +507,19 @@ func (h *CobroHandler) ObtenerCarteraVencida(c *gin.Context) {
 	response.Success(c, mapper.ToPagoResponses(pagos), "cartera vencida")
 }
 
+// ObtenerProximoEstado godoc
+// @Summary Obtener próximo estado de incapacidad
+// @Description Sugiere el próximo estado basado en acciones de cobro
+// @Tags cartera
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Param request body map[string]interface{} true "Acción a realizar"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /cartera/incapacidades/{id}/proximo-estado [get]
 func (h *CobroHandler) ObtenerProximoEstado(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {

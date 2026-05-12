@@ -30,6 +30,18 @@ func NewDocumentoHandler(useCase *usecase.DocumentoUseCase, historialListFn func
 	}
 }
 
+// Subir godoc
+// @Summary Subir documento
+// @Description Registra un documento asociado a una incapacidad
+// @Tags documentos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.SubirDocumentoRequest true "Datos del documento"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/{id}/documentos [post]
 func (h *DocumentoHandler) Subir(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -64,6 +76,19 @@ func (h *DocumentoHandler) Subir(c *gin.Context) {
 	response.Created(c, toDocumentoResponse(documento), "documento subido exitosamente")
 }
 
+// Validar godoc
+// @Summary Validar documento
+// @Description Valida o rechaza un documento
+// @Tags documentos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del documento"
+// @Param request body dto.ValidarDocumentoRequest true "Estado de validación"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /documentos/{id}/validar [patch]
 func (h *DocumentoHandler) Validar(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -103,6 +128,23 @@ func (h *DocumentoHandler) Validar(c *gin.Context) {
 	response.Success(c, toDocumentoResponse(documento), "documento validado exitosamente")
 }
 
+// Listar godoc
+// @Summary Listar documentos
+// @Description Lista los documentos de una incapacidad
+// @Tags documentos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Param id_incapacidad query int true "ID de la incapacidad"
+// @Param estado query string false "Filtrar por estado"
+// @Param tipo query string false "Filtrar por tipo"
+// @Param page query int false "Página" default(1)
+// @Param limit query int false "Límite" default(20)
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/{id}/documentos [get]
 func (h *DocumentoHandler) Listar(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -142,6 +184,18 @@ func (h *DocumentoHandler) Listar(c *gin.Context) {
 	response.Paginated(c, toDocumentoResponses(items), total, int64(page), int64(limit))
 }
 
+// Eliminar godoc
+// @Summary Eliminar documento
+// @Description Elimina un documento del sistema
+// @Tags documentos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID del documento"
+// @Success 204
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /documentos/{id} [delete]
 func (h *DocumentoHandler) Eliminar(c *gin.Context) {
 	actor, err := actorFromGin(c)
 	if err != nil {
@@ -163,6 +217,22 @@ func (h *DocumentoHandler) Eliminar(c *gin.Context) {
 	response.NoContent(c)
 }
 
+// ListarHistorial godoc
+// @Summary Listar historial de incapacidad
+// @Description Lista el historial de cambios de una incapacidad
+// @Tags incapacidades
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Param id_incapacidad query int false "ID de la incapacidad"
+// @Param id_tipo_historial query int false "Filtrar por tipo de evento"
+// @Param page query int false "Página" default(1)
+// @Param limit query int false "Límite" default(20)
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/{id}/historial [get]
 func (h *DocumentoHandler) ListarHistorial(c *gin.Context) {
 	var query dto.ListarHistorialQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -255,6 +325,19 @@ func stringPtr(s string) *string {
 	return &s
 }
 
+// GenerarURLPrefirmada godoc
+// @Summary Generar URL prefirmada para upload
+// @Description Genera una URL prefirmada para subir documentos a R2
+// @Tags documentos
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID de la incapacidad"
+// @Param request body map[string]interface{} true "Datos del archivo (nombre, formato, tipo)"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 401 {object} map[string]interface{}
+// @Router /incapacidades/{id}/documentos/url [post]
 func (h *DocumentoHandler) GenerarURLPrefirmada(c *gin.Context) {
 	if h.storageService == nil {
 		response.InternalError(c, "servicio de almacenamiento no disponible", "STORAGE_NOT_CONFIGURED")
