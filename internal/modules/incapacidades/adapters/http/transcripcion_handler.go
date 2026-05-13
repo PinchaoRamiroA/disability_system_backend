@@ -1,6 +1,8 @@
 package http
 
 import (
+	"errors"
+	"log"
 	"strconv"
 
 	"disability_system_backend/internal/modules/incapacidades/dto"
@@ -100,6 +102,11 @@ func (h *TranscripcionHandler) MarcarEnProceso(c *gin.Context) {
 
 	incapacidad, err := h.useCase.MarcarEnProceso(c.Request.Context(), id, actor)
 	if err != nil {
+		log.Printf("MarcarEnProceso error: %v", err)
+		if errors.Is(err, usecase.ErrTranscripcionNotAllowed) {
+			response.BadRequest(c, "no se puede cambiar el estado de transcripción cuando ya está completada", "TRANSCRIPCION_NOT_ALLOWED", nil)
+			return
+		}
 		handleError(c, err)
 		return
 	}

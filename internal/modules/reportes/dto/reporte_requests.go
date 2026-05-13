@@ -3,7 +3,7 @@ package dto
 import "time"
 
 type GenerarReporteRequest struct {
-	Tipo        string  `json:"tipo" binding:"required"`
+	Tipo        string  `json:"tipo"`
 	FechaInicio string  `json:"fecha_inicio"`
 	FechaFin    string  `json:"fecha_fin"`
 	IDEntidad   *uint64 `json:"id_entidad,omitempty"`

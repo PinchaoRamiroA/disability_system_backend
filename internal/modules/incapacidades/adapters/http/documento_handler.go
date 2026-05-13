@@ -234,14 +234,16 @@ func (h *DocumentoHandler) Eliminar(c *gin.Context) {
 // @Failure 401 {object} map[string]interface{}
 // @Router /incapacidades/{id}/historial [get]
 func (h *DocumentoHandler) ListarHistorial(c *gin.Context) {
-	var query dto.ListarHistorialQuery
-	if err := c.ShouldBindQuery(&query); err != nil {
-		response.ValidationError(c, "filtros inválidos", err.Error())
+	idStr := c.Param("id")
+	incapacidadID, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil || incapacidadID == 0 {
+		response.BadRequest(c, "id de incapacidad inválido", "BAD_REQUEST", nil)
 		return
 	}
 
-	if query.IDIncapacidad == 0 {
-		response.BadRequest(c, "id_incapacidad es requerido", "BAD_REQUEST", nil)
+	var query dto.ListarHistorialQuery
+	if err := c.ShouldBindQuery(&query); err != nil {
+		response.ValidationError(c, "filtros inválidos", err.Error())
 		return
 	}
 
@@ -262,7 +264,7 @@ func (h *DocumentoHandler) ListarHistorial(c *gin.Context) {
 		tipoID = &query.IDTipoHistorial
 	}
 
-	items, total, err := h.historialListFn(query.IDIncapacidad, tipoID, page, limit)
+	items, total, err := h.historialListFn(incapacidadID, tipoID, page, limit)
 	if err != nil {
 		var appErr *apperrors.AppError
 		if errors.As(err, &appErr) {

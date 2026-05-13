@@ -12,9 +12,9 @@ type CrearUsuarioRequest struct {
 }
 
 type ActualizarUsuarioRequest struct {
-	IDRol         uint64  `json:"id_rol" binding:"required,gt=0"`
-	Nombre        string  `json:"nombre" binding:"required,min=3,max=150"`
-	Correo        string  `json:"correo" binding:"required,email,max=150"`
+	IDRol         *uint64 `json:"id_rol,omitempty"`
+	Nombre        string  `json:"nombre"`
+	Correo        string  `json:"correo"`
 	NumeroCelular *string `json:"numero_celular,omitempty"`
 	Direccion     *string `json:"direccion,omitempty"`
 }

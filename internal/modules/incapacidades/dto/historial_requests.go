@@ -17,7 +17,7 @@ type HistorialResponse struct {
 }
 
 type ListarHistorialQuery struct {
-	IDIncapacidad uint64 `form:"id_incapacidad" binding:"required"`
+	IDIncapacidad uint64 `form:"id_incapacidad"`
 	IDTipoHistorial uint64 `form:"id_tipo_historial"`
 	Page          int    `form:"page"`
 	Limit         int    `form:"limit"`

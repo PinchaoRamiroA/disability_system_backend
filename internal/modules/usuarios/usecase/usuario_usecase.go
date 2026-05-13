@@ -119,7 +119,7 @@ func (uc *UsuarioUseCase) Listar(ctx context.Context, page, limit int, estado *b
 }
 
 func (uc *UsuarioUseCase) Actualizar(ctx context.Context, id uint64, req struct {
-	IDRol         uint64
+	IDRol         *uint64
 	Nombre        string
 	Correo        string
 	NumeroCelular *string
@@ -130,12 +130,15 @@ func (uc *UsuarioUseCase) Actualizar(ctx context.Context, id uint64, req struct 
 		return nil, err
 	}
 
-	_, err = uc.rolRepo.FindByID(ctx, req.IDRol)
-	if err != nil {
-		return nil, apperrors.ErrRolNotFound.WithError(err)
+	if req.IDRol != nil {
+		_, err = uc.rolRepo.FindByID(ctx, *req.IDRol)
+		if err != nil {
+			return nil, apperrors.ErrRolNotFound.WithError(err)
+		}
+		usuario.IDRol = *req.IDRol
 	}
 
-	if req.Correo != usuario.Correo {
+	if req.Correo != "" && req.Correo != usuario.Correo {
 		exists, err := uc.usuarioRepo.EmailExists(ctx, req.Correo, &id)
 		if err != nil {
 			return nil, err
@@ -143,13 +146,20 @@ func (uc *UsuarioUseCase) Actualizar(ctx context.Context, id uint64, req struct 
 		if exists {
 			return nil, apperrors.ErrEmailAlreadyExists
 		}
+		usuario.Correo = req.Correo
 	}
 
-	usuario.IDRol = req.IDRol
-	usuario.Nombre = req.Nombre
-	usuario.Correo = req.Correo
-	usuario.NumeroCelular = req.NumeroCelular
-	usuario.Direccion = req.Direccion
+	if req.Nombre != "" {
+		usuario.Nombre = req.Nombre
+	}
+
+	if req.NumeroCelular != nil {
+		usuario.NumeroCelular = req.NumeroCelular
+	}
+
+	if req.Direccion != nil {
+		usuario.Direccion = req.Direccion
+	}
 
 	if err := uc.usuarioRepo.Update(ctx, usuario); err != nil {
 		return nil, err

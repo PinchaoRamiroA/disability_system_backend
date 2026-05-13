@@ -40,3 +40,7 @@ type ReportesRepository interface {
 	SumValorCartera(ctx context.Context) (pagado, pendiente float64, err error)
 	GetCarteraPorEntidad(ctx context.Context) ([]domain.ReporteCarteraEntidad, error)
 }
+
+type PermissionRepository interface {
+	FindPermissionsByRoleName(ctx context.Context, role string) ([]string, error)
+}

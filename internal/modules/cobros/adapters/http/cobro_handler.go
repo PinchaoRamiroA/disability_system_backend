@@ -508,14 +508,13 @@ func (h *CobroHandler) ObtenerCarteraVencida(c *gin.Context) {
 }
 
 // ObtenerProximoEstado godoc
-// @Summary Obtener próximo estado de incapacidad
-// @Description Sugiere el próximo estado basado en acciones de cobro
-// @Tags cartera
+// @Summary Obtener el próximo estado de una incapacidad
+// @Description Retorna el próximo estado sugerido basado en la acción a realizar
+// @Tags Cartera
 // @Accept json
 // @Produce json
-// @Security BearerAuth
 // @Param id path int true "ID de la incapacidad"
-// @Param request body map[string]interface{} true "Acción a realizar"
+// @Param accion query string true "Acción a realizar"
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
@@ -531,14 +530,12 @@ func (h *CobroHandler) ObtenerProximoEstado(c *gin.Context) {
 		handleError(c, err)
 		return
 	}
-	var req struct {
-		Accion string `json:"accion" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.ValidationError(c, "datos inválidos", err.Error())
+	accion := c.Query("accion")
+	if accion == "" {
+		response.BadRequest(c, "parámetro 'accion' requerido", "MISSING_PARAM", nil)
 		return
 	}
-	estado, err := h.useCase.ObtenerProximoEstadoIncapacidad(c.Request.Context(), actor, incapacidadID, req.Accion)
+	estado, err := h.useCase.ObtenerProximoEstadoIncapacidad(c.Request.Context(), actor, incapacidadID, accion)
 	if err != nil {
 		handleError(c, err)
 		return

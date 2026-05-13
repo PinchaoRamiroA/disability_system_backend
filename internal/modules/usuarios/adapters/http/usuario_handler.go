@@ -179,7 +179,7 @@ func (h *UsuarioHandler) Actualizar(c *gin.Context) {
 	}
 
 	usuario, err := h.usecase.Actualizar(c.Request.Context(), id, struct {
-		IDRol         uint64
+		IDRol         *uint64
 		Nombre        string
 		Correo        string
 		NumeroCelular *string
