@@ -2,6 +2,7 @@
   "info": {
     "_postman_id": "01ca9425-c3b9-46f7-b0e5-42bea1e7f8d1",
     "name": "Disability_system",
+    "description": "API de gestión de incapacidades médicas",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "36756699"
   },
@@ -10,40 +11,18 @@
       "name": "Auth",
       "item": [
         {
-          "name": "registrar",
+          "name": "Login",
           "request": {
             "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan3@ejemplo.com\",\n  \"password\": \"123456\",\n  \"numero_documento\": \"123456\",\n  \"numero_celular\": \"+573001234567\",\n  \"direccion\": \"Calle 123 #45-67\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
-            },
-            "url": {
-              "raw": "{{url_local}}/auth/register",
-              "host": [
-                "{{url_local}}"
-              ],
-              "path": [
-                "auth",
-                "register"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "login",
-          "request": {
-            "method": "POST",
-            "header": [],
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"juan3@ejemplo.com\",\n  \"password\": \"123456\"\n}",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"your_password\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -52,25 +31,52 @@
             },
             "url": {
               "raw": "{{url_local}}/auth/login",
-              "host": [
-                "{{url_local}}"
-              ],
-              "path": [
-                "auth",
-                "login"
-              ]
+              "host": ["{{url_local}}"],
+              "path": ["auth", "login"]
             }
           },
           "response": []
         },
         {
-          "name": "refresh",
+          "name": "Register",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refresh_token\": \"\"\n}",
+              "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@ejemplo.com\",\n  \"password\": \"123456\",\n  \"numero_documento\": \"12345678\",\n  \"numero_celular\": \"+573001234567\",\n  \"direccion\": \"Calle 123 #45-67\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/auth/register",
+              "host": ["{{url_local}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -79,13 +85,8 @@
             },
             "url": {
               "raw": "{{url_local}}/auth/refresh",
-              "host": [
-                "{{url_local}}"
-              ],
-              "path": [
-                "auth",
-                "refresh"
-              ]
+              "host": ["{{url_local}}"],
+              "path": ["auth", "refresh"]
             }
           },
           "response": []
@@ -96,13 +97,35 @@
       "name": "Incapacidades",
       "item": [
         {
-          "name": "Crear",
+          "name": "Listar incapacidades",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades?page=1&limit=20",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear incapacidad",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id_usuario\": 1,\n  \"id_estado\": 1,\n  \"id_tipo\": 1,\n  \"id_entidad\": 1,\n  \"canal_recepcion\": \"presencial\",\n  \"titulo\": \"Incapacidad por enfermedad general\",\n  \"fecha_inicio\": \"2024-01-15\",\n  \"fecha_fin\": \"2024-01-30\",\n  \"origen\": \"laboral\",\n  \"fecha_radicacion\": \"2024-01-20\",\n  \"fecha_pago\": \"2024-02-15\",\n  \"observaciones\": \"string\"\n}",
+              "raw": "{\n  \"id_tipo\": 1,\n  \"id_entidad\": 1,\n  \"titulo\": \"Incapacidad por enfermedad general\",\n  \"fecha_inicio\": \"2024-01-15\",\n  \"fecha_fin\": \"2024-01-30\",\n  \"origen\": \"laboral\",\n  \"canal_recepcion\": \"presencial\",\n  \"fecha_radicacion\": \"2024-01-20\",\n  \"fecha_pago\": \"2024-02-15\",\n  \"observaciones\": \"Notas adicionales\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -111,12 +134,211 @@
             },
             "url": {
               "raw": "{{url_local}}/incapacidades",
-              "host": [
-                "{{url_local}}"
-              ],
-              "path": [
-                "incapacidades"
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener incapacidad por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar incapacidad",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Incapacidad actualizada\",\n  \"observaciones\": \"Nuevas observaciones\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Archivar incapacidad",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar estado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_estado\": 2,\n  \"observaciones\": \"Cambio de estado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1/estado",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1", "estado"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar historial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1/historial",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1", "historial"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener plazos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1/plazos",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1", "plazos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar transcripción",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha_transcripcion\": \"2024-01-20\",\n  \"numero_radicado\": \"RAD-001\",\n  \"observaciones\": \"Transcripción realizada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1/transcribir",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1", "transcribir"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar transcripción en proceso",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_transcripcion\": \"en_proceso\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1/transcripcion",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1", "transcripcion"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar transcripciones pendientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/transcripciones/pendientes?page=1&limit=20",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "transcripciones", "pendientes"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
               ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener documentos requeridos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/tipos/1/documentos-requeridos",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "tipos", "1", "documentos-requeridos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar entidades",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/entidades",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "entidades"]
             }
           },
           "response": []
@@ -128,13 +350,21 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/estados",
-              "host": [
-                "{{url_local}}"
-              ],
-              "path": [
-                "incapacidades",
-                "estados"
-              ]
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "estados"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar tipos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/tipos",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "tipos"]
             }
           },
           "response": []
@@ -142,21 +372,729 @@
       ]
     },
     {
-      "name": "Roles",
+      "name": "Documentos",
       "item": [
         {
-          "name": "Listar",
+          "name": "Listar documentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1/documentos?id_incapacidad=1&page=1&limit=20",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1", "documentos"],
+              "query": [
+                {"key": "id_incapacidad", "value": "1"},
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Subir documento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_incapacidad\": 1,\n  \"tipo\": \"certificado\",\n  \"nombre_archivo\": \"certificado.pdf\",\n  \"url\": \"https://storage.example.com/certificado.pdf\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1/documentos",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1", "documentos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Subir documento (binario)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "file", "type": "file", "src": ""},
+                {"key": "tipo", "value": "certificado", "type": "text"}
+              ]
+            },
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1/documentos/upload",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1", "documentos", "upload"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generar URL prefirmada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"certificado.pdf\",\n  \"formato\": \"application/pdf\",\n  \"tipo\": \"certificado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/incapacidades/1/documentos/url",
+              "host": ["{{url_local}}"],
+              "path": ["incapacidades", "1", "documentos", "url"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validar documento",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"validado\": true,\n  \"observaciones\": \"Documento aprobado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/documentos/1/validar",
+              "host": ["{{url_local}}"],
+              "path": ["documentos", "1", "validar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar documento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/documentos/1",
+              "host": ["{{url_local}}"],
+              "path": ["documentos", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cobros",
+      "item": [
+        {
+          "name": "Listar pagos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cobros/pagos?page=1&limit=20",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "pagos"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear pago",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_incapacidad\": 1,\n  \"id_entidad\": 1,\n  \"tipo_pago\": \"prima\",\n  \"estado_pago\": \"pendiente\",\n  \"valor\": \"1500000\",\n  \"fecha_pago\": \"2024-01-20\",\n  \"descripcion\": \"Pago de incapacidad\",\n  \"periodo_contable\": \"2024-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/cobros/pagos",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "pagos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener pago por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cobros/pagos/1",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "pagos", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar pago",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pagado\",\n  \"descripcion\": \"Pago actualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/cobros/pagos/1",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "pagos", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar pago",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cobros/pagos/1",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "pagos", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Conciliar pago",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conciliado\": true,\n  \"estado_pago\": \"conciliado\",\n  \"descripcion\": \"Pago conciliado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/cobros/pagos/1/conciliar",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "pagos", "1", "conciliar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar seguimientos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cobros/seguimientos?page=1&limit=20",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "seguimientos"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear seguimiento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_incapacidad\": 1,\n  \"tipo_seguimiento\": \"persuasivo\",\n  \"descripcion\": \"Seguimiento de cobro\",\n  \"fecha_contacto\": \"2024-01-15\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/cobros/seguimientos",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "seguimientos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener seguimiento por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cobros/seguimientos/1",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "seguimientos", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar seguimiento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Seguimiento actualizado\",\n  \"resultado\": \"exitoso\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/cobros/seguimientos/1",
+              "host": ["{{url_local}}"],
+              "path": ["cobros", "seguimientos", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cartera",
+      "item": [
+        {
+          "name": "Obtener estadísticas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cartera/estadisticas",
+              "host": ["{{url_local}}"],
+              "path": ["cartera", "estadisticas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener resumen por entidad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cartera/resumen-entidad",
+              "host": ["{{url_local}}"],
+              "path": ["cartera", "resumen-entidad"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener cartera vencida",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cartera/vencida",
+              "host": ["{{url_local}}"],
+              "path": ["cartera", "vencida"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener alertas de vencimiento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cartera/alertas-vencimiento?dias_minimos=5",
+              "host": ["{{url_local}}"],
+              "path": ["cartera", "alertas-vencimiento"],
+              "query": [
+                {"key": "dias_minimos", "value": "5"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener próximo estado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/cartera/incapacidades/1/proximo-estado",
+              "host": ["{{url_local}}"],
+              "path": ["cartera", "incapacidades", "1", "proximo-estado"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notificaciones",
+      "item": [
+        {
+          "name": "Listar notificaciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/notificaciones?page=1&limit=20",
+              "host": ["{{url_local}}"],
+              "path": ["notificaciones"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear notificación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_usuario\": 1,\n  \"id_incapacidad\": 1,\n  \"titulo\": \"Recordatorio de pago\",\n  \"mensaje\": \"El pago está próximo a vencer\",\n  \"tipo_notificacion\": \"recordatorio\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/notificaciones",
+              "host": ["{{url_local}}"],
+              "path": ["notificaciones"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener notificación por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/notificaciones/1",
+              "host": ["{{url_local}}"],
+              "path": ["notificaciones", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar notificación",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/notificaciones/1",
+              "host": ["{{url_local}}"],
+              "path": ["notificaciones", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar como leída",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/notificaciones/1/leida",
+              "host": ["{{url_local}}"],
+              "path": ["notificaciones", "1", "leida"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar todas como leídas",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/notificaciones/marcar-todas-leidas",
+              "host": ["{{url_local}}"],
+              "path": ["notificaciones", "marcar-todas-leidas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Contar no leídas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/notificaciones/no-leidas/count",
+              "host": ["{{url_local}}"],
+              "path": ["notificaciones", "no-leidas", "count"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Catalogos",
+      "item": [
+        {
+          "name": "Listar tipos de documento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/catalogos/tipos-documento",
+              "host": ["{{url_local}}"],
+              "path": ["catalogos", "tipos-documento"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar estados de documento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/catalogos/estados-documento",
+              "host": ["{{url_local}}"],
+              "path": ["catalogos", "estados-documento"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar tipos de pago",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/catalogos/tipos-pago",
+              "host": ["{{url_local}}"],
+              "path": ["catalogos", "tipos-pago"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reportes",
+      "item": [
+        {
+          "name": "Generar reporte",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo_reporte\": \"incapacidades\",\n  \"fecha_inicio\": \"2024-01-01\",\n  \"fecha_fin\": \"2024-12-31\",\n  \"id_entidad\": 1,\n  \"agrupar_por\": \"mes\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/reportes",
+              "host": ["{{url_local}}"],
+              "path": ["reportes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener resumen ejecutivo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/reportes/resumen-ejecutivo",
+              "host": ["{{url_local}}"],
+              "path": ["reportes", "resumen-ejecutivo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generar reporte de vencimientos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/reportes/vencimientos?dias_minimos=30",
+              "host": ["{{url_local}}"],
+              "path": ["reportes", "vencimientos"],
+              "query": [
+                {"key": "dias_minimos", "value": "30"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generar reporte por entidad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/reportes/entidades/1",
+              "host": ["{{url_local}}"],
+              "path": ["reportes", "entidades", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/usuarios?page=1&limit=20",
+              "host": ["{{url_local}}"],
+              "path": ["usuarios"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener usuario por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_local}}/usuarios/1",
+              "host": ["{{url_local}}"],
+              "path": ["usuarios", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Actualizado\",\n  \"numero_celular\": \"+573009999999\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_local}}/usuarios/1",
+              "host": ["{{url_local}}"],
+              "path": ["usuarios", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar roles",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{url_local}}/roles",
-              "host": [
-                "{{url_local}}"
-              ],
-              "path": [
-                "roles"
-              ]
+              "host": ["{{url_local}}"],
+              "path": ["roles"]
             }
           },
           "response": []
@@ -180,10 +1118,7 @@
       "script": {
         "type": "text/javascript",
         "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
+        "exec": [""]
       }
     },
     {
@@ -191,25 +1126,25 @@
       "script": {
         "type": "text/javascript",
         "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
+        "exec": [""]
       }
     }
   ],
   "variable": [
     {
       "key": "token",
-      "value": ""
+      "value": "",
+      "description": "JWT Access Token"
     },
     {
-      "key": "url",
-      "value": ""
+      "key": "refresh_token",
+      "value": "",
+      "description": "JWT Refresh Token"
     },
     {
       "key": "url_local",
-      "value": ""
+      "value": "http://localhost:8080/api/v1",
+      "description": "URL base de la API"
     }
   ]
 }
