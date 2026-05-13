@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "01ca9425-c3b9-46f7-b0e5-42bea1e7f8d1",
+    "_postman_id": "78cae847-88d8-456f-a412-de11531a87cc",
     "name": "Disability_system",
     "description": "API de gestión de incapacidades médicas",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -22,7 +22,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"your_password\"\n}",
+              "raw": "{\n    \"email\": \"r@ejemplo.com\",\n    \"password\": \"123456\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -31,8 +31,13 @@
             },
             "url": {
               "raw": "{{url_local}}/auth/login",
-              "host": ["{{url_local}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
           },
           "response": []
@@ -49,7 +54,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@ejemplo.com\",\n  \"password\": \"123456\",\n  \"numero_documento\": \"12345678\",\n  \"numero_celular\": \"+573001234567\",\n  \"direccion\": \"Calle 123 #45-67\"\n}",
+              "raw": "{\n  \"nombre\": \"Administrador R\",\n  \"email\": \"r@ejemplo.com\",\n  \"password\": \"123456\",\n  \"numero_documento\": \"12345675\",\n  \"numero_celular\": \"+573001234567\",\n  \"direccion\": \"Calle 123 #45-67\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -58,8 +63,13 @@
             },
             "url": {
               "raw": "{{url_local}}/auth/register",
-              "host": ["{{url_local}}"],
-              "path": ["auth", "register"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
             }
           },
           "response": []
@@ -85,8 +95,13 @@
             },
             "url": {
               "raw": "{{url_local}}/auth/refresh",
-              "host": ["{{url_local}}"],
-              "path": ["auth", "refresh"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
             }
           },
           "response": []
@@ -103,11 +118,21 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades?page=1&limit=20",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades"],
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "20"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
           },
@@ -134,8 +159,12 @@
             },
             "url": {
               "raw": "{{url_local}}/incapacidades",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades"
+              ]
             }
           },
           "response": []
@@ -147,8 +176,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/1",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1"
+              ]
             }
           },
           "response": []
@@ -174,8 +208,13 @@
             },
             "url": {
               "raw": "{{url_local}}/incapacidades/1",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1"
+              ]
             }
           },
           "response": []
@@ -187,8 +226,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/1",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1"
+              ]
             }
           },
           "response": []
@@ -214,8 +258,14 @@
             },
             "url": {
               "raw": "{{url_local}}/incapacidades/1/estado",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1", "estado"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1",
+                "estado"
+              ]
             }
           },
           "response": []
@@ -227,8 +277,34 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/1/historial",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1", "historial"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1",
+                "historial"
+              ],
+              "query": [
+                {
+                  "key": "id_tipo_historial",
+                  "value": "1",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
             }
           },
           "response": []
@@ -240,8 +316,14 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/1/plazos",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1", "plazos"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1",
+                "plazos"
+              ]
             }
           },
           "response": []
@@ -267,8 +349,14 @@
             },
             "url": {
               "raw": "{{url_local}}/incapacidades/1/transcribir",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1", "transcribir"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1",
+                "transcribir"
+              ]
             }
           },
           "response": []
@@ -285,7 +373,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"estado_transcripcion\": \"en_proceso\"\n}",
+              "raw": "{\n  \"estado\": \"en_proceso\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -293,9 +381,21 @@
               }
             },
             "url": {
-              "raw": "{{url_local}}/incapacidades/1/transcripcion",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1", "transcripcion"]
+              "raw": "{{url_local}}/incapacidades/1/transcripcion?estado=en_proceso",
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1",
+                "transcripcion"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "en_proceso"
+                }
+              ]
             }
           },
           "response": []
@@ -307,11 +407,23 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/transcripciones/pendientes?page=1&limit=20",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "transcripciones", "pendientes"],
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "transcripciones",
+                "pendientes"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "20"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
           },
@@ -324,8 +436,15 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/tipos/1/documentos-requeridos",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "tipos", "1", "documentos-requeridos"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "tipos",
+                "1",
+                "documentos-requeridos"
+              ]
             }
           },
           "response": []
@@ -337,8 +456,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/entidades",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "entidades"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "entidades"
+              ]
             }
           },
           "response": []
@@ -350,8 +474,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/estados",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "estados"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "estados"
+              ]
             }
           },
           "response": []
@@ -363,8 +492,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/tipos",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "tipos"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "tipos"
+              ]
             }
           },
           "response": []
@@ -381,12 +515,27 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/incapacidades/1/documentos?id_incapacidad=1&page=1&limit=20",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1", "documentos"],
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1",
+                "documentos"
+              ],
               "query": [
-                {"key": "id_incapacidad", "value": "1"},
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "20"}
+                {
+                  "key": "id_incapacidad",
+                  "value": "1"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
           },
@@ -404,7 +553,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id_incapacidad\": 1,\n  \"tipo\": \"certificado\",\n  \"nombre_archivo\": \"certificado.pdf\",\n  \"url\": \"https://storage.example.com/certificado.pdf\"\n}",
+              "raw": "{\n  \"id_incapacidad\": 1,\n  \"tipo\": \"certificado\",\n  \"nombre_archivo\": \"certificado.pdf\",\n  \"url\": \"https://pub-1f217c1a1b0549878cd7a1492f6f2771.r2.dev/incapacidad/1/1778633794_proyecto_incapacidades_(3).pdf\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -413,8 +562,14 @@
             },
             "url": {
               "raw": "{{url_local}}/incapacidades/1/documentos",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1", "documentos"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1",
+                "documentos"
+              ]
             }
           },
           "response": []
@@ -427,14 +582,32 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                {"key": "file", "type": "file", "src": ""},
-                {"key": "tipo", "value": "certificado", "type": "text"}
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [
+                    "",
+                    "/home/computer/Descargas/Proyecto_Incapacidades (3).pdf"
+                  ]
+                },
+                {
+                  "key": "tipo",
+                  "value": "certificado",
+                  "type": "text"
+                }
               ]
             },
             "url": {
               "raw": "{{url_local}}/incapacidades/1/documentos/upload",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1", "documentos", "upload"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1",
+                "documentos",
+                "upload"
+              ]
             }
           },
           "response": []
@@ -451,7 +624,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"certificado.pdf\",\n  \"formato\": \"application/pdf\",\n  \"tipo\": \"certificado\"\n}",
+              "raw": "{\n  \"nombre\": \"Proyecto_Incapacidades (3).pdf\",\n  \"formato\": \"application/pdf\",\n  \"tipo\": \"certificado\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -460,8 +633,15 @@
             },
             "url": {
               "raw": "{{url_local}}/incapacidades/1/documentos/url",
-              "host": ["{{url_local}}"],
-              "path": ["incapacidades", "1", "documentos", "url"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "incapacidades",
+                "1",
+                "documentos",
+                "url"
+              ]
             }
           },
           "response": []
@@ -478,7 +658,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"validado\": true,\n  \"observaciones\": \"Documento aprobado\"\n}",
+              "raw": "{\n  \"validado\": true,\n  \"estado\": \"Validado\",\n  \"observaciones\": \"Documento aprobado\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -487,8 +667,14 @@
             },
             "url": {
               "raw": "{{url_local}}/documentos/1/validar",
-              "host": ["{{url_local}}"],
-              "path": ["documentos", "1", "validar"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "documentos",
+                "1",
+                "validar"
+              ]
             }
           },
           "response": []
@@ -500,8 +686,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/documentos/1",
-              "host": ["{{url_local}}"],
-              "path": ["documentos", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "documentos",
+                "1"
+              ]
             }
           },
           "response": []
@@ -518,11 +709,22 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/cobros/pagos?page=1&limit=20",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "pagos"],
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "pagos"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "20"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
           },
@@ -540,7 +742,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id_incapacidad\": 1,\n  \"id_entidad\": 1,\n  \"tipo_pago\": \"prima\",\n  \"estado_pago\": \"pendiente\",\n  \"valor\": \"1500000\",\n  \"fecha_pago\": \"2024-01-20\",\n  \"descripcion\": \"Pago de incapacidad\",\n  \"periodo_contable\": \"2024-01\"\n}",
+              "raw": "{\n  \"id_incapacidad\": 1,\n  \"id_entidad\": 1,\n  \"tipo_pago\": \"Consignación\",\n  \"estado_pago\": \"Pendiente\",\n  \"valor\": \"1500000\",\n  \"fecha_pago\": \"2024-01-20\",\n  \"descripcion\": \"Pago de incapacidad\",\n  \"periodo_contable\": \"2024-01\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -549,8 +751,13 @@
             },
             "url": {
               "raw": "{{url_local}}/cobros/pagos",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "pagos"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "pagos"
+              ]
             }
           },
           "response": []
@@ -562,8 +769,14 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/cobros/pagos/1",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "pagos", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "pagos",
+                "1"
+              ]
             }
           },
           "response": []
@@ -580,7 +793,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"estado_pago\": \"pagado\",\n  \"descripcion\": \"Pago actualizado\"\n}",
+              "raw": "{\n  \"estado_pago\": \"Pagado\",\n  \"descripcion\": \"Pago actualizado\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -589,8 +802,14 @@
             },
             "url": {
               "raw": "{{url_local}}/cobros/pagos/1",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "pagos", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "pagos",
+                "1"
+              ]
             }
           },
           "response": []
@@ -602,8 +821,14 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/cobros/pagos/1",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "pagos", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "pagos",
+                "1"
+              ]
             }
           },
           "response": []
@@ -620,7 +845,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"conciliado\": true,\n  \"estado_pago\": \"conciliado\",\n  \"descripcion\": \"Pago conciliado\"\n}",
+              "raw": "{\n  \"conciliado\": true,\n  \"estado_pago\": \"Conciliado\",\n  \"descripcion\": \"Pago conciliado\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -629,8 +854,15 @@
             },
             "url": {
               "raw": "{{url_local}}/cobros/pagos/1/conciliar",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "pagos", "1", "conciliar"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "pagos",
+                "1",
+                "conciliar"
+              ]
             }
           },
           "response": []
@@ -642,11 +874,22 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/cobros/seguimientos?page=1&limit=20",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "seguimientos"],
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "seguimientos"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "20"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
           },
@@ -664,7 +907,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id_incapacidad\": 1,\n  \"tipo_seguimiento\": \"persuasivo\",\n  \"descripcion\": \"Seguimiento de cobro\",\n  \"fecha_contacto\": \"2024-01-15\"\n}",
+              "raw": "{\n  \"id_incapacidad\": 1,\n  \"tipo_seguimiento\": \"Persuasivo\",\n  \"descripcion\": \"Seguimiento de cobro\",\n  \"fecha_contacto\": \"2024-01-15\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -673,8 +916,13 @@
             },
             "url": {
               "raw": "{{url_local}}/cobros/seguimientos",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "seguimientos"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "seguimientos"
+              ]
             }
           },
           "response": []
@@ -686,8 +934,14 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/cobros/seguimientos/1",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "seguimientos", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "seguimientos",
+                "1"
+              ]
             }
           },
           "response": []
@@ -704,7 +958,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"descripcion\": \"Seguimiento actualizado\",\n  \"resultado\": \"exitoso\"\n}",
+              "raw": "{\n  \"descripcion\": \"Seguimiento actualizado\",\n  \"resultado\": \"Pago realizado\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -713,8 +967,14 @@
             },
             "url": {
               "raw": "{{url_local}}/cobros/seguimientos/1",
-              "host": ["{{url_local}}"],
-              "path": ["cobros", "seguimientos", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cobros",
+                "seguimientos",
+                "1"
+              ]
             }
           },
           "response": []
@@ -731,8 +991,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/cartera/estadisticas",
-              "host": ["{{url_local}}"],
-              "path": ["cartera", "estadisticas"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cartera",
+                "estadisticas"
+              ]
             }
           },
           "response": []
@@ -744,8 +1009,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/cartera/resumen-entidad",
-              "host": ["{{url_local}}"],
-              "path": ["cartera", "resumen-entidad"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cartera",
+                "resumen-entidad"
+              ]
             }
           },
           "response": []
@@ -757,8 +1027,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/cartera/vencida",
-              "host": ["{{url_local}}"],
-              "path": ["cartera", "vencida"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cartera",
+                "vencida"
+              ]
             }
           },
           "response": []
@@ -770,10 +1045,18 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/cartera/alertas-vencimiento?dias_minimos=5",
-              "host": ["{{url_local}}"],
-              "path": ["cartera", "alertas-vencimiento"],
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cartera",
+                "alertas-vencimiento"
+              ],
               "query": [
-                {"key": "dias_minimos", "value": "5"}
+                {
+                  "key": "dias_minimos",
+                  "value": "5"
+                }
               ]
             }
           },
@@ -785,9 +1068,23 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{url_local}}/cartera/incapacidades/1/proximo-estado",
-              "host": ["{{url_local}}"],
-              "path": ["cartera", "incapacidades", "1", "proximo-estado"]
+              "raw": "{{url_local}}/cartera/incapacidades/1/proximo-estado?accion=registrar_pago",
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "cartera",
+                "incapacidades",
+                "1",
+                "proximo-estado"
+              ],
+              "query": [
+                {
+                  "key": "accion",
+                  "value": "registrar_pago",
+                  "type": "text"
+                }
+              ]
             }
           },
           "response": []
@@ -804,11 +1101,21 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/notificaciones?page=1&limit=20",
-              "host": ["{{url_local}}"],
-              "path": ["notificaciones"],
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "notificaciones"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "20"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
           },
@@ -826,7 +1133,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id_usuario\": 1,\n  \"id_incapacidad\": 1,\n  \"titulo\": \"Recordatorio de pago\",\n  \"mensaje\": \"El pago está próximo a vencer\",\n  \"tipo_notificacion\": \"recordatorio\"\n}",
+              "raw": "{\n  \"id_usuario\": 1,\n  \"id_incapacidad\": 1,\n  \"titulo\": \"Recordatorio de pago\",\n  \"mensaje\": \"El pago está próximo a vencer\",\n  \"tipo_notificacion\": \"Recordatorio\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -835,8 +1142,12 @@
             },
             "url": {
               "raw": "{{url_local}}/notificaciones",
-              "host": ["{{url_local}}"],
-              "path": ["notificaciones"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "notificaciones"
+              ]
             }
           },
           "response": []
@@ -848,8 +1159,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/notificaciones/1",
-              "host": ["{{url_local}}"],
-              "path": ["notificaciones", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "notificaciones",
+                "1"
+              ]
             }
           },
           "response": []
@@ -861,8 +1177,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/notificaciones/1",
-              "host": ["{{url_local}}"],
-              "path": ["notificaciones", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "notificaciones",
+                "1"
+              ]
             }
           },
           "response": []
@@ -874,8 +1195,14 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/notificaciones/1/leida",
-              "host": ["{{url_local}}"],
-              "path": ["notificaciones", "1", "leida"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "notificaciones",
+                "1",
+                "leida"
+              ]
             }
           },
           "response": []
@@ -887,8 +1214,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/notificaciones/marcar-todas-leidas",
-              "host": ["{{url_local}}"],
-              "path": ["notificaciones", "marcar-todas-leidas"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "notificaciones",
+                "marcar-todas-leidas"
+              ]
             }
           },
           "response": []
@@ -900,8 +1232,14 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/notificaciones/no-leidas/count",
-              "host": ["{{url_local}}"],
-              "path": ["notificaciones", "no-leidas", "count"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "notificaciones",
+                "no-leidas",
+                "count"
+              ]
             }
           },
           "response": []
@@ -918,8 +1256,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/catalogos/tipos-documento",
-              "host": ["{{url_local}}"],
-              "path": ["catalogos", "tipos-documento"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "catalogos",
+                "tipos-documento"
+              ]
             }
           },
           "response": []
@@ -931,8 +1274,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/catalogos/estados-documento",
-              "host": ["{{url_local}}"],
-              "path": ["catalogos", "estados-documento"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "catalogos",
+                "estados-documento"
+              ]
             }
           },
           "response": []
@@ -944,8 +1292,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/catalogos/tipos-pago",
-              "host": ["{{url_local}}"],
-              "path": ["catalogos", "tipos-pago"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "catalogos",
+                "tipos-pago"
+              ]
             }
           },
           "response": []
@@ -967,7 +1320,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"tipo_reporte\": \"incapacidades\",\n  \"fecha_inicio\": \"2024-01-01\",\n  \"fecha_fin\": \"2024-12-31\",\n  \"id_entidad\": 1,\n  \"agrupar_por\": \"mes\"\n}",
+              "raw": "{\n  \"tipo\": \"incapacidades\",\n  \"fecha_inicio\": \"2024-01-01\",\n  \"fecha_fin\": \"2024-12-31\",\n  \"id_entidad\": 1,\n  \"agrupar_por\": \"mes\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -976,8 +1329,12 @@
             },
             "url": {
               "raw": "{{url_local}}/reportes",
-              "host": ["{{url_local}}"],
-              "path": ["reportes"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "reportes"
+              ]
             }
           },
           "response": []
@@ -989,8 +1346,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/reportes/resumen-ejecutivo",
-              "host": ["{{url_local}}"],
-              "path": ["reportes", "resumen-ejecutivo"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "reportes",
+                "resumen-ejecutivo"
+              ]
             }
           },
           "response": []
@@ -1002,10 +1364,18 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/reportes/vencimientos?dias_minimos=30",
-              "host": ["{{url_local}}"],
-              "path": ["reportes", "vencimientos"],
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "reportes",
+                "vencimientos"
+              ],
               "query": [
-                {"key": "dias_minimos", "value": "30"}
+                {
+                  "key": "dias_minimos",
+                  "value": "30"
+                }
               ]
             }
           },
@@ -1013,13 +1383,74 @@
         },
         {
           "name": "Generar reporte por entidad",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
           "request": {
             "method": "GET",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{url_local}}/reportes/entidades/1",
-              "host": ["{{url_local}}"],
-              "path": ["reportes", "entidades", "1"]
+              "raw": "{{url_local}}/reportes/entidades/1?tipo=incapacidades&fecha_inicio=2024-01-01&fecha_fin=2024-12-31&id_empleado=3",
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "reportes",
+                "entidades",
+                "1"
+              ],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "incapacidades"
+                },
+                {
+                  "key": "fecha_inicio",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "fecha_fin",
+                  "value": "2024-12-31"
+                },
+                {
+                  "key": "id_tipo",
+                  "value": "1",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "id_estado",
+                  "value": "1",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "id_empleado",
+                  "value": "3",
+                  "type": "text"
+                },
+                {
+                  "key": "origen",
+                  "value": "1",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "periodo",
+                  "value": "1",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
             }
           },
           "response": []
@@ -1036,11 +1467,21 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/usuarios?page=1&limit=20",
-              "host": ["{{url_local}}"],
-              "path": ["usuarios"],
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "usuarios"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "20"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
           },
@@ -1053,8 +1494,13 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/usuarios/1",
-              "host": ["{{url_local}}"],
-              "path": ["usuarios", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "usuarios",
+                "1"
+              ]
             }
           },
           "response": []
@@ -1071,7 +1517,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Juan Actualizado\",\n  \"numero_celular\": \"+573009999999\"\n}",
+              "raw": "{\n  \"nombre\": \"Administrador\",\n  \"numero_celular\": \"+573009999999\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1080,8 +1526,13 @@
             },
             "url": {
               "raw": "{{url_local}}/usuarios/1",
-              "host": ["{{url_local}}"],
-              "path": ["usuarios", "1"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "usuarios",
+                "1"
+              ]
             }
           },
           "response": []
@@ -1093,8 +1544,12 @@
             "header": [],
             "url": {
               "raw": "{{url_local}}/roles",
-              "host": ["{{url_local}}"],
-              "path": ["roles"]
+              "host": [
+                "{{url_local}}"
+              ],
+              "path": [
+                "roles"
+              ]
             }
           },
           "response": []
@@ -1107,7 +1562,7 @@
     "bearer": [
       {
         "key": "token",
-        "value": "{{token}}",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InJAZWplbXBsby5jb20iLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlzcyI6ImRpc2FiaWxpdHlfc3lzdGVtIiwic3ViIjoickBlamVtcGxvLmNvbSIsImV4cCI6MTc3ODcxNzYwMiwibmJmIjoxNzc4NjMxMjAyLCJpYXQiOjE3Nzg2MzEyMDJ9.XCYwEPBvIptTpsiK_yVuo468ViZjdzqLtsuU-bPaiy4",
         "type": "string"
       }
     ]
@@ -1118,7 +1573,10 @@
       "script": {
         "type": "text/javascript",
         "packages": {},
-        "exec": [""]
+        "requests": {},
+        "exec": [
+          ""
+        ]
       }
     },
     {
@@ -1126,7 +1584,10 @@
       "script": {
         "type": "text/javascript",
         "packages": {},
-        "exec": [""]
+        "requests": {},
+        "exec": [
+          ""
+        ]
       }
     }
   ],
