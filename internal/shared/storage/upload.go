@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"fmt"
+	"log"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -19,6 +20,7 @@ func (c *Client) Upload(ctx context.Context, data []byte, filename string, conte
 	key := GenerateKey(incapacidadID, filename)
 
 	if err := c.PutObject(ctx, key, data, contentType); err != nil {
+		log.Printf("R2 Upload Error: %v", err)
 		return nil, ErrUploadFailed.WithError(err)
 	}
 

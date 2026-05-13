@@ -73,14 +73,7 @@ func (a *App) InitAuth() *auth.JWTService {
 	// Initialize Handler
 	a.AuthHandler = authhttp.NewAuthHandler(loginUseCase, registerUseCase, refreshUseCase)
 
-	// Register Routes
-	a.InitAuthRoutes()
-	incapacidadeshttp.Register(a.Router.V1(), a.DB, jwtService, a.StorageService)
-	cobroshttp.Register(a.Router.V1(), a.DB, jwtService)
-	notificacioneshttp.Register(a.Router.V1(), a.DB, jwtService)
-	usuarioshttp.Register(a.Router.V1(), a.DB, jwtService)
-	reporteshttp.Register(a.Router.V1(), a.DB, jwtService)
-
+	// Initialize Storage Service first
 	if a.Config.App.Env != "test" {
 		storageService, err := storage.NewStorageService(context.Background(), storage.LoadR2Config())
 		if err != nil {
@@ -89,6 +82,14 @@ func (a *App) InitAuth() *auth.JWTService {
 			a.StorageService = storageService
 		}
 	}
+
+	// Register Routes
+	a.InitAuthRoutes()
+	incapacidadeshttp.Register(a.Router.V1(), a.DB, jwtService, a.StorageService)
+	cobroshttp.Register(a.Router.V1(), a.DB, jwtService)
+	notificacioneshttp.Register(a.Router.V1(), a.DB, jwtService)
+	usuarioshttp.Register(a.Router.V1(), a.DB, jwtService)
+	reporteshttp.Register(a.Router.V1(), a.DB, jwtService)
 
 	return jwtService
 }
