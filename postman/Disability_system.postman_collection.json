@@ -1562,7 +1562,7 @@
     "bearer": [
       {
         "key": "token",
-        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJlbWFpbCI6InJAZWplbXBsby5jb20iLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlzcyI6ImRpc2FiaWxpdHlfc3lzdGVtIiwic3ViIjoickBlamVtcGxvLmNvbSIsImV4cCI6MTc3ODcxNzYwMiwibmJmIjoxNzc4NjMxMjAyLCJpYXQiOjE3Nzg2MzEyMDJ9.XCYwEPBvIptTpsiK_yVuo468ViZjdzqLtsuU-bPaiy4",
+        "value": "{{token}}",
         "type": "string"
       }
     ]
