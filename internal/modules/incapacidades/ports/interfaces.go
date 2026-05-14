@@ -39,6 +39,9 @@ type IncapacidadFilters struct {
 	EntidadID      *uint64
 	Origen         string
 	CanalRecepcion string
+	Search         string
+	FechaDesde     string
+	FechaHasta     string
 	IncludeDeleted bool
 	Page           int
 	Limit          int

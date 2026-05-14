@@ -10,7 +10,7 @@ type UsuarioRepository interface {
 	FindByID(ctx context.Context, id uint64) (*domain.Usuario, error)
 	FindByEmail(ctx context.Context, email string) (*domain.Usuario, error)
 	FindByDocumentNumber(ctx context.Context, docNumber string) (*domain.Usuario, error)
-	FindAll(ctx context.Context, page, limit int, estado *bool, idRol *uint64) ([]domain.Usuario, int64, error)
+	FindAll(ctx context.Context, page, limit int, estado *bool, idRol *uint64, search string) ([]domain.Usuario, int64, error)
 	Create(ctx context.Context, usuario *domain.Usuario) error
 	Update(ctx context.Context, usuario *domain.Usuario) error
 	SoftDelete(ctx context.Context, id uint64) error

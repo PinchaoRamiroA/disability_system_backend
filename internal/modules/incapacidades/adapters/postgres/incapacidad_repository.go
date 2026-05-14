@@ -78,6 +78,18 @@ func (r *IncapacidadRepository) List(ctx context.Context, filters ports.Incapaci
 	if filters.CanalRecepcion != "" {
 		query = query.Where("incapacidad.canal_recepcion = ?", filters.CanalRecepcion)
 	}
+	if filters.Search != "" {
+		searchTerm := "%" + filters.Search + "%"
+		query = query.Joins("JOIN usuario ON usuario.id_usuario = incapacidad.id_usuario").
+			Where("(incapacidad.titulo ILIKE ? OR incapacidad.observaciones ILIKE ? OR usuario.nombre ILIKE ? OR usuario.numero_documento ILIKE ?)",
+				searchTerm, searchTerm, searchTerm, searchTerm)
+	}
+	if filters.FechaDesde != "" {
+		query = query.Where("incapacidad.fecha_inicio >= ?", filters.FechaDesde)
+	}
+	if filters.FechaHasta != "" {
+		query = query.Where("incapacidad.fecha_inicio <= ?", filters.FechaHasta)
+	}
 
 	var total int64
 	if err := query.Count(&total).Error; err != nil {

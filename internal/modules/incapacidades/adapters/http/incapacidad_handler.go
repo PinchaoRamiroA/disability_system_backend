@@ -120,6 +120,9 @@ func (h *IncapacidadHandler) Obtener(c *gin.Context) {
 // @Param id_entidad query int false "Filtrar por entidad"
 // @Param origen query string false "Filtrar por origen"
 // @Param canal_recepcion query string false "Filtrar por canal"
+// @Param search query string false "Buscar por título, observaciones, nombre o documento"
+// @Param fecha_desde query string false "Fecha inicio desde (YYYY-MM-DD)"
+// @Param fecha_hasta query string false "Fecha inicio hasta (YYYY-MM-DD)"
 // @Param page query int false "Página" default(1)
 // @Param limit query int false "Límite" default(20)
 // @Success 200 {object} map[string]interface{}
@@ -146,6 +149,9 @@ func (h *IncapacidadHandler) Listar(c *gin.Context) {
 		EntidadID:      query.IDEntidad,
 		Origen:         query.Origen,
 		CanalRecepcion: query.CanalRecepcion,
+		Search:         query.Search,
+		FechaDesde:     query.FechaDesde,
+		FechaHasta:     query.FechaHasta,
 		Page:           query.Page,
 		Limit:          query.Limit,
 	})

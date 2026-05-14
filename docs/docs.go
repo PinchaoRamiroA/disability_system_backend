@@ -1263,6 +1263,24 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "string",
+                        "description": "Buscar por título, observaciones, nombre o documento",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Fecha inicio desde (YYYY-MM-DD)",
+                        "name": "fecha_desde",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Fecha inicio hasta (YYYY-MM-DD)",
+                        "name": "fecha_hasta",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "default": 1,
                         "description": "Página",
@@ -3102,6 +3120,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Filtrar por rol",
                         "name": "id_rol",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Buscar por nombre, correo o documento",
+                        "name": "search",
                         "in": "query"
                     }
                 ],

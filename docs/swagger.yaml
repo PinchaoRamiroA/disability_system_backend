@@ -1186,6 +1186,18 @@ paths:
         in: query
         name: canal_recepcion
         type: string
+      - description: Buscar por título, observaciones, nombre o documento
+        in: query
+        name: search
+        type: string
+      - description: Fecha inicio desde (YYYY-MM-DD)
+        in: query
+        name: fecha_desde
+        type: string
+      - description: Fecha inicio hasta (YYYY-MM-DD)
+        in: query
+        name: fecha_hasta
+        type: string
       - default: 1
         description: Página
         in: query
@@ -2395,6 +2407,10 @@ paths:
         in: query
         name: id_rol
         type: integer
+      - description: Buscar por nombre, correo o documento
+        in: query
+        name: search
+        type: string
       produces:
       - application/json
       responses:

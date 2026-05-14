@@ -31,6 +31,7 @@ func NewUsuarioHandler(usecase *usecase.UsuarioUseCase) *UsuarioHandler {
 // @Param limit query int false "Límite de resultados" default(20)
 // @Param estado query bool false "Filtrar por estado"
 // @Param id_rol query int false "Filtrar por rol"
+// @Param search query string false "Buscar por nombre, correo o documento"
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]interface{}
 // @Router /usuarios [get]
@@ -48,7 +49,7 @@ func (h *UsuarioHandler) Listar(c *gin.Context) {
 		query.Limit = 20
 	}
 
-	usuarios, roles, total, err := h.usecase.Listar(c.Request.Context(), query.Page, query.Limit, query.Estado, query.IDRol)
+	usuarios, roles, total, err := h.usecase.Listar(c.Request.Context(), query.Page, query.Limit, query.Estado, query.IDRol, query.Search)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Error al listar usuarios", "INTERNAL_ERROR", err.Error())
 		return

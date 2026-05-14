@@ -41,6 +41,9 @@ type ListarIncapacidadesQuery struct {
 	IDEntidad      *uint64 `form:"id_entidad"`
 	Origen         string  `form:"origen"`
 	CanalRecepcion string  `form:"canal_recepcion"`
+	Search         string  `form:"search"`
+	FechaDesde     string  `form:"fecha_desde"`
+	FechaHasta     string  `form:"fecha_hasta"`
 	Page           int     `form:"page"`
 	Limit          int     `form:"limit"`
 }

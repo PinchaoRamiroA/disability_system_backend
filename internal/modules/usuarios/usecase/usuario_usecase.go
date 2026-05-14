@@ -94,8 +94,8 @@ func (uc *UsuarioUseCase) Obtener(ctx context.Context, id uint64) (*domain.Usuar
 	return usuario, rol, nil
 }
 
-func (uc *UsuarioUseCase) Listar(ctx context.Context, page, limit int, estado *bool, idRol *uint64) ([]domain.Usuario, []domain.Rol, int64, error) {
-	usuarios, total, err := uc.usuarioRepo.FindAll(ctx, page, limit, estado, idRol)
+func (uc *UsuarioUseCase) Listar(ctx context.Context, page, limit int, estado *bool, idRol *uint64, search string) ([]domain.Usuario, []domain.Rol, int64, error) {
+	usuarios, total, err := uc.usuarioRepo.FindAll(ctx, page, limit, estado, idRol, search)
 	if err != nil {
 		return nil, nil, 0, err
 	}

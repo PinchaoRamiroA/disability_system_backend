@@ -61,7 +61,7 @@ func (r *UsuarioRepository) FindByDocumentNumber(ctx context.Context, docNumber 
 	return toDomainUsuario(&model), nil
 }
 
-func (r *UsuarioRepository) FindAll(ctx context.Context, page, limit int, estado *bool, idRol *uint64) ([]domain.Usuario, int64, error) {
+func (r *UsuarioRepository) FindAll(ctx context.Context, page, limit int, estado *bool, idRol *uint64, search string) ([]domain.Usuario, int64, error) {
 	var modelList []models.UsuarioModel
 	var total int64
 
@@ -72,6 +72,10 @@ func (r *UsuarioRepository) FindAll(ctx context.Context, page, limit int, estado
 	}
 	if idRol != nil {
 		query = query.Where("id_rol = ?", *idRol)
+	}
+	if search != "" {
+		searchTerm := "%" + search + "%"
+		query = query.Where("(nombre ILIKE ? OR correo ILIKE ? OR numero_documento ILIKE ?)", searchTerm, searchTerm, searchTerm)
 	}
 
 	err := query.Count(&total).Error
