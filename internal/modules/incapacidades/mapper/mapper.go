@@ -37,6 +37,7 @@ func ToIncapacidadResponse(i *domain.Incapacidad) dto.IncapacidadResponse {
 		resp.Tipo = &dto.TipoIncapacidadResponse{
 			IDTipo:               i.Tipo.IDTipo,
 			Nombre:               i.Tipo.Nombre,
+			Origen:               i.Tipo.Origen,
 			DocumentosRequeridos: i.Tipo.DocumentosRequeridos,
 		}
 	}
@@ -82,6 +83,7 @@ func ToTipoResponses(items []domain.TipoIncapacidad) []dto.TipoIncapacidadRespon
 		responses = append(responses, dto.TipoIncapacidadResponse{
 			IDTipo:               item.IDTipo,
 			Nombre:               item.Nombre,
+			Origen:               item.Origen,
 			DocumentosRequeridos: item.DocumentosRequeridos,
 		})
 	}

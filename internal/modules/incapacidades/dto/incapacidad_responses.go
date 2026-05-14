@@ -29,6 +29,7 @@ type EstadoIncapacidadResponse struct {
 type TipoIncapacidadResponse struct {
 	IDTipo               uint64   `json:"id_tipo"`
 	Nombre               string   `json:"nombre"`
+	Origen               string   `json:"origen"`
 	DocumentosRequeridos []string `json:"documentos_requeridos,omitempty"`
 }
 

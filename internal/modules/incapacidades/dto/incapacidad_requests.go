@@ -9,7 +9,7 @@ type CrearIncapacidadRequest struct {
 	Titulo          string  `json:"titulo" binding:"required"`
 	FechaInicio     string  `json:"fecha_inicio" binding:"required"`
 	FechaFin        *string `json:"fecha_fin,omitempty"`
-	Origen          string  `json:"origen" binding:"required"`
+	Origen          string  `json:"origen,omitempty"`
 	FechaRadicacion *string `json:"fecha_radicacion,omitempty"`
 	FechaPago       *string `json:"fecha_pago,omitempty"`
 	Observaciones   *string `json:"observaciones,omitempty"`

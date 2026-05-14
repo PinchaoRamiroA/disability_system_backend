@@ -356,6 +356,7 @@ func toTipoDomain(m *incmodels.TipoIncapacidadModel) *domain.TipoIncapacidad {
 	return &domain.TipoIncapacidad{
 		IDTipo:               m.IDTipo,
 		Nombre:               m.Nombre,
+		Origen:               m.Origen,
 		DocumentosRequeridos: docs,
 		CreatedAt:            m.CreatedAt,
 		UpdatedAt:            m.UpdatedAt,

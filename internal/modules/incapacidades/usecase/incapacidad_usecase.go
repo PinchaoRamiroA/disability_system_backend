@@ -68,8 +68,8 @@ func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, inpu
 	if !actor.HasPermission("crear_incapacidad") {
 		return nil, apperrors.ErrForbidden.WithMessage("no tienes permiso para crear incapacidades")
 	}
-	if strings.TrimSpace(input.Titulo) == "" || strings.TrimSpace(input.Origen) == "" {
-		return nil, apperrors.ErrValidation.WithMessage("título y origen son obligatorios")
+	if strings.TrimSpace(input.Titulo) == "" {
+		return nil, apperrors.ErrValidation.WithMessage("título es obligatorio")
 	}
 	if input.IDUsuario == 0 {
 		input.IDUsuario = actor.UserID
@@ -109,6 +109,16 @@ func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, inpu
 		return nil, apperrors.ErrValidation.WithMessage("fecha_fin no puede ser anterior a fecha_inicio")
 	}
 
+	tipo, err := uc.repo.FindTipoByID(ctx, input.IDTipo)
+	if err != nil {
+		return nil, err
+	}
+
+	origen := strings.TrimSpace(input.Origen)
+	if origen == "" {
+		origen = tipo.Origen
+	}
+
 	incapacidad := &domain.Incapacidad{
 		IDUsuario:       input.IDUsuario,
 		IDEstado:        *estadoID,
@@ -118,7 +128,7 @@ func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, inpu
 		Titulo:          strings.TrimSpace(input.Titulo),
 		FechaInicio:     fechaInicio,
 		FechaFin:        fechaFin,
-		Origen:          strings.TrimSpace(input.Origen),
+		Origen:          origen,
 		FechaRadicacion: fechaRadicacion,
 		FechaPago:       fechaPago,
 		Observaciones:   input.Observaciones,
@@ -212,10 +222,15 @@ func (uc *IncapacidadUseCase) Actualizar(ctx context.Context, actor ports.Actor,
 		incapacidad.IDUsuario = *input.IDUsuario
 	}
 	if input.IDTipo != nil {
-		if _, err := uc.repo.FindTipoByID(ctx, *input.IDTipo); err != nil {
+		tipo, err := uc.repo.FindTipoByID(ctx, *input.IDTipo)
+		if err != nil {
 			return nil, err
 		}
 		incapacidad.IDTipo = *input.IDTipo
+		// Si se cambia el tipo, actualizamos el origen automáticamente si no se envió uno nuevo
+		if input.Origen == nil || strings.TrimSpace(*input.Origen) == "" {
+			incapacidad.Origen = tipo.Origen
+		}
 	}
 	if input.IDEntidad != nil {
 		if _, err := uc.repo.FindEntidadByID(ctx, *input.IDEntidad); err != nil {

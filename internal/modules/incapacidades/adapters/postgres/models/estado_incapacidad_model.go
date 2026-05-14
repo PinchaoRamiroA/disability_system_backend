@@ -9,6 +9,7 @@ import (
 type TipoIncapacidadModel struct {
 	IDTipo               uint64         `gorm:"primaryKey;autoIncrement;column:id_tipo"`
 	Nombre               string         `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
+	Origen               string         `gorm:"type:varchar(50);not null;column:origen"`
 	DocumentosRequeridos datatypes.JSON `gorm:"type:jsonb;column:documentos_requeridos"`
 	CreatedAt            time.Time      `gorm:"autoCreateTime;column:created_at"`
 	UpdatedAt            time.Time      `gorm:"autoUpdateTime;column:updated_at"`
