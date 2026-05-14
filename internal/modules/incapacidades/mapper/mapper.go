@@ -126,6 +126,7 @@ func ToTipoDocumentoResponses(items []domain.TipoDocumento) []dto.TipoDocumentoR
 		responses = append(responses, dto.TipoDocumentoResponse{
 			IDTipoDocumento: item.IDTipoDocumento,
 			Nombre:          item.Nombre,
+			Codigo:          item.Codigo,
 			Descripcion:     item.Descripcion,
 			Requerido:       item.Requerido,
 		})

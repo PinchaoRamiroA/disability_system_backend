@@ -54,6 +54,7 @@ type EstadoDocumentoResponse struct {
 type TipoDocumentoResponse struct {
 	IDTipoDocumento uint64  `json:"id_tipo_documento"`
 	Nombre          string  `json:"nombre"`
+	Codigo          string  `json:"codigo"`
 	Descripcion     *string `json:"descripcion,omitempty"`
 	Requerido       bool    `json:"requerido"`
 }

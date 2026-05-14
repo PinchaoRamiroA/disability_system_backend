@@ -405,6 +405,7 @@ func toTipoDocumentoDomain(m *incmodels.TipoDocumentoModel) *domain.TipoDocument
 	return &domain.TipoDocumento{
 		IDTipoDocumento: m.IDTipoDocumento,
 		Nombre:          m.Nombre,
+		Codigo:          m.Codigo,
 		Descripcion:     m.Descripcion,
 		Requerido:       m.Requerido,
 		CreatedAt:       m.CreatedAt,
@@ -422,23 +423,18 @@ func toTipoPagoDomain(m *incmodels.TipoPagoModel) *domain.TipoPago {
 	}
 }
 
-func (r *IncapacidadRepository) FindTiposDocumentoByNombre(ctx context.Context, nombres []string) ([]domain.TipoDocumento, error) {
-	if len(nombres) == 0 {
+func (r *IncapacidadRepository) FindTiposDocumentoByCodigo(ctx context.Context, codigos []string) ([]domain.TipoDocumento, error) {
+	if len(codigos) == 0 {
 		return []domain.TipoDocumento{}, nil
 	}
 	var models []incmodels.TipoDocumentoModel
-	if err := r.db.WithContext(ctx).Find(&models).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("codigo IN ?", codigos).Find(&models).Error; err != nil {
 		return nil, err
 	}
-	required := make(map[string]bool, len(nombres))
-	for _, nombre := range nombres {
-		required[normalizeDocumentName(nombre)] = true
-	}
+	
 	items := make([]domain.TipoDocumento, 0, len(models))
 	for i := range models {
-		if required[normalizeDocumentName(models[i].Nombre)] {
-			items = append(items, *toTipoDocumentoDomain(&models[i]))
-		}
+		items = append(items, *toTipoDocumentoDomain(&models[i]))
 	}
 	return items, nil
 }

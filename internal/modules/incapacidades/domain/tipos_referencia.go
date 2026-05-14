@@ -5,6 +5,7 @@ import "time"
 type TipoDocumento struct {
 	IDTipoDocumento uint64
 	Nombre          string
+	Codigo          string
 	Descripcion     *string
 	Requerido       bool
 	CreatedAt       time.Time

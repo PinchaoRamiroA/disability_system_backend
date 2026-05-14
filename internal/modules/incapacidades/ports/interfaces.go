@@ -64,7 +64,7 @@ type IncapacidadRepository interface {
 	ListEstadosDocumento(ctx context.Context) ([]domain.EstadoDocumento, error)
 	ListTiposDocumento(ctx context.Context) ([]domain.TipoDocumento, error)
 	ListTiposPago(ctx context.Context) ([]domain.TipoPago, error)
-	FindTiposDocumentoByNombre(ctx context.Context, nombres []string) ([]domain.TipoDocumento, error)
+	FindTiposDocumentoByCodigo(ctx context.Context, codigos []string) ([]domain.TipoDocumento, error)
 }
 
 type PermissionRepository interface {

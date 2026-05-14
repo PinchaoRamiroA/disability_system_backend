@@ -7,6 +7,7 @@ import (
 type TipoDocumentoModel struct {
 	IDTipoDocumento uint64    `gorm:"primaryKey;autoIncrement;column:id_tipo_documento"`
 	Nombre          string    `gorm:"type:varchar(100);uniqueIndex;not null;column:nombre"`
+	Codigo          string    `gorm:"type:varchar(100);uniqueIndex;not null;column:codigo"`
 	Descripcion     *string   `gorm:"type:text;column:descripcion"`
 	Requerido       bool      `gorm:"default:true;column:requerido"`
 	CreatedAt       time.Time `gorm:"autoCreateTime;column:created_at"`

@@ -38,6 +38,7 @@ type ResumenEntidad struct {
 type AlertaVencimiento struct {
 	IDIncapacidad    uint64            `json:"id_incapacidad"`
 	Incapacidad      IncapacidadResumen `json:"incapacidad"`
+	NombreEntidad    string            `json:"nombre_entidad"`
 	TipoAlerta       string            `json:"tipo_alerta"`
 	FechaVencimiento string            `json:"fecha_vencimiento"`
 	DiasRestantes    int               `json:"dias_restantes"`
@@ -201,6 +202,7 @@ func (s *CobroWorkflowService) ObtenerAlertasVencimiento(ctx context.Context, di
 			alertas = append(alertas, AlertaVencimiento{
 				IDIncapacidad:    pago.IDIncapacidad,
 				Incapacidad:      incInfo,
+				NombreEntidad:    pago.NombreEntidad,
 				TipoAlerta:       tipoAlerta,
 				FechaVencimiento: pago.FechaPago.Format("2006-01-02"),
 				DiasRestantes:    -diasVencido,

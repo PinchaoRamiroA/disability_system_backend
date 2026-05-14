@@ -212,7 +212,7 @@ func (r *ReportesRepository) GetVencimientosReport(ctx context.Context, diasMini
 	reporte := &domain.ReporteVencimientos{}
 
 	docQuery := r.db.WithContext(ctx).Table("documento d").
-		Select("d.id_incapacidad, u.nombre, td.nombre as tipo_documento, d.fecha_carga, ed.nombre as estado").
+		Select("d.id_incapacidad, u.nombre as nombre_empleado, td.nombre as tipo_documento, d.fecha_carga, ed.nombre as estado").
 		Joins("JOIN incapacidad i ON d.id_incapacidad = i.id_incapacidad").
 		Joins("JOIN usuario u ON i.id_usuario = u.id_usuario").
 		Joins("JOIN tipo_documento td ON d.tipo_documento = td.nombre").
@@ -223,7 +223,7 @@ func (r *ReportesRepository) GetVencimientosReport(ctx context.Context, diasMini
 		IDIncapacidad  uint64
 		NombreEmpleado string
 		TipoDocumento  string
-		FechaLimite    string
+		FechaCarga     time.Time
 		Estado         string
 	}
 	if err := docQuery.Scan(&docResults).Error; err == nil {
@@ -238,33 +238,41 @@ func (r *ReportesRepository) GetVencimientosReport(ctx context.Context, diasMini
 	}
 
 	pagoQuery := r.db.WithContext(ctx).Table("pago p").
-		Select("p.id_incapacidad, p.id_pago, e.nombre as entidad, p.valor, p.fecha_pago, ep.nombre as estado").
+		Select("p.id_incapacidad, p.id_pago, e.nombre as nombre_entidad, p.valor, p.fecha_pago as fecha_limite_pago, ep.nombre as estado").
 		Joins("JOIN entidad e ON p.id_entidad = e.id_entidad").
 		Joins("JOIN estado_pago ep ON p.estado_pago = ep.nombre").
 		Where("ep.nombre NOT IN ('Pagado', 'Anulado', 'Conciliado')")
 
 	var pagoResults []struct {
-		IDIncapacidad uint64
-		IDPago        uint64
-		NombreEntidad string
-		Valor         string
-		FechaLimite   string
-		Estado        string
+		IDIncapacidad   uint64
+		IDPago          uint64
+		NombreEntidad   string
+		Valor           string
+		FechaLimitePago time.Time
+		Estado          string
 	}
 	if err := pagoQuery.Scan(&pagoResults).Error; err == nil {
+		now := time.Now()
 		for _, row := range pagoResults {
+			diasVencido := 0
+			if row.FechaLimitePago.Before(now) {
+				diasVencido = int(now.Sub(row.FechaLimitePago).Hours() / 24)
+			}
+
 			reporte.AlertasPagos = append(reporte.AlertasPagos, domain.ReporteVencimientoPago{
-				IDIncapacidad: row.IDIncapacidad,
-				IDPago:        row.IDPago,
-				NombreEntidad: row.NombreEntidad,
-				Valor:         row.Valor,
-				Estado:        row.Estado,
+				IDIncapacidad:   row.IDIncapacidad,
+				IDPago:          row.IDPago,
+				NombreEntidad:   row.NombreEntidad,
+				Valor:           row.Valor,
+				FechaLimitePago: row.FechaLimitePago,
+				DiasVencido:     diasVencido,
+				Estado:          row.Estado,
 			})
 		}
 	}
 
 	incQuery := r.db.WithContext(ctx).Table("incapacidad i").
-		Select("i.id_incapacidad, u.nombre, i.fecha_inicio, e.nombre as estado").
+		Select("i.id_incapacidad, u.nombre as nombre_empleado, i.fecha_inicio, e.nombre as estado").
 		Joins("JOIN usuario u ON i.id_usuario = u.id_usuario").
 		Joins("JOIN estado_incapacidad e ON i.id_estado = e.id_estado").
 		Where("e.nombre NOT IN ('Pagada', 'Archivada', 'Cerrada') AND i.is_deleted = false AND i.fecha_fin IS NULL")
@@ -272,15 +280,18 @@ func (r *ReportesRepository) GetVencimientosReport(ctx context.Context, diasMini
 	var incResults []struct {
 		IDIncapacidad  uint64
 		NombreEmpleado string
-		FechaInicio    string
+		FechaInicio    time.Time
 		Estado         string
 	}
 	if err := incQuery.Scan(&incResults).Error; err == nil {
+		now := time.Now()
 		for _, row := range incResults {
 			reporte.AlertasIncapacidades = append(reporte.AlertasIncapacidades, domain.ReporteVencimientoINC{
-				IDIncapacidad:  row.IDIncapacidad,
-				NombreEmpleado: row.NombreEmpleado,
-				Estado:         row.Estado,
+				IDIncapacidad:     row.IDIncapacidad,
+				NombreEmpleado:    row.NombreEmpleado,
+				FechaInicio:       row.FechaInicio,
+				DiasTranscurridos: int(now.Sub(row.FechaInicio).Hours() / 24),
+				Estado:            row.Estado,
 			})
 		}
 	}

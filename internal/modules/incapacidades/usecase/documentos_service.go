@@ -40,7 +40,7 @@ func (s *IncapacidadDocumentosService) ObtenerDocumentosRequeridos(ctx context.C
 		return []domain.TipoDocumento{}, nil
 	}
 
-	return s.repo.FindTiposDocumentoByNombre(ctx, tipo.DocumentosRequeridos)
+	return s.repo.FindTiposDocumentoByCodigo(ctx, tipo.DocumentosRequeridos)
 }
 
 func (s *IncapacidadDocumentosService) ValidarDocumentosRequeridos(ctx context.Context, tipoID uint64, documentosCargados []domain.Documento) (*DocumentosRequeridosResult, error) {
@@ -49,24 +49,19 @@ func (s *IncapacidadDocumentosService) ValidarDocumentosRequeridos(ctx context.C
 		return nil, err
 	}
 
-	requeridos, err := s.repo.FindTiposDocumentoByNombre(ctx, tipo.DocumentosRequeridos)
+	requeridos, err := s.repo.FindTiposDocumentoByCodigo(ctx, tipo.DocumentosRequeridos)
 	if err != nil {
 		return nil, err
 	}
 
-	requeridosMap := make(map[string]domain.TipoDocumento)
-	for _, req := range requeridos {
-		requeridosMap[req.Nombre] = req
-	}
-
 	cargadosMap := make(map[string]bool)
 	for _, doc := range documentosCargados {
-		cargadosMap[normalizeDocumentKey(doc.Tipo)] = true
+		cargadosMap[doc.Tipo] = true
 	}
 
 	var faltantes []domain.TipoDocumento
 	for _, req := range requeridos {
-		if req.Requerido && !cargadosMap[normalizeDocumentKey(req.Nombre)] {
+		if req.Requerido && !cargadosMap[req.Codigo] {
 			faltantes = append(faltantes, req)
 		}
 	}
