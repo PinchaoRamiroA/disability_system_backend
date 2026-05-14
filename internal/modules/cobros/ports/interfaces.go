@@ -46,6 +46,13 @@ type PagoRepository interface {
 	SoftDeletePago(ctx context.Context, id uint64) error
 	IncapacidadExists(ctx context.Context, id uint64) (bool, error)
 	EntidadExists(ctx context.Context, id uint64) (bool, error)
+	GetEntidadInfo(ctx context.Context) (map[uint64]struct{ Nombre, Tipo string }, error)
+	GetIncapacidadesDetailed(ctx context.Context, ids []uint64) (map[uint64]IncapacidadInfo, error)
+}
+
+type IncapacidadInfo struct {
+	ID     uint64
+	Titulo string
 }
 
 type SeguimientoRepository interface {

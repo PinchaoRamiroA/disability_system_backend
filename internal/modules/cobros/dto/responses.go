@@ -4,6 +4,7 @@ type PagoResponse struct {
 	IDPago          uint64  `json:"id_pago"`
 	IDIncapacidad   uint64  `json:"id_incapacidad"`
 	IDEntidad       uint64  `json:"id_entidad"`
+	NombreEntidad   string  `json:"nombre_entidad,omitempty"`
 	TipoPago        string  `json:"tipo_pago"`
 	EstadoPago      string  `json:"estado_pago"`
 	Descripcion     *string `json:"descripcion,omitempty"`

@@ -22,6 +22,7 @@ func ToPagoResponse(p *domain.Pago) dto.PagoResponse {
 		PeriodoContable: p.PeriodoContable,
 		Conciliado:      p.Conciliado,
 		RegistradoPor:   p.RegistradoPor,
+		NombreEntidad:   p.NombreEntidad,
 		CreatedAt:       p.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:       p.UpdatedAt.Format(time.RFC3339),
 	}

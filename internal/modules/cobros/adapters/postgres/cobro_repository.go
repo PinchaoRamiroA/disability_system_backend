@@ -37,7 +37,10 @@ func (r *CobroRepository) CreatePago(ctx context.Context, pago *domain.Pago) err
 func (r *CobroRepository) FindPagoByID(ctx context.Context, id uint64) (*domain.Pago, error) {
 	var model cobrosmodels.PagoModel
 	err := r.db.WithContext(ctx).
-		Where("id_pago = ? AND is_deleted = false", id).
+		Table("pago").
+		Select("pago.*, entidad.nombre as nombre_entidad").
+		Joins("left join entidad on entidad.id_entidad = pago.id_entidad").
+		Where("pago.id_pago = ? AND pago.is_deleted = false", id).
 		First(&model).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -50,22 +53,26 @@ func (r *CobroRepository) FindPagoByID(ctx context.Context, id uint64) (*domain.
 
 func (r *CobroRepository) ListPagos(ctx context.Context, filters ports.PagoFilters) ([]domain.Pago, int64, error) {
 	var models []cobrosmodels.PagoModel
-	query := r.db.WithContext(ctx).Model(&cobrosmodels.PagoModel{}).Where("is_deleted = false")
+	query := r.db.WithContext(ctx).
+		Table("pago").
+		Select("pago.*, entidad.nombre as nombre_entidad").
+		Joins("left join entidad on entidad.id_entidad = pago.id_entidad").
+		Where("pago.is_deleted = false")
 
 	if filters.IDIncapacidad != nil {
-		query = query.Where("id_incapacidad = ?", *filters.IDIncapacidad)
+		query = query.Where("pago.id_incapacidad = ?", *filters.IDIncapacidad)
 	}
 	if filters.IDEntidad != nil {
-		query = query.Where("id_entidad = ?", *filters.IDEntidad)
+		query = query.Where("pago.id_entidad = ?", *filters.IDEntidad)
 	}
 	if filters.TipoPago != "" {
-		query = query.Where("tipo_pago = ?", filters.TipoPago)
+		query = query.Where("pago.tipo_pago = ?", filters.TipoPago)
 	}
 	if filters.EstadoPago != "" {
-		query = query.Where("estado_pago = ?", filters.EstadoPago)
+		query = query.Where("pago.estado_pago = ?", filters.EstadoPago)
 	}
 	if filters.Conciliado != nil {
-		query = query.Where("conciliado = ?", *filters.Conciliado)
+		query = query.Where("pago.conciliado = ?", *filters.Conciliado)
 	}
 
 	var total int64
@@ -74,7 +81,7 @@ func (r *CobroRepository) ListPagos(ctx context.Context, filters ports.PagoFilte
 	}
 
 	page, limit := normalizePagination(filters.Page, filters.Limit)
-	err := query.Order("created_at DESC").
+	err := query.Order("pago.created_at DESC").
 		Limit(limit).
 		Offset((page - 1) * limit).
 		Find(&models).Error
@@ -212,6 +219,21 @@ func (r *CobroRepository) EntidadExists(ctx context.Context, id uint64) (bool, e
 	return count > 0, err
 }
 
+func (r *CobroRepository) GetEntidadInfo(ctx context.Context) (map[uint64]struct{ Nombre, Tipo string }, error) {
+	var entities []incmodels.EntidadModel
+	if err := r.db.WithContext(ctx).Select("id_entidad, nombre, tipo").Find(&entities).Error; err != nil {
+		return nil, err
+	}
+	info := make(map[uint64]struct{ Nombre, Tipo string }, len(entities))
+	for _, e := range entities {
+		info[e.IDEntidad] = struct{ Nombre, Tipo string }{
+			Nombre: e.Nombre,
+			Tipo:   e.Tipo,
+		}
+	}
+	return info, nil
+}
+
 func toPagoModel(p *domain.Pago) *cobrosmodels.PagoModel {
 	return &cobrosmodels.PagoModel{
 		IDPago:          p.IDPago,
@@ -245,6 +267,7 @@ func toPagoDomain(m *cobrosmodels.PagoModel) *domain.Pago {
 		CreatedAt:       m.CreatedAt,
 		UpdatedAt:       m.UpdatedAt,
 		IsDeleted:       m.IsDeleted,
+		NombreEntidad:   m.NombreEntidad,
 	}
 }
 
@@ -285,4 +308,24 @@ func normalizePagination(page, limit int) (int, int) {
 		limit = 100
 	}
 	return page, limit
+}
+
+func (r *CobroRepository) GetIncapacidadesDetailed(ctx context.Context, ids []uint64) (map[uint64]ports.IncapacidadInfo, error) {
+	var models []incmodels.IncapacidadModel
+	err := r.db.WithContext(ctx).
+		Select("id_incapacidad, titulo").
+		Where("id_incapacidad IN ?", ids).
+		Find(&models).Error
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[uint64]ports.IncapacidadInfo, len(models))
+	for _, m := range models {
+		result[m.IDIncapacidad] = ports.IncapacidadInfo{
+			ID:     m.IDIncapacidad,
+			Titulo: m.Titulo,
+		}
+	}
+	return result, nil
 }

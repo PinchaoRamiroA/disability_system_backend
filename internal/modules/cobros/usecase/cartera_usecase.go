@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"disability_system_backend/internal/modules/cobros/domain"
@@ -35,13 +36,18 @@ type ResumenEntidad struct {
 }
 
 type AlertaVencimiento struct {
-	IDIncapacidad   uint64
-	IDEntidad       uint64
-	NombreEntidad   string
-	DiasVencido     int
-	Estado         string
-	FechaLimitePago *time.Time
-	TipoAlerta     string
+	IDIncapacidad    uint64            `json:"id_incapacidad"`
+	Incapacidad      IncapacidadResumen `json:"incapacidad"`
+	TipoAlerta       string            `json:"tipo_alerta"`
+	FechaVencimiento string            `json:"fecha_vencimiento"`
+	DiasRestantes    int               `json:"dias_restantes"`
+	Prioridad        string            `json:"prioridad"`
+	Mensaje          string            `json:"mensaje"`
+}
+
+type IncapacidadResumen struct {
+	ID     uint64 `json:"id"`
+	Titulo string `json:"titulo"`
 }
 
 type CobroWorkflowService struct {
@@ -113,12 +119,20 @@ func (s *CobroWorkflowService) ObtenerResumenPorEntidad(ctx context.Context) ([]
 		return nil, err
 	}
 
+	entidadInfo, err := s.pagoRepo.GetEntidadInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	resumenPorEntidad := make(map[uint64]*ResumenEntidad)
 
 	for _, pago := range pagos {
 		if _, ok := resumenPorEntidad[pago.IDEntidad]; !ok {
+			info := entidadInfo[pago.IDEntidad]
 			resumenPorEntidad[pago.IDEntidad] = &ResumenEntidad{
 				IDEntidad: pago.IDEntidad,
+				Nombre:    info.Nombre,
+				Tipo:      info.Tipo,
 			}
 		}
 
@@ -152,19 +166,46 @@ func (s *CobroWorkflowService) ObtenerAlertasVencimiento(ctx context.Context, di
 		return nil, err
 	}
 
+	incapacidadIDs := make([]uint64, 0)
+	for _, p := range pagos {
+		incapacidadIDs = append(incapacidadIDs, p.IDIncapacidad)
+	}
+
+	incapacidades, err := s.pagoRepo.GetIncapacidadesDetailed(ctx, incapacidadIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	var alertas []AlertaVencimiento
 	fechaLimite := time.Now().AddDate(0, 0, -diasMinimos)
 
 	for _, pago := range pagos {
 		if pago.FechaPago.Before(fechaLimite) && pago.EstadoPago != "Pagado" && pago.EstadoPago != "Anulado" && pago.EstadoPago != "Conciliado" {
 			diasVencido := int(time.Since(pago.FechaPago).Hours() / 24)
+			tipoAlerta := getTipoAlerta(diasVencido)
+			
+			mensaje := ""
+			if diasVencido > 0 {
+				mensaje = "Vencida hace " + strconv.Itoa(diasVencido) + " días"
+			} else {
+				mensaje = "Vence en " + strconv.Itoa(-diasVencido) + " días"
+			}
+
+			incInfo := IncapacidadResumen{
+				ID: pago.IDIncapacidad,
+			}
+			if inc, ok := incapacidades[pago.IDIncapacidad]; ok {
+				incInfo.Titulo = inc.Titulo
+			}
+
 			alertas = append(alertas, AlertaVencimiento{
-				IDIncapacidad:   pago.IDIncapacidad,
-				IDEntidad:       pago.IDEntidad,
-				DiasVencido:     diasVencido,
-				Estado:          pago.EstadoPago,
-				FechaLimitePago: &pago.FechaPago,
-				TipoAlerta:      getTipoAlerta(diasVencido),
+				IDIncapacidad:    pago.IDIncapacidad,
+				Incapacidad:      incInfo,
+				TipoAlerta:       tipoAlerta,
+				FechaVencimiento: pago.FechaPago.Format("2006-01-02"),
+				DiasRestantes:    -diasVencido,
+				Prioridad:        tipoAlerta,
+				Mensaje:          mensaje,
 			})
 		}
 	}

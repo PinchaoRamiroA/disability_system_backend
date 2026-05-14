@@ -21,6 +21,7 @@ type PagoModel struct {
 	CreatedAt       time.Time       `gorm:"autoCreateTime;column:created_at"`
 	UpdatedAt       time.Time       `gorm:"autoUpdateTime;column:updated_at"`
 	IsDeleted       bool            `gorm:"default:false;column:is_deleted"`
+	NombreEntidad   string          `gorm:"->;column:nombre_entidad"` // Read-only field from join
 }
 
 func (PagoModel) TableName() string {

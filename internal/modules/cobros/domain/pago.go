@@ -21,4 +21,5 @@ type Pago struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	IsDeleted       bool
+	NombreEntidad   string
 }
