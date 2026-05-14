@@ -280,12 +280,7 @@ const docTemplate = `{
         },
         "/cartera/incapacidades/{id}/proximo-estado": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Sugiere el próximo estado basado en acciones de cobro",
+                "description": "Retorna el próximo estado sugerido basado en la acción a realizar",
                 "consumes": [
                     "application/json"
                 ],
@@ -293,9 +288,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "cartera"
+                    "Cartera"
                 ],
-                "summary": "Obtener próximo estado de incapacidad",
+                "summary": "Obtener el próximo estado de una incapacidad",
                 "parameters": [
                     {
                         "type": "integer",
@@ -305,14 +300,11 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "string",
                         "description": "Acción a realizar",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
+                        "name": "accion",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1813,61 +1805,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Registra un documento asociado a una incapacidad",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "documentos"
-                ],
-                "summary": "Subir documento",
-                "parameters": [
-                    {
-                        "description": "Datos del documento",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/disability_system_backend_internal_modules_incapacidades_dto.SubirDocumentoRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/incapacidades/{id}/documentos/upload": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Sube un archivo directamente al bucket R2",
+                "description": "Sube un archivo directamente al bucket R2 y lo registra",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -1877,7 +1815,7 @@ const docTemplate = `{
                 "tags": [
                     "documentos"
                 ],
-                "summary": "Subir documento (binario)",
+                "summary": "Subir documento",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1925,68 +1863,6 @@ const docTemplate = `{
                     },
                     "413": {
                         "description": "Request Entity Too Large",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/incapacidades/{id}/documentos/url": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Genera una URL prefirmada para subir documentos a R2",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "documentos"
-                ],
-                "summary": "Generar URL prefirmada para upload",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID de la incapacidad",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Datos del archivo (nombre, formato, tipo)",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -3953,7 +3829,6 @@ const docTemplate = `{
                 "fecha_inicio",
                 "id_entidad",
                 "id_tipo",
-                "origen",
                 "titulo"
             ],
             "properties": {
@@ -4010,33 +3885,6 @@ const docTemplate = `{
                 }
             }
         },
-        "disability_system_backend_internal_modules_incapacidades_dto.SubirDocumentoRequest": {
-            "type": "object",
-            "required": [
-                "formato",
-                "id_incapacidad",
-                "nombre",
-                "tipo",
-                "url"
-            ],
-            "properties": {
-                "formato": {
-                    "type": "string"
-                },
-                "id_incapacidad": {
-                    "type": "integer"
-                },
-                "nombre": {
-                    "type": "string"
-                },
-                "tipo": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
         "disability_system_backend_internal_modules_incapacidades_dto.TranscribirIncapacidadRequest": {
             "type": "object",
             "properties": {
@@ -4083,9 +3931,6 @@ const docTemplate = `{
         },
         "disability_system_backend_internal_modules_reportes_dto.GenerarReporteRequest": {
             "type": "object",
-            "required": [
-                "tipo"
-            ],
             "properties": {
                 "fecha_fin": {
                     "type": "string"
@@ -4118,15 +3963,9 @@ const docTemplate = `{
         },
         "disability_system_backend_internal_modules_usuarios_dto.ActualizarUsuarioRequest": {
             "type": "object",
-            "required": [
-                "correo",
-                "id_rol",
-                "nombre"
-            ],
             "properties": {
                 "correo": {
-                    "type": "string",
-                    "maxLength": 150
+                    "type": "string"
                 },
                 "direccion": {
                     "type": "string"
@@ -4135,9 +3974,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "nombre": {
-                    "type": "string",
-                    "maxLength": 150,
-                    "minLength": 3
+                    "type": "string"
                 },
                 "numero_celular": {
                     "type": "string"
@@ -4252,9 +4089,9 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1",
+	Version:          "",
 	Host:             "",
-	BasePath:         "/api/v1/",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "",
 	Description:      "",

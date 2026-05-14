@@ -235,7 +235,6 @@ definitions:
     - fecha_inicio
     - id_entidad
     - id_tipo
-    - origen
     - titulo
     type: object
   disability_system_backend_internal_modules_incapacidades_dto.MarcarTranscripcionRequest:
@@ -247,25 +246,6 @@ definitions:
         type: string
     required:
     - estado
-    type: object
-  disability_system_backend_internal_modules_incapacidades_dto.SubirDocumentoRequest:
-    properties:
-      formato:
-        type: string
-      id_incapacidad:
-        type: integer
-      nombre:
-        type: string
-      tipo:
-        type: string
-      url:
-        type: string
-    required:
-    - formato
-    - id_incapacidad
-    - nombre
-    - tipo
-    - url
     type: object
   disability_system_backend_internal_modules_incapacidades_dto.TranscribirIncapacidadRequest:
     properties:
@@ -316,28 +296,19 @@ definitions:
         type: string
       tipo:
         type: string
-    required:
-    - tipo
     type: object
   disability_system_backend_internal_modules_usuarios_dto.ActualizarUsuarioRequest:
     properties:
       correo:
-        maxLength: 150
         type: string
       direccion:
         type: string
       id_rol:
         type: integer
       nombre:
-        maxLength: 150
-        minLength: 3
         type: string
       numero_celular:
         type: string
-    required:
-    - correo
-    - id_rol
-    - nombre
     type: object
   disability_system_backend_internal_modules_usuarios_dto.AsignarRolRequest:
     properties:
@@ -581,7 +552,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Sugiere el próximo estado basado en acciones de cobro
+      description: Retorna el próximo estado sugerido basado en la acción a realizar
       parameters:
       - description: ID de la incapacidad
         in: path
@@ -589,12 +560,10 @@ paths:
         required: true
         type: integer
       - description: Acción a realizar
-        in: body
-        name: request
+        in: query
+        name: accion
         required: true
-        schema:
-          additionalProperties: true
-          type: object
+        type: string
       produces:
       - application/json
       responses:
@@ -613,11 +582,9 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      security:
-      - BearerAuth: []
-      summary: Obtener próximo estado de incapacidad
+      summary: Obtener el próximo estado de una incapacidad
       tags:
-      - cartera
+      - Cartera
   /cartera/resumen-entidad:
     get:
       consumes:
@@ -1453,43 +1420,8 @@ paths:
       - documentos
     post:
       consumes:
-      - application/json
-      description: Registra un documento asociado a una incapacidad
-      parameters:
-      - description: Datos del documento
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/disability_system_backend_internal_modules_incapacidades_dto.SubirDocumentoRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Subir documento
-      tags:
-      - documentos
-  /incapacidades/{id}/documentos/upload:
-    post:
-      consumes:
       - multipart/form-data
-      description: Sube un archivo directamente al bucket R2
+      description: Sube un archivo directamente al bucket R2 y lo registra
       parameters:
       - description: ID de la incapacidad
         in: path
@@ -1531,48 +1463,7 @@ paths:
             type: object
       security:
       - BearerAuth: []
-      summary: Subir documento (binario)
-      tags:
-      - documentos
-  /incapacidades/{id}/documentos/url:
-    post:
-      consumes:
-      - application/json
-      description: Genera una URL prefirmada para subir documentos a R2
-      parameters:
-      - description: ID de la incapacidad
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Datos del archivo (nombre, formato, tipo)
-        in: body
-        name: request
-        required: true
-        schema:
-          additionalProperties: true
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Generar URL prefirmada para upload
+      summary: Subir documento
       tags:
       - documentos
   /incapacidades/{id}/estado:
