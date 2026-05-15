@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"disability_system_backend/internal/shared/config"
@@ -36,7 +37,15 @@ func NewConnection(cfg *config.Config) (*gorm.DB, error) {
 
 func buildDSN(cfg *config.Config) string {
 	if cfg.DB.URL != "" {
-		return cfg.DB.URL
+		url := cfg.DB.URL
+		if !strings.Contains(url, "statement_cache_capacity") {
+			if strings.Contains(url, "?") {
+				url += "&statement_cache_capacity=0"
+			} else {
+				url += "?statement_cache_capacity=0"
+			}
+		}
+		return url
 	}
 
 	dsn := fmt.Sprintf(
@@ -52,6 +61,8 @@ func buildDSN(cfg *config.Config) string {
 	if cfg.DB.PoolMode == "transaction" {
 		dsn += " pooler=true"
 	}
+
+	dsn += " statement_cache_capacity=0"
 
 	return dsn
 }
