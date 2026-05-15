@@ -13,6 +13,7 @@ type CrearIncapacidadRequest struct {
 	FechaRadicacion *string `json:"fecha_radicacion,omitempty"`
 	FechaPago       *string `json:"fecha_pago,omitempty"`
 	Observaciones   *string `json:"observaciones,omitempty"`
+	CreatedBy       *uint64 `json:"created_by,omitempty"`
 }
 
 type ActualizarIncapacidadRequest struct {

@@ -48,7 +48,7 @@ func (h *IncapacidadHandler) Crear(c *gin.Context) {
 		return
 	}
 
-	userID := actor.UserID
+	var userID uint64
 	if req.IDUsuario != nil {
 		userID = *req.IDUsuario
 	}
