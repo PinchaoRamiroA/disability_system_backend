@@ -330,16 +330,22 @@ func (r *ReportesRepository) GetTotalIncapacidades(ctx context.Context, filtros 
 
 func (r *ReportesRepository) GetTotalDiasPerdidos(ctx context.Context, filtros domain.FiltrosReporte) (int64, error) {
 	var total int64
-	query := r.db.WithContext(ctx).Table("incapacidad i").Where("i.is_deleted = false")
 
+	sql := `SELECT COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))), 0)
+			FROM incapacidad i
+			WHERE i.is_deleted = false`
+
+	args := []interface{}{}
 	if filtros.FechaInicio != nil {
-		query = query.Where("i.fecha_inicio >= ?", *filtros.FechaInicio)
+		sql += " AND i.fecha_inicio >= ?"
+		args = append(args, *filtros.FechaInicio)
 	}
 	if filtros.FechaFin != nil {
-		query = query.Where("i.fecha_inicio <= ?", *filtros.FechaFin)
+		sql += " AND i.fecha_inicio <= ?"
+		args = append(args, *filtros.FechaFin)
 	}
 
-	query.Select("COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))), 0)").Scan(&total)
+	r.db.WithContext(ctx).Raw(sql, args...).Scan(&total)
 	return total, nil
 }
 
@@ -350,22 +356,24 @@ func (r *ReportesRepository) GetDiasPorTipo(ctx context.Context, filtros domain.
 	}
 	var results []Result
 
-	query := r.db.WithContext(ctx).Table("incapacidad i").
-		Select("ti.nombre, COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))), 0) as dias").
-		Joins("JOIN tipo_incapacidad ti ON i.id_tipo = ti.id_tipo").
-		Where("i.is_deleted = false").
-		Group("ti.nombre")
+	sql := `SELECT ti.nombre, COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))), 0) as dias
+			FROM incapacidad i
+			JOIN tipo_incapacidad ti ON i.id_tipo = ti.id_tipo
+			WHERE i.is_deleted = false`
 
+	args := []interface{}{}
 	if filtros.FechaInicio != nil {
-		query = query.Where("i.fecha_inicio >= ?", *filtros.FechaInicio)
+		sql += " AND i.fecha_inicio >= ?"
+		args = append(args, *filtros.FechaInicio)
 	}
 	if filtros.FechaFin != nil {
-		query = query.Where("i.fecha_inicio <= ?", *filtros.FechaFin)
+		sql += " AND i.fecha_inicio <= ?"
+		args = append(args, *filtros.FechaFin)
 	}
 
-	if err := query.Scan(&results).Error; err != nil {
-		return nil, err
-	}
+	sql += " GROUP BY ti.nombre"
+
+	r.db.WithContext(ctx).Raw(sql, args...).Scan(&results)
 
 	diasPorTipo := make(map[string]int64)
 	for _, row := range results {
@@ -381,22 +389,24 @@ func (r *ReportesRepository) GetDiasPorEntidad(ctx context.Context, filtros doma
 	}
 	var results []Result
 
-	query := r.db.WithContext(ctx).Table("incapacidad i").
-		Select("en.nombre, COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))), 0) as dias").
-		Joins("JOIN entidad en ON i.id_entidad = en.id_entidad").
-		Where("i.is_deleted = false").
-		Group("en.nombre")
+	sql := `SELECT en.nombre, COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))), 0) as dias
+			FROM incapacidad i
+			JOIN entidad en ON i.id_entidad = en.id_entidad
+			WHERE i.is_deleted = false`
 
+	args := []interface{}{}
 	if filtros.FechaInicio != nil {
-		query = query.Where("i.fecha_inicio >= ?", *filtros.FechaInicio)
+		sql += " AND i.fecha_inicio >= ?"
+		args = append(args, *filtros.FechaInicio)
 	}
 	if filtros.FechaFin != nil {
-		query = query.Where("i.fecha_inicio <= ?", *filtros.FechaFin)
+		sql += " AND i.fecha_inicio <= ?"
+		args = append(args, *filtros.FechaFin)
 	}
 
-	if err := query.Scan(&results).Error; err != nil {
-		return nil, err
-	}
+	sql += " GROUP BY en.nombre"
+
+	r.db.WithContext(ctx).Raw(sql, args...).Scan(&results)
 
 	diasPorEntidad := make(map[string]int64)
 	for _, row := range results {
@@ -414,27 +424,29 @@ func (r *ReportesRepository) GetTopEmpleadosIncapacidades(ctx context.Context, f
 	}
 	var results []Result
 
-	query := r.db.WithContext(ctx).Table("incapacidad i").
-		Select("i.id_usuario, u.nombre, SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))) as total_dias, COUNT(*) as cantidad_inc").
-		Joins("JOIN usuario u ON i.id_usuario = u.id_usuario").
-		Where("i.is_deleted = false").
-		Group("i.id_usuario, u.nombre").
-		Order("SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))) DESC")
+	sql := `SELECT i.id_usuario, u.nombre,
+			SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))) as total_dias,
+			COUNT(*) as cantidad_inc
+			FROM incapacidad i
+			JOIN usuario u ON i.id_usuario = u.id_usuario
+			WHERE i.is_deleted = false`
 
-	if limit > 0 {
-		query = query.Limit(limit)
-	}
-
+	args := []interface{}{}
 	if filtros.FechaInicio != nil {
-		query = query.Where("i.fecha_inicio >= ?", *filtros.FechaInicio)
+		sql += " AND i.fecha_inicio >= ?"
+		args = append(args, *filtros.FechaInicio)
 	}
 	if filtros.FechaFin != nil {
-		query = query.Where("i.fecha_inicio <= ?", *filtros.FechaFin)
+		sql += " AND i.fecha_fin <= ?"
+		args = append(args, *filtros.FechaFin)
 	}
 
-	if err := query.Scan(&results).Error; err != nil {
-		return nil, err
+	sql += " GROUP BY i.id_usuario, u.nombre ORDER BY total_dias DESC"
+	if limit > 0 {
+		sql += fmt.Sprintf(" LIMIT %d", limit)
 	}
+
+	r.db.WithContext(ctx).Raw(sql, args...).Scan(&results)
 
 	top := make([]domain.ReporteTopIncapacidad, len(results))
 	for i, row := range results {
@@ -445,7 +457,7 @@ func (r *ReportesRepository) GetTopEmpleadosIncapacidades(ctx context.Context, f
 			CantidadINC:    row.CantidadINC,
 		}
 	}
-	return top, nil
+return top, nil
 }
 
 func (r *ReportesRepository) CountIncapacidadesActivas(ctx context.Context) (int64, error) {

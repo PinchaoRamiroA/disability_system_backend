@@ -1,0 +1,1 @@
+ALTER TABLE historial DROP COLUMN IF EXISTS updated_at;
