@@ -121,6 +121,9 @@ func (uc *CobroUseCase) ListarPagos(ctx context.Context, actor ports.Actor, filt
 	if !canReadCobros(actor) {
 		return nil, 0, apperrors.ErrForbidden.WithMessage("no tienes permiso para consultar pagos")
 	}
+	if !actor.HasPermission("registrar_pago") && !actor.HasPermission("gestionar_cobro_persuasivo") && !actor.HasPermission("gestionar_cobro_juridico") {
+		filters.UserID = &actor.UserID
+	}
 	return uc.pagoRepo.ListPagos(ctx, filters)
 }
 

@@ -1,12 +1,14 @@
 package http
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
 	usuariosdto "disability_system_backend/internal/modules/usuarios/dto"
 	"disability_system_backend/internal/modules/usuarios/mapper"
 	"disability_system_backend/internal/modules/usuarios/usecase"
+	apperrors "disability_system_backend/internal/shared/errors"
 	"disability_system_backend/internal/shared/response"
 
 	"github.com/gin-gonic/gin"
@@ -51,7 +53,7 @@ func (h *UsuarioHandler) Listar(c *gin.Context) {
 
 	usuarios, roles, total, err := h.usecase.Listar(c.Request.Context(), query.Page, query.Limit, query.Estado, query.IDRol, query.Search)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al listar usuarios", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
@@ -91,7 +93,7 @@ func (h *UsuarioHandler) Obtener(c *gin.Context) {
 
 	usuario, rol, err := h.usecase.Obtener(c.Request.Context(), id)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al obtener usuario", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
@@ -138,13 +140,13 @@ func (h *UsuarioHandler) Crear(c *gin.Context) {
 		NumeroAcudiente: req.NumeroAcudiente,
 	})
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al crear usuario", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
 	_, rol, err := h.usecase.Obtener(c.Request.Context(), usuario.ID)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al obtener rol", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
@@ -193,13 +195,13 @@ func (h *UsuarioHandler) Actualizar(c *gin.Context) {
 		Direccion:     req.Direccion,
 	})
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al actualizar usuario", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
 	_, rol, err := h.usecase.Obtener(c.Request.Context(), usuario.ID)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al obtener rol", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
@@ -235,7 +237,7 @@ func (h *UsuarioHandler) CambiarEstado(c *gin.Context) {
 	}
 
 	if err := h.usecase.CambiarEstado(c.Request.Context(), id, req.Estado); err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al cambiar estado", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
@@ -264,7 +266,7 @@ func (h *UsuarioHandler) CambiarPassword(c *gin.Context) {
 	id := c.GetUint64("user_id")
 
 	if err := h.usecase.CambiarPassword(c.Request.Context(), id, req.PasswordActual, req.PasswordNuevo); err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al cambiar contraseña", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
@@ -299,7 +301,7 @@ func (h *UsuarioHandler) AsignarRol(c *gin.Context) {
 	}
 
 	if err := h.usecase.AsignarRol(c.Request.Context(), id, req.IDRol); err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al asignar rol", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
@@ -327,9 +329,18 @@ func (h *UsuarioHandler) Eliminar(c *gin.Context) {
 	}
 
 	if err := h.usecase.Eliminar(c.Request.Context(), id); err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error al eliminar usuario", "INTERNAL_ERROR", err.Error())
+		handleError(c, err)
 		return
 	}
 
 	response.Success(c, nil, "Usuario eliminado correctamente")
+}
+
+func handleError(c *gin.Context, err error) {
+	var appErr *apperrors.AppError
+	if errors.As(err, &appErr) {
+		response.Error(c, appErr.HTTPStatus, appErr.Message, appErr.Code, appErr.Details)
+		return
+	}
+	response.InternalError(c, "Error interno", "INTERNAL_ERROR")
 }

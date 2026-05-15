@@ -99,12 +99,20 @@ func (r *UsuarioRepository) FindAll(ctx context.Context, page, limit int, estado
 
 func (r *UsuarioRepository) Create(ctx context.Context, usuario *domain.Usuario) error {
 	model := toModelUsuario(usuario)
-	return r.db.WithContext(ctx).Create(model).Error
+	if err := r.db.WithContext(ctx).Create(model).Error; err != nil {
+		return err
+	}
+	*usuario = *toDomainUsuario(model)
+	return nil
 }
 
 func (r *UsuarioRepository) Update(ctx context.Context, usuario *domain.Usuario) error {
 	model := toModelUsuario(usuario)
-	return r.db.WithContext(ctx).Save(model).Error
+	if err := r.db.WithContext(ctx).Save(model).Error; err != nil {
+		return err
+	}
+	*usuario = *toDomainUsuario(model)
+	return nil
 }
 
 func (r *UsuarioRepository) SoftDelete(ctx context.Context, id uint64) error {

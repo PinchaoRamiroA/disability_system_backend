@@ -11,6 +11,7 @@ import (
 	notificacioneshttp "disability_system_backend/internal/modules/notificaciones/adapters/http"
 	reporteshttp "disability_system_backend/internal/modules/reportes/adapters/http"
 	usuarioshttp "disability_system_backend/internal/modules/usuarios/adapters/http"
+	auditoriahttp "disability_system_backend/internal/modules/auditoria/adapters/http"
 	"disability_system_backend/internal/shared/auth"
 	"disability_system_backend/internal/shared/database"
 	"disability_system_backend/internal/shared/middleware"
@@ -90,6 +91,7 @@ func (a *App) InitAuth() *auth.JWTService {
 	notificacioneshttp.Register(a.Router.V1(), a.DB, jwtService)
 	usuarioshttp.Register(a.Router.V1(), a.DB, jwtService)
 	reporteshttp.Register(a.Router.V1(), a.DB, jwtService)
+	auditoriahttp.Register(a.Router.V1(), a.DB, jwtService)
 
 	return jwtService
 }

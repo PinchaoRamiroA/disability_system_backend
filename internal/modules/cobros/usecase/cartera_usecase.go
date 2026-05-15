@@ -161,8 +161,12 @@ func (s *CobroWorkflowService) ObtenerResumenPorEntidad(ctx context.Context) ([]
 	return result, nil
 }
 
-func (s *CobroWorkflowService) ObtenerAlertasVencimiento(ctx context.Context, diasMinimos int) ([]AlertaVencimiento, error) {
-	pagos, _, err := s.pagoRepo.ListPagos(ctx, ports.PagoFilters{Limit: 1000})
+func (s *CobroWorkflowService) ObtenerAlertasVencimiento(ctx context.Context, diasMinimos int, actor ports.Actor) ([]AlertaVencimiento, error) {
+	filters := ports.PagoFilters{Limit: 1000}
+	if !actor.HasPermission("registrar_pago") && !actor.HasPermission("gestionar_cobro_persuasivo") && !actor.HasPermission("gestionar_cobro_juridico") && !actor.HasPermission("generar_alertas") {
+		filters.UserID = &actor.UserID
+	}
+	pagos, _, err := s.pagoRepo.ListPagos(ctx, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -338,7 +342,7 @@ func (uc *CobroUseCase) ObtenerAlertasVencimiento(ctx context.Context, actor por
 	}
 
 	workflowSvc := NewCobroWorkflowService(uc.pagoRepo, uc.seguimientoRepo)
-	return workflowSvc.ObtenerAlertasVencimiento(ctx, diasMinimos)
+	return workflowSvc.ObtenerAlertasVencimiento(ctx, diasMinimos, actor)
 }
 
 func (uc *CobroUseCase) ObtenerCarteraVencida(ctx context.Context, actor ports.Actor) ([]domain.Pago, error) {

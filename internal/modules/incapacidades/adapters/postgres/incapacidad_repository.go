@@ -80,9 +80,10 @@ func (r *IncapacidadRepository) List(ctx context.Context, filters ports.Incapaci
 	}
 	if filters.Search != "" {
 		searchTerm := "%" + filters.Search + "%"
-		query = query.Joins("JOIN usuario ON usuario.id_usuario = incapacidad.id_usuario").
-			Where("(incapacidad.titulo ILIKE ? OR incapacidad.observaciones ILIKE ? OR usuario.nombre ILIKE ? OR usuario.numero_documento ILIKE ?)",
-				searchTerm, searchTerm, searchTerm, searchTerm)
+
+		query = query.
+			Joins("JOIN usuario ON usuario.id_usuario = incapacidad.id_usuario").
+			Where("usuario.numero_documento ILIKE ?", searchTerm)
 	}
 	if filters.FechaDesde != "" {
 		query = query.Where("incapacidad.fecha_inicio >= ?", filters.FechaDesde)

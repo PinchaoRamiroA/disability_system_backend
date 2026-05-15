@@ -331,7 +331,7 @@ func (r *ReportesRepository) GetTotalIncapacidades(ctx context.Context, filtros 
 func (r *ReportesRepository) GetTotalDiasPerdidos(ctx context.Context, filtros domain.FiltrosReporte) (int64, error) {
 	var total int64
 
-	sql := `SELECT COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))), 0)
+	sql := `SELECT COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin::date, CURRENT_DATE) - i.fecha_inicio::date))), 0)
 			FROM incapacidad i
 			WHERE i.is_deleted = false`
 
@@ -356,7 +356,7 @@ func (r *ReportesRepository) GetDiasPorTipo(ctx context.Context, filtros domain.
 	}
 	var results []Result
 
-	sql := `SELECT ti.nombre, COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))), 0) as dias
+	sql := `SELECT ti.nombre, COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin::date, CURRENT_DATE) - i.fecha_inicio::date))), 0) as dias
 			FROM incapacidad i
 			JOIN tipo_incapacidad ti ON i.id_tipo = ti.id_tipo
 			WHERE i.is_deleted = false`
@@ -389,7 +389,7 @@ func (r *ReportesRepository) GetDiasPorEntidad(ctx context.Context, filtros doma
 	}
 	var results []Result
 
-	sql := `SELECT en.nombre, COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))), 0) as dias
+	sql := `SELECT en.nombre, COALESCE(SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin::date, CURRENT_DATE) - i.fecha_inicio::date))), 0) as dias
 			FROM incapacidad i
 			JOIN entidad en ON i.id_entidad = en.id_entidad
 			WHERE i.is_deleted = false`
@@ -425,7 +425,7 @@ func (r *ReportesRepository) GetTopEmpleadosIncapacidades(ctx context.Context, f
 	var results []Result
 
 	sql := `SELECT i.id_usuario, u.nombre,
-			SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin, CURRENT_DATE) - i.fecha_inicio))) as total_dias,
+			SUM(EXTRACT(DAY FROM (COALESCE(i.fecha_fin::date, CURRENT_DATE) - i.fecha_inicio::date))) as total_dias,
 			COUNT(*) as cantidad_inc
 			FROM incapacidad i
 			JOIN usuario u ON i.id_usuario = u.id_usuario

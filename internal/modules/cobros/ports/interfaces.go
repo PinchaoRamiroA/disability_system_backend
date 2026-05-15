@@ -22,6 +22,7 @@ func (a Actor) HasPermission(permission string) bool {
 }
 
 type PagoFilters struct {
+	UserID        *uint64
 	IDIncapacidad *uint64
 	IDEntidad     *uint64
 	TipoPago      string

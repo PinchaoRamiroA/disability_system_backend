@@ -59,6 +59,11 @@ func (r *CobroRepository) ListPagos(ctx context.Context, filters ports.PagoFilte
 		Joins("left join entidad on entidad.id_entidad = pago.id_entidad").
 		Where("pago.is_deleted = false")
 
+	if filters.UserID != nil {
+		query = query.Joins("INNER JOIN incapacidad ON incapacidad.id_incapacidad = pago.id_incapacidad").
+			Where("incapacidad.id_usuario = ?", *filters.UserID)
+	}
+
 	if filters.IDIncapacidad != nil {
 		query = query.Where("pago.id_incapacidad = ?", *filters.IDIncapacidad)
 	}
