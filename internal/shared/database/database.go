@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"disability_system_backend/internal/shared/config"
@@ -11,10 +12,13 @@ import (
 )
 
 func NewConnection(cfg *config.Config) (*gorm.DB, error) {
-	dsn := buildDSN(cfg)
+	dsn := buildDSNWithOptions(cfg)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: NewLogger(),
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{
+		Logger:      NewLogger(),
 		PrepareStmt: false,
 	})
 
@@ -54,4 +58,22 @@ func buildDSN(cfg *config.Config) string {
 	}
 
 	return dsn
+}
+
+func buildDSNWithOptions(cfg *config.Config) string {
+	dsn := buildDSN(cfg)
+
+	if !contains(dsn, "statement_cache_capacity") {
+		separator := "?"
+		if contains(dsn, "?") {
+			separator = "&"
+		}
+		dsn += separator + "statement_cache_capacity=0"
+	}
+
+	return dsn
+}
+
+func contains(s, substr string) bool {
+	return strings.Contains(s, substr)
 }
