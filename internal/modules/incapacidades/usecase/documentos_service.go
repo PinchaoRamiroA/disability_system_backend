@@ -122,8 +122,37 @@ func (s *IncapacidadDocumentosService) ObtenerTiempoMaximoPago(ctx context.Conte
 }
 
 func (s *IncapacidadDocumentosService) VerificarEstadoTransicion(ctx context.Context, incapacidad *domain.Incapacidad, nuevoEstado *domain.EstadoIncapacidad) error {
-	if incapacidad.Estado != nil && !incapacidad.Estado.PermiteTransicion {
+	if incapacidad == nil {
+		return apperrors.ErrBadRequest.WithMessage("la incapacidad es requerida")
+	}
+	if nuevoEstado == nil {
+		return apperrors.ErrBadRequest.WithMessage("el nuevo estado es requerido")
+	}
+
+	estadoActual := incapacidad.Estado
+	if (estadoActual == nil || estadoActual.Nombre == "") && incapacidad.IDEstado != 0 && s.repo != nil {
+		estado, err := s.repo.FindEstadoByID(ctx, incapacidad.IDEstado)
+		if err != nil && estadoActual == nil {
+			return err
+		}
+		if err == nil && estado != nil {
+			estadoActual = estado
+			incapacidad.Estado = estado
+		}
+	}
+
+	if estadoActual == nil {
+		return apperrors.ErrConflict.WithMessage("la incapacidad no tiene un estado actual asignado")
+	}
+
+	if !estadoActual.PermiteTransicion {
 		return apperrors.ErrConflict.WithMessage("el estado actual no permite transiciones")
+	}
+
+	if nuevoEstado.Nombre == "" && nuevoEstado.IDEstado != 0 && s.repo != nil {
+		if est, err := s.repo.FindEstadoByID(ctx, nuevoEstado.IDEstado); err == nil && est != nil {
+			nuevoEstado = est
+		}
 	}
 
 	if nuevoEstado.Nombre == "Rechazada" || nuevoEstado.Nombre == "Archivada" || nuevoEstado.Nombre == "Cerrada" {
@@ -147,7 +176,7 @@ func (s *IncapacidadDocumentosService) VerificarEstadoTransicion(ctx context.Con
 		"Cobro jurídico":           {"Pagada", "Rechazada", "Archivada"},
 	}
 
-	if currentState, ok := validTransitions[incapacidad.Estado.Nombre]; ok {
+	if currentState, ok := validTransitions[estadoActual.Nombre]; ok {
 		for _, valid := range currentState {
 			if valid == nuevoEstado.Nombre {
 				return nil
@@ -155,7 +184,7 @@ func (s *IncapacidadDocumentosService) VerificarEstadoTransicion(ctx context.Con
 		}
 	}
 
-	return apperrors.ErrConflict.WithMessage("transición de estado no válida: de " + incapacidad.Estado.Nombre + " a " + nuevoEstado.Nombre)
+	return apperrors.ErrConflict.WithMessage("transición de estado no válida: de " + estadoActual.Nombre + " a " + nuevoEstado.Nombre)
 }
 
 func (s *IncapacidadDocumentosService) ObtenerDiasTranscurridos(fechaInicio time.Time) int {
