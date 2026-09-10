@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"reflect"
 	"time"
 
 	"disability_system_backend/internal/modules/incapacidades/domain"
@@ -19,6 +20,30 @@ type DocumentoUseCase struct {
 
 func NewDocumentoUseCase(repo ports.DocumentoRepository, historialSvc ports.HistorialService) *DocumentoUseCase {
 	return &DocumentoUseCase{repo: repo, historialSvc: historialSvc}
+}
+
+func isNilHistorialService(svc ports.HistorialService) bool {
+	if svc == nil {
+		return true
+	}
+	v := reflect.ValueOf(svc)
+	switch v.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Pointer, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+		return v.IsNil()
+	default:
+		return false
+	}
+}
+
+func (uc *DocumentoUseCase) SetHistorialService(historialSvc ports.HistorialService) {
+	uc.historialSvc = historialSvc
+}
+
+func (uc *DocumentoUseCase) registrarHistorial(ctx context.Context, incapacidadID, tipoID uint64, descripcion string, gestorID *uint64) {
+	if isNilHistorialService(uc.historialSvc) {
+		return
+	}
+	_ = uc.historialSvc.CreateEntry(ctx, incapacidadID, tipoID, descripcion, gestorID)
 }
 
 func (uc *DocumentoUseCase) SetDocumentoFaltanteNotifier(incapacidadRepo ports.IncapacidadRepository, notifier ports.DocumentoFaltanteNotifier) {
@@ -60,7 +85,7 @@ func (uc *DocumentoUseCase) Subir(ctx context.Context, actor ports.Actor, input 
 	}
 
 	descripcion := "Documento '" + input.Nombre + "' subido al sistema"
-	uc.historialSvc.CreateEntry(ctx, input.IDIncapacidad, 1, descripcion, &actor.UserID)
+	uc.registrarHistorial(ctx, input.IDIncapacidad, 1, descripcion, &actor.UserID)
 	uc.notificarDocumentosFaltantes(ctx, input.IDIncapacidad)
 
 	return documento, nil
@@ -95,7 +120,7 @@ func (uc *DocumentoUseCase) Validar(ctx context.Context, actor ports.Actor, id u
 	if comentario != "" {
 		descripcion += ": " + comentario
 	}
-	uc.historialSvc.CreateEntry(ctx, documento.IDIncapacidad, 1, descripcion, &actor.UserID)
+	uc.registrarHistorial(ctx, documento.IDIncapacidad, 1, descripcion, &actor.UserID)
 	uc.notificarDocumentosFaltantes(ctx, documento.IDIncapacidad)
 
 	return documento, nil
