@@ -21,10 +21,16 @@ type actorWrapper struct {
 }
 
 func (a *actorWrapper) GetUserID() uint64 {
+	if a == nil {
+		return 0
+	}
 	return a.userID
 }
 
 func (a *actorWrapper) HasPermission(p string) bool {
+	if a == nil {
+		return false
+	}
 	for _, perm := range a.permisos {
 		if perm == p {
 			return true

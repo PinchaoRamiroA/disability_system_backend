@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"reflect"
 
 	"disability_system_backend/internal/modules/auditoria/domain"
 	"disability_system_backend/internal/modules/auditoria/dto"
@@ -17,15 +18,30 @@ func NewAuditoriaUseCase(repo ports.AuditoriaRepository) *AuditoriaUseCase {
 	return &AuditoriaUseCase{repo: repo}
 }
 
+func isNilActor(actor ports.Actor) bool {
+	if actor == nil {
+		return true
+	}
+	v := reflect.ValueOf(actor)
+	switch v.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Pointer, reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+		return v.IsNil()
+	default:
+		return false
+	}
+}
+
 func (uc *AuditoriaUseCase) Crear(ctx context.Context, actor ports.Actor, req dto.CrearAuditoriaRequest) (*domain.Auditoria, error) {
 	// Solo admins o el propio sistema deberían crear auditoría
 	// Asumiremos que si el sistema la llama desde otro módulo, el context u actor ya está autorizado.
 	// Por ahora lo dejaremos crear sin permisos restrictivos, o puedes restringirlo según la necesidad.
 	
 	idUsuario := req.IDUsuario
-	if idUsuario == nil && actor != nil {
+	if idUsuario == nil && !isNilActor(actor) {
 		userID := actor.GetUserID()
-		idUsuario = &userID
+		if userID != 0 {
+			idUsuario = &userID
+		}
 	}
 
 	auditoria := &domain.Auditoria{
@@ -47,8 +63,10 @@ func (uc *AuditoriaUseCase) Crear(ctx context.Context, actor ports.Actor, req dt
 
 func (uc *AuditoriaUseCase) Listar(ctx context.Context, actor ports.Actor, query dto.ListarAuditoriaQuery) ([]domain.Auditoria, int64, error) {
 	// Verificar permisos (por ejemplo, "consultar_auditoria")
-	if actor != nil && !actor.HasPermission("consultar_auditoria") {
-		return nil, 0, apperrors.ErrForbidden.WithMessage("No tienes permiso para consultar auditoría")
+	if actor != nil {
+		if isNilActor(actor) || !actor.HasPermission("consultar_auditoria") {
+			return nil, 0, apperrors.ErrForbidden.WithMessage("No tienes permiso para consultar auditoría")
+		}
 	}
 
 	return uc.repo.List(ctx, query)
