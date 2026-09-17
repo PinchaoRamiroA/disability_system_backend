@@ -221,17 +221,26 @@ func (s *CobroWorkflowService) ObtenerAlertasVencimiento(ctx context.Context, di
 		return nil, err
 	}
 
-	var alertas []AlertaVencimiento
-	fechaLimite := time.Now().AddDate(0, 0, -diasMinimos)
+	alertas := make([]AlertaVencimiento, 0)
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	diasVentana := diasMinimos
+	if diasVentana < 0 {
+		diasVentana = -diasVentana
+	}
+	fechaLimite := today.AddDate(0, 0, diasVentana+1)
 
 	for _, pago := range pagos {
-		if pago.FechaPago.Before(fechaLimite) && pago.EstadoPago != "Pagado" && pago.EstadoPago != "Anulado" && pago.EstadoPago != "Conciliado" {
-			diasVencido := int(time.Since(pago.FechaPago).Hours() / 24)
+		pagoDate := time.Date(pago.FechaPago.Year(), pago.FechaPago.Month(), pago.FechaPago.Day(), 0, 0, 0, 0, time.UTC)
+		if pagoDate.Before(fechaLimite) && pago.EstadoPago != "Pagado" && pago.EstadoPago != "Anulado" && pago.EstadoPago != "Conciliado" {
+			diasVencido := int(today.Sub(pagoDate).Hours() / 24)
 			tipoAlerta := getTipoAlerta(diasVencido)
-			
-			mensaje := ""
+
+			var mensaje string
 			if diasVencido > 0 {
 				mensaje = "Vencida hace " + strconv.Itoa(diasVencido) + " días"
+			} else if diasVencido == 0 {
+				mensaje = "Vence hoy"
 			} else {
 				mensaje = "Vence en " + strconv.Itoa(-diasVencido) + " días"
 			}
