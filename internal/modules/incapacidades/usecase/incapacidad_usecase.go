@@ -64,6 +64,10 @@ func (uc *IncapacidadUseCase) SetDocumentoFaltanteNotifier(notifier ports.Docume
 	uc.faltanteNotifier = notifier
 }
 
+func (uc *IncapacidadUseCase) SetDocumentosService(docService *IncapacidadDocumentosService) {
+	uc.docService = docService
+}
+
 func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, input CrearIncapacidadInput) (*domain.Incapacidad, error) {
 	if !actor.HasPermission("crear_incapacidad") {
 		return nil, apperrors.ErrForbidden.WithMessage("no tienes permiso para crear incapacidades")
@@ -302,9 +306,6 @@ func (uc *IncapacidadUseCase) CambiarEstado(ctx context.Context, actor ports.Act
 	if err != nil {
 		return nil, err
 	}
-	if incapacidad.Estado != nil && !incapacidad.Estado.PermiteTransicion {
-		return nil, apperrors.ErrConflict.WithMessage("el estado actual no permite transición")
-	}
 	estado, err := uc.repo.FindEstadoByID(ctx, estadoID)
 	if err != nil {
 		return nil, err
@@ -312,7 +313,18 @@ func (uc *IncapacidadUseCase) CambiarEstado(ctx context.Context, actor ports.Act
 	if strings.EqualFold(estado.Nombre, "Archivada") && !actor.HasPermission("archivar_incapacidad") {
 		return nil, apperrors.ErrForbidden.WithMessage("no tienes permiso para archivar incapacidades")
 	}
+
+	if uc.docService == nil && uc.repo != nil {
+		uc.docService = NewIncapacidadDocumentosService(uc.repo)
+	}
+	if uc.docService != nil {
+		if err := uc.docService.VerificarEstadoTransicion(ctx, incapacidad, estado); err != nil {
+			return nil, err
+		}
+	}
+
 	incapacidad.IDEstado = estadoID
+	incapacidad.Estado = estado
 	if observaciones != nil {
 		incapacidad.Observaciones = observaciones
 	}

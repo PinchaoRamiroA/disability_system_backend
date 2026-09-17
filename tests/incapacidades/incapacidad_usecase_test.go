@@ -120,6 +120,11 @@ func (m *MockIncapacidadRepository) FindTiposDocumentoByNombre(ctx context.Conte
 	return args.Get(0).([]domain.TipoDocumento), args.Error(1)
 }
 
+func (m *MockIncapacidadRepository) FindTiposDocumentoByCodigo(ctx context.Context, codigos []string) ([]domain.TipoDocumento, error) {
+	args := m.Called(ctx, codigos)
+	return args.Get(0).([]domain.TipoDocumento), args.Error(1)
+}
+
 type MockDocumentoFaltanteNotifier struct {
 	mock.Mock
 }
