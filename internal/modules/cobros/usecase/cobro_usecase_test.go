@@ -125,6 +125,14 @@ func (r *fakeCobroRepository) EntidadExists(ctx context.Context, id uint64) (boo
 	return true, nil
 }
 
+func (r *fakeCobroRepository) GetEntidadInfo(ctx context.Context) (map[uint64]struct{ Nombre, Tipo string }, error) {
+	return map[uint64]struct{ Nombre, Tipo string }{}, nil
+}
+
+func (r *fakeCobroRepository) GetIncapacidadesDetailed(ctx context.Context, ids []uint64) (map[uint64]ports.IncapacidadInfo, error) {
+	return map[uint64]ports.IncapacidadInfo{}, nil
+}
+
 func (r *fakeCobroRepository) CreateSeguimiento(ctx context.Context, seguimiento *domain.SeguimientoCobro) error {
 	seguimiento.IDSeguimiento = 1
 	r.seguimientos[1] = seguimiento

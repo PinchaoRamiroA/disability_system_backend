@@ -64,17 +64,23 @@ func NewCobroWorkflowService(pagoRepo ports.PagoRepository, seguimientoRepo port
 }
 
 func (s *CobroWorkflowService) ObtenerEstadisticasGenerales(ctx context.Context) (*EstadisticasCartera, error) {
-	pagos, total, err := s.pagoRepo.ListPagos(ctx, ports.PagoFilters{Limit: 1000})
+	pagos, total, err := s.pagoRepo.ListPagos(ctx, ports.PagoFilters{Limit: 10000})
 	if err != nil {
 		return nil, err
 	}
 
 	var totalValor, totalCobrado, totalPendiente float64
 	var pagosPendientes, pagosVencidos int64
+	incapacidadesTotal := make(map[uint64]bool)
+	incapacidadesActivas := make(map[uint64]bool)
 
 	for _, pago := range pagos {
 		valor, _ := pago.Valor.Float64()
 		totalValor += valor
+
+		if pago.IDIncapacidad != 0 {
+			incapacidadesTotal[pago.IDIncapacidad] = true
+		}
 
 		switch pago.EstadoPago {
 		case "Pagado", "Conciliado":
@@ -84,6 +90,9 @@ func (s *CobroWorkflowService) ObtenerEstadisticasGenerales(ctx context.Context)
 			pagosPendientes++
 			if pago.FechaPago.Before(time.Now()) && pago.EstadoPago != "Anulado" {
 				pagosVencidos++
+			}
+			if pago.EstadoPago != "Anulado" && pago.IDIncapacidad != 0 {
+				incapacidadesActivas[pago.IDIncapacidad] = true
 			}
 		}
 	}
@@ -102,9 +111,19 @@ func (s *CobroWorkflowService) ObtenerEstadisticasGenerales(ctx context.Context)
 		}
 	}
 
+	totalIncapacidades := int64(len(incapacidadesTotal))
+	if totalIncapacidades == 0 && total > 0 {
+		totalIncapacidades = total
+	}
+
+	totalActivas := int64(len(incapacidadesActivas))
+	if totalActivas == 0 && len(incapacidadesTotal) == 0 && pagosPendientes > 0 {
+		totalActivas = pagosPendientes
+	}
+
 	return &EstadisticasCartera{
-		TotalIncapacidades:     total,
-		IncapacidadesActivas:    total - int64(len(pagos)),
+		TotalIncapacidades:     totalIncapacidades,
+		IncapacidadesActivas:   totalActivas,
 		TotalValorCartera:      formatCurrency(totalValor),
 		TotalValorCobrado:      formatCurrency(totalCobrado),
 		TotalValorPendiente:    formatCurrency(totalPendiente),
