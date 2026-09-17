@@ -229,3 +229,60 @@ func TestObtenerEstadisticasGenerales_BUG04(t *testing.T) {
 		assert.Equal(t, int64(0), stats.IncapacidadesActivas)
 	})
 }
+
+func TestObtenerResumenPorEntidad_BUG05_Precision(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("should preserve precision when accumulating financial decimal values", func(t *testing.T) {
+		pagoRepo := new(mockPagoRepo)
+		segRepo := new(mockSeguimientoRepo)
+		service := usecase.NewCobroWorkflowService(pagoRepo, segRepo)
+
+		// 10 pagos de 0.10 cada uno. En float64 clásico, 0.1 + 0.1 + ... != 1.0 (acumula error 0.9999999999999999)
+		pagos := make([]domain.Pago, 10)
+		for i := 0; i < 10; i++ {
+			pagos[i] = domain.Pago{
+				IDPago:        uint64(i + 1),
+				IDIncapacidad: uint64(i + 1),
+				IDEntidad:     1,
+				EstadoPago:    "Pagado",
+				Valor:         decimal.NewFromFloat(0.10),
+				FechaPago:     time.Now(),
+			}
+		}
+
+		// Agregar pagos con decimales exactos
+		pagoExtra := domain.Pago{
+			IDPago:        11,
+			IDIncapacidad: 11,
+			IDEntidad:     1,
+			EstadoPago:    "Pendiente",
+			Valor:         decimal.RequireFromString("1234567.89"),
+			FechaPago:     time.Now(),
+		}
+		pagos = append(pagos, pagoExtra)
+
+		pagoRepo.On("ListPagos", ctx, ports.PagoFilters{Limit: 10000}).Return(pagos, int64(len(pagos)), nil)
+		pagoRepo.On("GetEntidadInfo", ctx).Return(map[uint64]struct{ Nombre, Tipo string }{
+			1: {Nombre: "Sura EPS", Tipo: "EPS"},
+		}, nil)
+
+		resumen, err := service.ObtenerResumenPorEntidad(ctx)
+
+		assert.NoError(t, err)
+		assert.Len(t, resumen, 1)
+
+		entidadResumen := resumen[0]
+		assert.Equal(t, uint64(1), entidadResumen.IDEntidad)
+		assert.Equal(t, "Sura EPS", entidadResumen.Nombre)
+		assert.Equal(t, int64(11), entidadResumen.CantidadINC)
+		// 10 * 0.10 = 1.00 cobrado
+		assert.Equal(t, "1", entidadResumen.ValorCobrado)
+		// 1234567.89 pendiente
+		assert.Equal(t, "1234567.89", entidadResumen.ValorPendiente)
+		// 1.00 + 1234567.89 = 1234568.89 total exacto
+		assert.Equal(t, "1234568.89", entidadResumen.ValorTotal)
+
+		pagoRepo.AssertExpectations(t)
+	})
+}

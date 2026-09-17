@@ -63,20 +63,31 @@ func NewCobroWorkflowService(pagoRepo ports.PagoRepository, seguimientoRepo port
 	}
 }
 
+type resumenEntidadAccumulator struct {
+	IDEntidad       uint64
+	Nombre          string
+	Tipo            string
+	CantidadINC     int64
+	ValorTotal      decimal.Decimal
+	ValorCobrado    decimal.Decimal
+	ValorPendiente  decimal.Decimal
+	PagosPendientes int64
+	PagosVencidos   int64
+}
+
 func (s *CobroWorkflowService) ObtenerEstadisticasGenerales(ctx context.Context) (*EstadisticasCartera, error) {
 	pagos, total, err := s.pagoRepo.ListPagos(ctx, ports.PagoFilters{Limit: 10000})
 	if err != nil {
 		return nil, err
 	}
 
-	var totalValor, totalCobrado, totalPendiente float64
+	var totalValor, totalCobrado, totalPendiente decimal.Decimal
 	var pagosPendientes, pagosVencidos int64
 	incapacidadesTotal := make(map[uint64]bool)
 	incapacidadesActivas := make(map[uint64]bool)
 
 	for _, pago := range pagos {
-		valor, _ := pago.Valor.Float64()
-		totalValor += valor
+		totalValor = totalValor.Add(pago.Valor)
 
 		if pago.IDIncapacidad != 0 {
 			incapacidadesTotal[pago.IDIncapacidad] = true
@@ -84,9 +95,9 @@ func (s *CobroWorkflowService) ObtenerEstadisticasGenerales(ctx context.Context)
 
 		switch pago.EstadoPago {
 		case "Pagado", "Conciliado":
-			totalCobrado += valor
+			totalCobrado = totalCobrado.Add(pago.Valor)
 		default:
-			totalPendiente += valor
+			totalPendiente = totalPendiente.Add(pago.Valor)
 			pagosPendientes++
 			if pago.FechaPago.Before(time.Now()) && pago.EstadoPago != "Anulado" {
 				pagosVencidos++
@@ -124,9 +135,9 @@ func (s *CobroWorkflowService) ObtenerEstadisticasGenerales(ctx context.Context)
 	return &EstadisticasCartera{
 		TotalIncapacidades:     totalIncapacidades,
 		IncapacidadesActivas:   totalActivas,
-		TotalValorCartera:      formatCurrency(totalValor),
-		TotalValorCobrado:      formatCurrency(totalCobrado),
-		TotalValorPendiente:    formatCurrency(totalPendiente),
+		TotalValorCartera:      formatDecimal(totalValor),
+		TotalValorCobrado:      formatDecimal(totalCobrado),
+		TotalValorPendiente:    formatDecimal(totalPendiente),
 		PagosPendientes:        pagosPendientes,
 		PagosVencidos:          pagosVencidos,
 		SeguimientosPendientes: seguimientosPendientes,
@@ -144,38 +155,48 @@ func (s *CobroWorkflowService) ObtenerResumenPorEntidad(ctx context.Context) ([]
 		return nil, err
 	}
 
-	resumenPorEntidad := make(map[uint64]*ResumenEntidad)
+	resumenPorEntidad := make(map[uint64]*resumenEntidadAccumulator)
 
 	for _, pago := range pagos {
-		if _, ok := resumenPorEntidad[pago.IDEntidad]; !ok {
+		acc, ok := resumenPorEntidad[pago.IDEntidad]
+		if !ok {
 			info := entidadInfo[pago.IDEntidad]
-			resumenPorEntidad[pago.IDEntidad] = &ResumenEntidad{
+			acc = &resumenEntidadAccumulator{
 				IDEntidad: pago.IDEntidad,
 				Nombre:    info.Nombre,
 				Tipo:      info.Tipo,
 			}
+			resumenPorEntidad[pago.IDEntidad] = acc
 		}
 
-		valor, _ := pago.Valor.Float64()
-		r := resumenPorEntidad[pago.IDEntidad]
-		r.CantidadINC++
+		acc.CantidadINC++
+		acc.ValorTotal = acc.ValorTotal.Add(pago.Valor)
 
 		switch pago.EstadoPago {
 		case "Pagado", "Conciliado":
-			r.ValorCobrado = formatCurrency(sumCurrency(r.ValorCobrado, valor))
+			acc.ValorCobrado = acc.ValorCobrado.Add(pago.Valor)
 		default:
-			r.ValorPendiente = formatCurrency(sumCurrency(r.ValorPendiente, valor))
-			r.PagosPendientes++
+			acc.ValorPendiente = acc.ValorPendiente.Add(pago.Valor)
+			acc.PagosPendientes++
 			if pago.FechaPago.Before(time.Now()) && pago.EstadoPago != "Anulado" {
-				r.PagosVencidos++
+				acc.PagosVencidos++
 			}
 		}
-		r.ValorTotal = formatCurrency(sumCurrency(r.ValorTotal, valor))
 	}
 
 	result := make([]ResumenEntidad, 0, len(resumenPorEntidad))
-	for _, r := range resumenPorEntidad {
-		result = append(result, *r)
+	for _, acc := range resumenPorEntidad {
+		result = append(result, ResumenEntidad{
+			IDEntidad:       acc.IDEntidad,
+			Nombre:          acc.Nombre,
+			Tipo:            acc.Tipo,
+			CantidadINC:     acc.CantidadINC,
+			ValorTotal:      formatDecimal(acc.ValorTotal),
+			ValorCobrado:    formatDecimal(acc.ValorCobrado),
+			ValorPendiente:  formatDecimal(acc.ValorPendiente),
+			PagosPendientes: acc.PagosPendientes,
+			PagosVencidos:   acc.PagosVencidos,
+		})
 	}
 	return result, nil
 }
@@ -305,19 +326,23 @@ func (s *CobroWorkflowService) CalcularDiasVencido(fechaPago time.Time) int {
 	return int(time.Since(fechaPago).Hours() / 24)
 }
 
+func formatDecimal(d decimal.Decimal) string {
+	return d.Round(2).String()
+}
+
 func formatCurrency(value float64) string {
 	return formatFloat(value)
 }
 
 func sumCurrency(current string, addition float64) float64 {
-	var currentValue float64
+	var currentDec decimal.Decimal
 	if current != "" {
-		d, err := decimal.NewFromString(current)
-		if err == nil {
-			currentValue, _ = d.Float64()
+		if d, err := decimal.NewFromString(current); err == nil {
+			currentDec = d
 		}
 	}
-	return currentValue + addition
+	res, _ := currentDec.Add(decimal.NewFromFloat(addition)).Float64()
+	return res
 }
 
 func formatFloat(f float64) string {
