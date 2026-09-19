@@ -22,7 +22,12 @@ func (a Actor) HasPermission(permission string) bool {
 }
 
 func (a Actor) CanManageIncapacidades() bool {
-	return a.HasPermission("editar_incapacidad") ||
+	return a.Role == "Administrador" ||
+		a.Role == "admin" ||
+		a.Role == "Gestión Humana" ||
+		a.Role == "SG-SST" ||
+		a.Role == "Recepcionista" ||
+		a.HasPermission("editar_incapacidad") ||
 		a.HasPermission("validar_documentos") ||
 		a.HasPermission("registrar_pago") ||
 		a.HasPermission("consultar_reportes") ||

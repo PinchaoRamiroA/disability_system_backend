@@ -78,6 +78,9 @@ func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, inpu
 	if input.IDUsuario == 0 {
 		input.IDUsuario = actor.UserID
 	}
+	if input.IDUsuario != actor.UserID && !actor.CanManageIncapacidades() {
+		return nil, apperrors.ErrForbidden.WithMessage("solo los administradores o gestores autorizados pueden registrar incapacidades para otros colaboradores")
+	}
 	if err := uc.ensureReferences(ctx, input.IDUsuario, input.IDTipo, input.IDEntidad); err != nil {
 		return nil, err
 	}

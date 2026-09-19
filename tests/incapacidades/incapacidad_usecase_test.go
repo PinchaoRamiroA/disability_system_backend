@@ -196,6 +196,32 @@ func TestCrearIncapacidad_SinPermiso(t *testing.T) {
 	assert.Contains(t, err.Error(), "permiso")
 }
 
+func TestCrearIncapacidad_EmpleadoNoPuedeCrearParaTercero(t *testing.T) {
+	mockRepo := new(MockIncapacidadRepository)
+	uc := usecase.NewIncapacidadUseCase(mockRepo)
+
+	actor := ports.Actor{
+		UserID:   2,
+		Role:     "Empleado",
+		Permisos: []string{"crear_incapacidad"},
+	}
+
+	input := usecase.CrearIncapacidadInput{
+		IDUsuario:   5, // ID distinto al del actor
+		IDTipo:      1,
+		IDEntidad:   1,
+		Titulo:      "Incapacidad no permitida",
+		FechaInicio: "2024-01-15",
+		Origen:      "Enfermedad General",
+	}
+
+	incapacidad, err := uc.Crear(context.Background(), actor, input)
+
+	assert.Error(t, err)
+	assert.Nil(t, incapacidad)
+	assert.Contains(t, err.Error(), "otros colaboradores")
+}
+
 func TestTranscribirIncapacidad_Success(t *testing.T) {
 	mockRepo := new(MockIncapacidadRepository)
 

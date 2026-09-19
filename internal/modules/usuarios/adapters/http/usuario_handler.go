@@ -91,6 +91,16 @@ func (h *UsuarioHandler) Obtener(c *gin.Context) {
 		return
 	}
 
+	userRole, _ := c.Get("user_role")
+	userID, _ := c.Get("user_id")
+	roleStr, _ := userRole.(string)
+	uid, _ := userID.(uint64)
+	isManager := roleStr == "Administrador" || roleStr == "admin" || roleStr == "Gestión Humana" || roleStr == "SG-SST" || roleStr == "Recepcionista"
+	if !isManager && uid != id {
+		response.Forbidden(c, "no tienes permiso para consultar información de otros usuarios", apperrors.ErrForbidden.Code)
+		return
+	}
+
 	usuario, rol, err := h.usecase.Obtener(c.Request.Context(), id)
 	if err != nil {
 		handleError(c, err)
