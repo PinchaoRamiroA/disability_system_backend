@@ -5,6 +5,7 @@ import (
 
 	"disability_system_backend/internal/shared/auth"
 	apperrors "disability_system_backend/internal/shared/errors"
+	"disability_system_backend/internal/shared/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,32 +22,23 @@ func (m *JWTMiddleware) Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.AbortWithStatusJSON(apperrors.ErrUnauthorized.HTTPStatus, gin.H{
-				"success": false,
-				"code":    apperrors.ErrUnauthorized.Code,
-				"message": "autorización requerida",
-			})
+			response.Unauthorized(c, "autorización requerida", apperrors.ErrUnauthorized.Code)
+			c.Abort()
 			return
 		}
 
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-			c.AbortWithStatusJSON(apperrors.ErrTokenInvalid.HTTPStatus, gin.H{
-				"success": false,
-				"code":    apperrors.ErrTokenInvalid.Code,
-				"message": "formato de token inválido",
-			})
+			response.Error(c, apperrors.ErrTokenInvalid.HTTPStatus, "formato de token inválido", apperrors.ErrTokenInvalid.Code, nil)
+			c.Abort()
 			return
 		}
 
 		tokenString := parts[1]
 		claims, err := m.jwtService.ValidateToken(tokenString)
 		if err != nil {
-			c.AbortWithStatusJSON(apperrors.ErrTokenInvalid.HTTPStatus, gin.H{
-				"success": false,
-				"code":    apperrors.ErrTokenInvalid.Code,
-				"message": "token inválido",
-			})
+			response.Error(c, apperrors.ErrTokenInvalid.HTTPStatus, "token inválido", apperrors.ErrTokenInvalid.Code, nil)
+			c.Abort()
 			return
 		}
 
@@ -62,21 +54,15 @@ func (m *JWTMiddleware) RequireRole(roles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userRole, exists := c.Get("user_role")
 		if !exists {
-			c.AbortWithStatusJSON(apperrors.ErrUnauthorized.HTTPStatus, gin.H{
-				"success": false,
-				"code":    apperrors.ErrUnauthorized.Code,
-				"message": "rol no encontrado en contexto",
-			})
+			response.Unauthorized(c, "rol no encontrado en contexto", apperrors.ErrUnauthorized.Code)
+			c.Abort()
 			return
 		}
 
 		role, ok := userRole.(string)
 		if !ok {
-			c.AbortWithStatusJSON(apperrors.ErrInternal.HTTPStatus, gin.H{
-				"success": false,
-				"code":    apperrors.ErrInternal.Code,
-				"message": "error al procesar rol",
-			})
+			response.InternalError(c, "error al procesar rol", apperrors.ErrInternal.Code)
+			c.Abort()
 			return
 		}
 
@@ -87,10 +73,7 @@ func (m *JWTMiddleware) RequireRole(roles ...string) gin.HandlerFunc {
 			}
 		}
 
-		c.AbortWithStatusJSON(apperrors.ErrForbidden.HTTPStatus, gin.H{
-			"success": false,
-			"code":    apperrors.ErrForbidden.Code,
-			"message": "no tienes permiso para acceder a este recurso",
-		})
+		response.Forbidden(c, "no tienes permiso para acceder a este recurso", apperrors.ErrForbidden.Code)
+		c.Abort()
 	}
 }
