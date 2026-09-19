@@ -316,10 +316,26 @@ func normalizePagination(page, limit int) (int, int) {
 }
 
 func (r *CobroRepository) GetIncapacidadesDetailed(ctx context.Context, ids []uint64) (map[uint64]ports.IncapacidadInfo, error) {
+	if len(ids) == 0 {
+		return make(map[uint64]ports.IncapacidadInfo), nil
+	}
+
+	uniqueIDs := make([]uint64, 0, len(ids))
+	seen := make(map[uint64]bool)
+	for _, id := range ids {
+		if id != 0 && !seen[id] {
+			seen[id] = true
+			uniqueIDs = append(uniqueIDs, id)
+		}
+	}
+	if len(uniqueIDs) == 0 {
+		return make(map[uint64]ports.IncapacidadInfo), nil
+	}
+
 	var models []incmodels.IncapacidadModel
 	err := r.db.WithContext(ctx).
 		Select("id_incapacidad, titulo").
-		Where("id_incapacidad IN ?", ids).
+		Where("id_incapacidad IN ?", uniqueIDs).
 		Find(&models).Error
 	if err != nil {
 		return nil, err

@@ -76,7 +76,7 @@ func (a *App) InitAuth() *auth.JWTService {
 
 	// Initialize Storage Service first
 	if a.Config.App.Env != "test" {
-		storageService, err := storage.NewStorageService(context.Background(), storage.LoadR2Config())
+		storageService, err := storage.NewStorageService(context.Background(), storage.LoadR2Config(), a.Logger)
 		if err != nil {
 			a.Logger.Warn("storage service not configured", "error", err)
 		} else {

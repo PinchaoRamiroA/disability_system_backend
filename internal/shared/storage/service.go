@@ -5,6 +5,7 @@ import (
 	"io"
 	"mime/multipart"
 
+	"disability_system_backend/internal/shared/logger"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -14,7 +15,7 @@ type StorageService struct {
 	validator *FileValidator
 }
 
-func NewStorageService(ctx context.Context, cfg R2Config) (*StorageService, error) {
+func NewStorageService(ctx context.Context, cfg R2Config, loggers ...*logger.Logger) (*StorageService, error) {
 	if !cfg.IsConfigured() {
 		return nil, ErrNotConfigured
 	}
@@ -28,7 +29,12 @@ func NewStorageService(ctx context.Context, cfg R2Config) (*StorageService, erro
 		o.UsePathStyle = true
 	})
 
-	client := NewClient(s3Client, cfg.Bucket, cfg.PublicURL)
+	var l *logger.Logger
+	if len(loggers) > 0 {
+		l = loggers[0]
+	}
+
+	client := NewClient(s3Client, cfg.Bucket, cfg.PublicURL, l)
 	validator := NewFileValidator(cfg.MaxFileSize)
 
 	return &StorageService{

@@ -5,20 +5,27 @@ import (
 	"context"
 	"io"
 
+	"disability_system_backend/internal/shared/logger"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 type Client struct {
-	s3Client *s3.Client
-	bucket   string
+	s3Client  *s3.Client
+	bucket    string
 	publicURL string
+	logger    *logger.Logger
 }
 
-func NewClient(s3Client *s3.Client, bucket, publicURL string) *Client {
+func NewClient(s3Client *s3.Client, bucket, publicURL string, loggers ...*logger.Logger) *Client {
+	var l *logger.Logger
+	if len(loggers) > 0 {
+		l = loggers[0]
+	}
 	return &Client{
-		s3Client: s3Client,
-		bucket:   bucket,
+		s3Client:  s3Client,
+		bucket:    bucket,
 		publicURL: publicURL,
+		logger:    l,
 	}
 }
 
@@ -38,6 +45,10 @@ func (c *Client) PublicURL(key string) string {
 }
 
 func (c *Client) PutObject(ctx context.Context, key string, body []byte, contentType string) error {
+	if c.s3Client == nil {
+		return ErrUploadFailed.WithMessage("s3 client not initialized")
+	}
+
 	input := &s3.PutObjectInput{
 		Bucket:      &c.bucket,
 		Key:         &key,
@@ -50,6 +61,10 @@ func (c *Client) PutObject(ctx context.Context, key string, body []byte, content
 }
 
 func (c *Client) DeleteObject(ctx context.Context, key string) error {
+	if c.s3Client == nil {
+		return ErrDeleteFailed.WithMessage("s3 client not initialized")
+	}
+
 	input := &s3.DeleteObjectInput{
 		Bucket: &c.bucket,
 		Key:    &key,
@@ -60,6 +75,10 @@ func (c *Client) DeleteObject(ctx context.Context, key string) error {
 }
 
 func (c *Client) GetObject(ctx context.Context, key string) ([]byte, error) {
+	if c.s3Client == nil {
+		return nil, ErrFileNotFound.WithMessage("s3 client not initialized")
+	}
+
 	input := &s3.GetObjectInput{
 		Bucket: &c.bucket,
 		Key:    &key,
