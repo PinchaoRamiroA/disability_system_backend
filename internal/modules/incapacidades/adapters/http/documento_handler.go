@@ -2,7 +2,9 @@ package http
 
 import (
 	"errors"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"disability_system_backend/internal/modules/historial/domain"
@@ -17,9 +19,9 @@ import (
 )
 
 type DocumentoHandler struct {
-	useCase          *usecase.DocumentoUseCase
-	historialListFn  func(incapacidadID uint64, tipoID *uint64, page, limit int) ([]domain.Historial, int64, error)
-	storageService   *storage.StorageService
+	useCase         *usecase.DocumentoUseCase
+	historialListFn func(incapacidadID uint64, tipoID *uint64, page, limit int) ([]domain.Historial, int64, error)
+	storageService  *storage.StorageService
 }
 
 func NewDocumentoHandler(useCase *usecase.DocumentoUseCase, historialListFn func(uint64, *uint64, int, int) ([]domain.Historial, int64, error), storageService *storage.StorageService) *DocumentoHandler {
@@ -359,12 +361,12 @@ func toHistorialResponses(items []domain.Historial) []dto.HistorialResponse {
 	result := make([]dto.HistorialResponse, 0, len(items))
 	for _, item := range items {
 		result = append(result, dto.HistorialResponse{
-			IDHistorial:    item.IDHistorial,
-			IDIncapacidad:  item.IDIncapacidad,
+			IDHistorial:     item.IDHistorial,
+			IDIncapacidad:   item.IDIncapacidad,
 			IDTipoHistorial: item.IDTipoHistorial,
-			Descripcion:    item.Descripcion,
-			Fecha:          item.Fecha.Format("2006-01-02 15:04:05"),
-			GestorID:       item.GestorID,
+			Descripcion:     item.Descripcion,
+			Fecha:           item.Fecha.Format("2006-01-02 15:04:05"),
+			GestorID:        item.GestorID,
 		})
 	}
 	return result
@@ -374,9 +376,8 @@ func stringPtr(s string) *string {
 	return &s
 }
 
-
 func getContentTypeFromExtension(ext string) string {
-	switch ext {
+	switch strings.ToLower(ext) {
 	case ".pdf":
 		return "application/pdf"
 	case ".jpg", ".jpeg":
@@ -388,15 +389,12 @@ func getContentTypeFromExtension(ext string) string {
 	}
 }
 
+func GetExtensionFromFilename(filename string) string {
+	return strings.ToLower(filepath.Ext(filename))
+}
+
 func getExtensionFromFilename(filename string) string {
-	ext := ""
-	if len(filename) > 4 {
-		ext = filename[len(filename)-4:]
-		if ext[0] != '.' {
-			ext = filename[len(filename)-5:]
-		}
-	}
-	return ext
+	return GetExtensionFromFilename(filename)
 }
 
 func handleStorageError(c *gin.Context, err error) {

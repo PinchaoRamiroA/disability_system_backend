@@ -1,3 +1,4 @@
+basePath: /api/v1
 definitions:
   disability_system_backend_internal_modules_auth_dto.LoginRequest:
     properties:
@@ -209,6 +210,8 @@ definitions:
     properties:
       canal_recepcion:
         type: string
+      created_by:
+        type: integer
       fecha_fin:
         type: string
       fecha_inicio:
@@ -384,7 +387,128 @@ definitions:
     type: object
 info:
   contact: {}
+  description: API REST para la gestión de incapacidades médicas, cobro a EPS/ARL
+    y seguimiento documental
+  title: Sistema de Gestión de Incapacidades
+  version: "1.0"
 paths:
+  /auditoria:
+    get:
+      consumes:
+      - application/json
+      description: Lista el historial de acciones y auditoría en el sistema
+      parameters:
+      - description: Filtrar por ID de usuario
+        in: query
+        name: id_usuario
+        type: integer
+      - description: Filtrar por ID de incapacidad
+        in: query
+        name: id_incapacidad
+        type: integer
+      - description: Filtrar por tipo de acción
+        in: query
+        name: tipo_accion
+        type: string
+      - description: Filtrar por módulo
+        in: query
+        name: modulo
+        type: string
+      - description: Fecha de inicio (YYYY-MM-DD)
+        in: query
+        name: fecha_inicio
+        type: string
+      - description: Fecha de fin (YYYY-MM-DD)
+        in: query
+        name: fecha_fin
+        type: string
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar entradas de auditoría
+      tags:
+      - auditoria
+  /auditoria/usuario/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Lista el historial de acciones realizadas por un usuario específico
+      parameters:
+      - description: ID del usuario
+        in: path
+        name: id
+        required: true
+        type: integer
+      - default: 1
+        description: Página
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Límite
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Listar auditoría de un usuario
+      tags:
+      - auditoria
   /auth/login:
     post:
       consumes:
@@ -1387,7 +1511,6 @@ paths:
       - description: ID de la incapacidad
         in: query
         name: id_incapacidad
-        required: true
         type: integer
       - description: Filtrar por estado
         in: query
@@ -2684,4 +2807,7 @@ paths:
       summary: Asignar rol a usuario
       tags:
       - usuarios
+schemes:
+- http
+- https
 swagger: "2.0"

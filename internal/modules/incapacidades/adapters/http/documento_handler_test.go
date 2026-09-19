@@ -176,3 +176,33 @@ func TestDocumentoHandler_Listar_BUG08(t *testing.T) {
 		repo.AssertNotCalled(t, "List", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 	})
 }
+
+func TestGetExtensionFromFilename_BUG15(t *testing.T) {
+	testCases := []struct {
+		filename string
+		expected string
+	}{
+		{"documento.pdf", ".pdf"},
+		{"foto.jpg", ".jpg"},
+		{"foto.jpeg", ".jpeg"},
+		{"imagen.png", ".png"},
+		{"SCAN.PDF", ".pdf"},
+		{"IMAGE.JPEG", ".jpeg"},
+		{"FOTO.PNG", ".png"},
+		{"a.go", ".go"},
+		{"1.pdf", ".pdf"},
+		{"reporte.2024.final.docx", ".docx"},
+		{"archivo_sin_extension", ""},
+		{"1234", ""},
+		{"12345", ""},
+		{".gitignore", ".gitignore"},
+		{".env.local", ".local"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.filename, func(t *testing.T) {
+			actual := httpadapter.GetExtensionFromFilename(tc.filename)
+			assert.Equal(t, tc.expected, actual, "filename %s should yield extension %s", tc.filename, tc.expected)
+		})
+	}
+}
