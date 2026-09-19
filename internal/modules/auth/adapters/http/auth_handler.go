@@ -55,7 +55,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	resp := mapper.ToLoginResponse(user, role, tokens.AccessToken, tokens.RefreshToken, h.loginUseCase.GetExpirationSeconds())
+	resp := mapper.ToLoginResponse(user, role, tokens.AccessToken, tokens.RefreshToken, h.getExpirationSeconds())
 	response.Success(c, resp, "login exitoso")
 }
 
@@ -116,8 +116,18 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	resp := mapper.ToTokenResponse(tokens.AccessToken, tokens.RefreshToken, 0)
+	resp := mapper.ToTokenResponse(tokens.AccessToken, tokens.RefreshToken, h.getExpirationSeconds())
 	response.Success(c, resp, "token renovado")
+}
+
+func (h *AuthHandler) getExpirationSeconds() int64 {
+	if h.refreshUseCase != nil && h.refreshUseCase.GetExpirationSeconds() > 0 {
+		return h.refreshUseCase.GetExpirationSeconds()
+	}
+	if h.loginUseCase != nil {
+		return h.loginUseCase.GetExpirationSeconds()
+	}
+	return 0
 }
 
 func handleError(c *gin.Context, err error) {
