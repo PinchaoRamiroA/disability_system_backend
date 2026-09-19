@@ -252,10 +252,66 @@ Ubicación:
 
 El sistema utiliza:
 
-- JWT Access Tokens
+- JWT Access Tokens (Bearer)
+- Refresh Tokens
 - Middleware de autorización
-- Roles y permisos
-- Guards por módulo
+- Control de acceso basado en Roles y Permisos (RBAC)
+
+---
+
+## 👥 Usuarios de Prueba para Desarrollo (Login Rápido)
+
+Para facilitar el desarrollo del frontend y las pruebas de la API, la base de datos cuenta con usuarios precargados para cada uno de los **9 roles** del sistema. Todos comparten la misma contraseña:
+
+> 🔑 **Contraseña para todos los usuarios de prueba:** `password123`
+
+| Rol | ID Rol | Correo / Email | Contraseña | Nombre | Funciones / Permisos Principales |
+|---|---|---|---|---|---|
+| **Administrador** | `1` | `admin@empresa.com` | `password123` | Admin Principal | Control total: usuarios, roles, reportes, incapacidades, cobros y auditoría. |
+| **Gestión Humana** | `2` | `gh@empresa.com` | `password123` | Gestor Humano | Crear y editar incapacidades, validar y rechazar documentos, generar alertas. |
+| **Gerencia** | `3` | `gerencia@empresa.com` | `password123` | Gerente General | Consultar incapacidades, historial y reportes ejecutivos. |
+| **Empleado** | `4` | `empleado@empresa.com` <br> `juan.perez@empleado.com` | `password123` | Empleado Demo <br> Juan Perez | Consulta de sus propias incapacidades y envío de documentación de soporte. |
+| **Contabilidad** | `5` | `contabilidad@empresa.com` | `password123` | Contador | Registro de pagos de EPS/ARL, conciliación bancaria y reportes contables. |
+| **Jurídica** | `6` | `juridica@empresa.com` | `password123` | Asesor Jurídico | Gestión de cobros jurídicos, consulta de incapacidades e historial. |
+| **Recepcionista** | `7` | `recepcion@empresa.com` | `password123` | Recepcionista | Radicación y creación inicial de incapacidades. |
+| **Cartera** | `8` | `cartera@empresa.com` | `password123` | Analista de Cartera | Gestión de cobro persuasivo, alertas de vencimiento y registro de pagos. |
+| **SG-SST** | `9` | `sgsst@empresa.com` | `password123` | Coordinador SG-SST | Validación de seguridad y salud, edición y alertas de incapacidades laborales. |
+
+### 🚀 Ejemplo de Login (cURL)
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@empresa.com",
+    "password": "password123"
+  }'
+```
+
+**Respuesta esperada (`200 OK`):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": 1,
+      "nombre": "Admin Principal",
+      "correo": "admin@empresa.com",
+      "rol": {
+        "id": 1,
+        "nombre": "Administrador",
+        "permisos": ["..."]
+      }
+    },
+    "access_token": "eyJhbGciOi...",
+    "refresh_token": "eyJhbGciOi...",
+    "token_type": "Bearer",
+    "expires_in": 86400
+  },
+  "message": "login exitoso"
+}
+```
 
 ---
 
@@ -495,9 +551,19 @@ GET /health
 
 ---
 
-# 📖 Documentación API
+# 📖 Documentación API (Swagger)
 
-Swagger/OpenAPI será generado automáticamente.
+La interfaz interactiva de Swagger UI está disponible en:
+
+```http
+http://localhost:8080/swagger/index.html
+```
+
+Para regenerar la documentación tras modificar comentarios o endpoints:
+
+```bash
+swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal
+```
 
 ---
 

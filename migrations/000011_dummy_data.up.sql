@@ -11,6 +11,7 @@ INSERT INTO usuario (id_rol, nombre, correo, numero_documento, password_hash, es
 
 -- Insertar empleados (asumiendo que id_rol = 4 es Empleado según el seed anterior)
 INSERT INTO usuario (id_rol, nombre, correo, numero_documento, password_hash, estado) VALUES
+(4, 'Empleado Demo', 'empleado@empresa.com', '200000000', '$2a$10$5JGzZsF/VZbcpMPaoFcWr.Ur.923/5d8dR8O54FJv02zbvh2brTim', true),
 (4, 'Juan Perez', 'juan.perez@empleado.com', '200000001', '$2a$10$5JGzZsF/VZbcpMPaoFcWr.Ur.923/5d8dR8O54FJv02zbvh2brTim', true),
 (4, 'Maria Gomez', 'maria.gomez@empleado.com', '200000002', '$2a$10$5JGzZsF/VZbcpMPaoFcWr.Ur.923/5d8dR8O54FJv02zbvh2brTim', true),
 (4, 'Carlos Rodriguez', 'carlos.rodriguez@empleado.com', '200000003', '$2a$10$5JGzZsF/VZbcpMPaoFcWr.Ur.923/5d8dR8O54FJv02zbvh2brTim', true),
