@@ -3,25 +3,21 @@ package usecase
 import (
 	"context"
 
-	"disability_system_backend/internal/modules/usuarios/adapters/postgres"
 	"disability_system_backend/internal/modules/usuarios/domain"
+	"disability_system_backend/internal/modules/usuarios/ports"
 	"disability_system_backend/internal/shared/auth"
 	apperrors "disability_system_backend/internal/shared/errors"
-
-	"gorm.io/gorm"
 )
 
 type UsuarioUseCase struct {
-	usuarioRepo *postgres.UsuarioRepository
-	rolRepo     *postgres.RolRepository
-	db          *gorm.DB
+	usuarioRepo ports.UsuarioRepository
+	rolRepo     ports.RolRepository
 }
 
-func NewUsuarioUseCase(db *gorm.DB) *UsuarioUseCase {
+func NewUsuarioUseCase(usuarioRepo ports.UsuarioRepository, rolRepo ports.RolRepository) *UsuarioUseCase {
 	return &UsuarioUseCase{
-		usuarioRepo: postgres.NewUsuarioRepository(db),
-		rolRepo:     postgres.NewRolRepository(db),
-		db:          db,
+		usuarioRepo: usuarioRepo,
+		rolRepo:     rolRepo,
 	}
 }
 
@@ -169,15 +165,13 @@ func (uc *UsuarioUseCase) Actualizar(ctx context.Context, id uint64, req struct 
 }
 
 func (uc *UsuarioUseCase) CambiarEstado(ctx context.Context, id uint64, estado bool) error {
-	_, err := uc.usuarioRepo.FindByID(ctx, id)
+	usuario, err := uc.usuarioRepo.FindByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	return uc.db.WithContext(ctx).Exec(
-		"UPDATE usuario SET estado = ? WHERE id_usuario = ?",
-		estado, id,
-	).Error
+	usuario.Estado = estado
+	return uc.usuarioRepo.Update(ctx, usuario)
 }
 
 func (uc *UsuarioUseCase) CambiarPassword(ctx context.Context, id uint64, passwordActual, passwordNuevo string) error {
@@ -195,10 +189,8 @@ func (uc *UsuarioUseCase) CambiarPassword(ctx context.Context, id uint64, passwo
 		return err
 	}
 
-	return uc.db.WithContext(ctx).Exec(
-		"UPDATE usuario SET password_hash = ? WHERE id_usuario = ?",
-		passwordHash, id,
-	).Error
+	usuario.PasswordHash = passwordHash
+	return uc.usuarioRepo.Update(ctx, usuario)
 }
 
 func (uc *UsuarioUseCase) AsignarRol(ctx context.Context, id uint64, idRol uint64) error {

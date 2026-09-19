@@ -9,18 +9,27 @@ import (
 	apperrors "disability_system_backend/internal/shared/errors"
 )
 
+const DefaultRoleName = "Empleado"
+
 type RegisterUseCase struct {
 	userRepo       ports.UserRepository
 	passwordHasher ports.PasswordHasher
+	roleRepo       ports.RoleRepository
 }
 
 func NewRegisterUseCase(
 	userRepo ports.UserRepository,
 	passwordHasher ports.PasswordHasher,
+	roleRepo ...ports.RoleRepository,
 ) *RegisterUseCase {
+	var rRepo ports.RoleRepository
+	if len(roleRepo) > 0 {
+		rRepo = roleRepo[0]
+	}
 	return &RegisterUseCase{
 		userRepo:       userRepo,
 		passwordHasher: passwordHasher,
+		roleRepo:       rRepo,
 	}
 }
 
@@ -44,6 +53,18 @@ func (uc *RegisterUseCase) Execute(
 		return nil, apperrors.ErrConflict.WithMessage("el número de documento ya está registrado")
 	}
 
+	var roleID uint64 = 4
+	if uc.roleRepo != nil {
+		role, err := uc.roleRepo.FindByName(ctx, DefaultRoleName)
+		if err != nil {
+			return nil, apperrors.ErrRolNotFound.WithMessage("rol por defecto no encontrado").WithError(err)
+		}
+		if role == nil {
+			return nil, apperrors.ErrRolNotFound.WithMessage("rol por defecto no encontrado")
+		}
+		roleID = role.ID
+	}
+
 	hashedPassword, err := uc.passwordHasher.Hash(password)
 	if err != nil {
 		return nil, apperrors.ErrHashPassword.WithError(err)
@@ -51,7 +72,7 @@ func (uc *RegisterUseCase) Execute(
 
 	now := time.Now()
 	user := &domain.User{
-		IDRol:           4,
+		IDRol:           roleID,
 		Nombre:          nombre,
 		Correo:          email,
 		PasswordHash:    hashedPassword,

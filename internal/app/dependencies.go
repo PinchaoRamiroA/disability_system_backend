@@ -68,7 +68,7 @@ func (a *App) InitAuth() *auth.JWTService {
 
 	// Initialize UseCases
 	loginUseCase := usecase.NewLoginUseCase(userRepo, roleRepo, tokenService, passwordHasher, a.Config.JWT.Expiration)
-	registerUseCase := usecase.NewRegisterUseCase(userRepo, passwordHasher)
+	registerUseCase := usecase.NewRegisterUseCase(userRepo, passwordHasher, roleRepo)
 	refreshUseCase := usecase.NewRefreshTokenUseCase(tokenService, a.Config.JWT.Expiration)
 
 	// Initialize Handler

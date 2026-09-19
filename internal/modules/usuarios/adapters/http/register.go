@@ -11,9 +11,10 @@ import (
 )
 
 func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService) {
+	usuarioRepo := postgres.NewUsuarioRepository(db)
 	rolRepo := postgres.NewRolRepository(db)
 
-	usuarioUseCase := usecase.NewUsuarioUseCase(db)
+	usuarioUseCase := usecase.NewUsuarioUseCase(usuarioRepo, rolRepo)
 	rolUseCase := usecase.NewRolUseCase(rolRepo)
 
 	usuarioHandler := NewUsuarioHandler(usuarioUseCase)

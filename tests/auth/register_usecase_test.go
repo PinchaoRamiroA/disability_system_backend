@@ -113,3 +113,65 @@ func TestRegisterUseCase_Execute_AssignsDefaultRole(t *testing.T) {
 	assert.NotNil(t, user)
 	assert.Equal(t, uint64(4), user.IDRol)
 }
+
+func TestRegisterUseCase_Execute_AssignsRoleDynamicallyByName_BUG12(t *testing.T) {
+	mockUserRepo := new(MockUserRepository)
+	mockHasher := new(MockPasswordHasher)
+	mockRoleRepo := new(MockRoleRepository)
+
+	uc := usecase.NewRegisterUseCase(mockUserRepo, mockHasher, mockRoleRepo)
+
+	mockUserRepo.On("EmailExists", mock.Anything, "dynamic@example.com").Return(false, nil)
+	mockUserRepo.On("DocumentExists", mock.Anything, "88888888").Return(false, nil)
+	mockRoleRepo.On("FindByName", mock.Anything, "Empleado").Return(&domain.Role{
+		ID:     77,
+		Nombre: "Empleado",
+	}, nil)
+	mockHasher.On("Hash", "password123").Return("hashed", nil)
+	mockUserRepo.On("Create", mock.Anything, mock.MatchedBy(func(u *domain.User) bool {
+		return u.IDRol == 77
+	})).Return(nil)
+
+	user, err := uc.Execute(
+		context.Background(),
+		"Dynamic User",
+		"dynamic@example.com",
+		"password123",
+		"88888888",
+	)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, user)
+	assert.Equal(t, uint64(77), user.IDRol, "IDRol must be dynamically resolved from role repository, not hardcoded to 4")
+
+	mockUserRepo.AssertExpectations(t)
+	mockHasher.AssertExpectations(t)
+	mockRoleRepo.AssertExpectations(t)
+}
+
+func TestRegisterUseCase_Execute_DefaultRoleNotFound_BUG12(t *testing.T) {
+	mockUserRepo := new(MockUserRepository)
+	mockHasher := new(MockPasswordHasher)
+	mockRoleRepo := new(MockRoleRepository)
+
+	uc := usecase.NewRegisterUseCase(mockUserRepo, mockHasher, mockRoleRepo)
+
+	mockUserRepo.On("EmailExists", mock.Anything, "dynamic@example.com").Return(false, nil)
+	mockUserRepo.On("DocumentExists", mock.Anything, "88888888").Return(false, nil)
+	mockRoleRepo.On("FindByName", mock.Anything, "Empleado").Return(nil, assert.AnError)
+
+	user, err := uc.Execute(
+		context.Background(),
+		"Dynamic User",
+		"dynamic@example.com",
+		"password123",
+		"88888888",
+	)
+
+	assert.Error(t, err)
+	assert.Nil(t, user)
+	assert.Contains(t, err.Error(), "rol por defecto no encontrado")
+
+	mockUserRepo.AssertExpectations(t)
+	mockRoleRepo.AssertExpectations(t)
+}
