@@ -171,7 +171,7 @@ func (h *DocumentoHandler) Validar(c *gin.Context) {
 // @Produce json
 // @Security BearerAuth
 // @Param id path int true "ID de la incapacidad"
-// @Param id_incapacidad query int true "ID de la incapacidad"
+// @Param id_incapacidad query int false "ID de la incapacidad"
 // @Param estado query string false "Filtrar por estado"
 // @Param tipo query string false "Filtrar por tipo"
 // @Param page query int false "Página" default(1)
@@ -193,7 +193,19 @@ func (h *DocumentoHandler) Listar(c *gin.Context) {
 		return
 	}
 
-	if query.IDIncapacidad == 0 {
+	var incapacidadID uint64
+	if idStr := c.Param("id"); idStr != "" {
+		id, err := strconv.ParseUint(idStr, 10, 64)
+		if err != nil || id == 0 {
+			response.BadRequest(c, "id de incapacidad inválido", "BAD_REQUEST", nil)
+			return
+		}
+		incapacidadID = id
+	} else if query.IDIncapacidad != 0 {
+		incapacidadID = query.IDIncapacidad
+	}
+
+	if incapacidadID == 0 {
 		response.BadRequest(c, "id_incapacidad es requerido", "BAD_REQUEST", nil)
 		return
 	}
@@ -210,7 +222,7 @@ func (h *DocumentoHandler) Listar(c *gin.Context) {
 		limit = 100
 	}
 
-	items, total, err := h.useCase.Listar(c.Request.Context(), actor, query.IDIncapacidad, query.Estado, query.Tipo, page, limit)
+	items, total, err := h.useCase.Listar(c.Request.Context(), actor, incapacidadID, query.Estado, query.Tipo, page, limit)
 	if err != nil {
 		handleError(c, err)
 		return
