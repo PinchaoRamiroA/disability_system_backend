@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 	"reflect"
 	"time"
 
@@ -43,7 +44,9 @@ func (uc *DocumentoUseCase) registrarHistorial(ctx context.Context, incapacidadI
 	if isNilHistorialService(uc.historialSvc) {
 		return
 	}
-	_ = uc.historialSvc.CreateEntry(ctx, incapacidadID, tipoID, descripcion, gestorID)
+	if err := uc.historialSvc.CreateEntry(ctx, incapacidadID, tipoID, descripcion, gestorID); err != nil {
+		slog.ErrorContext(ctx, "error al registrar historial de documento", "error", err, "id_incapacidad", incapacidadID)
+	}
 }
 
 func (uc *DocumentoUseCase) SetDocumentoFaltanteNotifier(incapacidadRepo ports.IncapacidadRepository, notifier ports.DocumentoFaltanteNotifier) {

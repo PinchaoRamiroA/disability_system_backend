@@ -269,4 +269,37 @@ func TestIncapacidadUseCase_CambiarEstado_BUG07(t *testing.T) {
 
 		repo.AssertExpectations(t)
 	})
+
+	t.Run("should invoke historialFn when changing state", func(t *testing.T) {
+		repo := new(mockIncapacidadRepo)
+		uc := usecase.NewIncapacidadUseCase(repo)
+
+		incapacidad := &domain.Incapacidad{
+			IDIncapacidad: 11,
+			IDEstado:      1,
+			Estado:        estadoRecibida,
+		}
+
+		repo.On("FindByID", ctx, uint64(11)).Return(incapacidad, nil)
+		repo.On("FindEstadoByID", ctx, uint64(2)).Return(estadoEnValidacion, nil)
+		repo.On("Update", ctx, mock.Anything).Return(nil)
+
+		historialCalled := false
+		uc.SetHistorialService(func(ctx context.Context, incapacidadID uint64, tipoID uint64, descripcion string, gestorID *uint64) error {
+			historialCalled = true
+			assert.Equal(t, uint64(11), incapacidadID)
+			assert.Equal(t, uint64(2), tipoID)
+			assert.Contains(t, descripcion, "Cambio de estado a En validación documental")
+			assert.Equal(t, uint64(1), *gestorID)
+			return nil
+		})
+
+		res, err := uc.CambiarEstado(ctx, actorEditor, 11, 2, nil)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.True(t, historialCalled)
+		repo.AssertExpectations(t)
+	})
 }
+

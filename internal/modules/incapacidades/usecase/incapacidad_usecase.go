@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -158,7 +159,9 @@ func (uc *IncapacidadUseCase) Crear(ctx context.Context, actor ports.Actor, inpu
 			tipoNombre = tipoIncapacidad.Nombre
 		}
 		descripcion := "Incapacidad creada - Tipo: " + tipoNombre
-		_ = uc.historialFn(ctx, incapacidad.IDIncapacidad, 1, descripcion, &actor.UserID)
+		if err := uc.historialFn(ctx, incapacidad.IDIncapacidad, 1, descripcion, &actor.UserID); err != nil {
+			slog.ErrorContext(ctx, "error al registrar historial de creación de incapacidad", "error", err, "id_incapacidad", incapacidad.IDIncapacidad)
+		}
 	}
 	uc.notificarDocumentosFaltantesIniciales(ctx, incapacidad)
 
@@ -340,7 +343,9 @@ func (uc *IncapacidadUseCase) CambiarEstado(ctx context.Context, actor ports.Act
 		if observaciones != nil && *observaciones != "" {
 			desc += ". Motivo: " + *observaciones
 		}
-		_ = uc.historialFn(ctx, incapacidad.IDIncapacidad, 2, desc, &actor.UserID)
+		if err := uc.historialFn(ctx, incapacidad.IDIncapacidad, 2, desc, &actor.UserID); err != nil {
+			slog.ErrorContext(ctx, "error al registrar historial de cambio de estado", "error", err, "id_incapacidad", incapacidad.IDIncapacidad)
+		}
 	}
 
 	return incapacidad, nil
