@@ -60,6 +60,7 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 		group.DELETE("/:id", incapacidadHandler.Archivar)
 		group.GET("/:id/documentos", documentoHandler.Listar)
 		group.POST("/:id/documentos", documentoHandler.Subir)
+		group.POST("/:id/documentos/upload", documentoHandler.Subir)
 		group.GET("/:id/historial", documentoHandler.ListarHistorial)
 		group.GET("/:id/plazos", incapacidadHandler.ObtenerPlazos)
 
@@ -72,6 +73,7 @@ func Register(v1 *router.APIVersion, db *gorm.DB, jwtService *auth.JWTService, s
 
 	docGroup := v1.Group("/documentos", jwtMiddleware.Authenticate(), permissionMiddleware.LoadActor())
 	{
+		docGroup.GET("", documentoHandler.Listar)
 		docGroup.PATCH("/:id/validar", documentoHandler.Validar)
 		docGroup.DELETE("/:id", documentoHandler.Eliminar)
 	}
