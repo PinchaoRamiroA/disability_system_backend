@@ -334,6 +334,15 @@ func (uc *IncapacidadUseCase) CambiarEstado(ctx context.Context, actor ports.Act
 	if err := uc.repo.Update(ctx, incapacidad); err != nil {
 		return nil, err
 	}
+
+	if uc.historialFn != nil {
+		desc := "Cambio de estado a " + estado.Nombre
+		if observaciones != nil && *observaciones != "" {
+			desc += ". Motivo: " + *observaciones
+		}
+		_ = uc.historialFn(ctx, incapacidad.IDIncapacidad, 2, desc, &actor.UserID)
+	}
+
 	return incapacidad, nil
 }
 
