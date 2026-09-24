@@ -45,11 +45,12 @@ type IncapacidadFilters struct {
 	Origen         string
 	CanalRecepcion string
 	Search         string
-	FechaDesde     string
-	FechaHasta     string
-	IncludeDeleted bool
-	Page           int
-	Limit          int
+	FechaDesde          string
+	FechaHasta          string
+	EstadoTranscripcion string
+	IncludeDeleted      bool
+	Page                int
+	Limit               int
 }
 
 type IncapacidadRepository interface {

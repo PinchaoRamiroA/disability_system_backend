@@ -91,6 +91,13 @@ func (r *IncapacidadRepository) List(ctx context.Context, filters ports.Incapaci
 	if filters.FechaHasta != "" {
 		query = query.Where("incapacidad.fecha_inicio <= ?", filters.FechaHasta)
 	}
+	if filters.EstadoTranscripcion != "" {
+		if filters.EstadoTranscripcion == "pendientes" {
+			query = query.Where("incapacidad.estado_transcripcion IN (?)", []string{"pendiente", "en_proceso"})
+		} else {
+			query = query.Where("incapacidad.estado_transcripcion = ?", filters.EstadoTranscripcion)
+		}
+	}
 
 	var total int64
 	if err := query.Count(&total).Error; err != nil {

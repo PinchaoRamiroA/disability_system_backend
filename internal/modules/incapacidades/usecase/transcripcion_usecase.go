@@ -83,9 +83,10 @@ func (uc *TranscripcionUseCase) ListarPendientes(ctx context.Context, estado str
 	}
 
 	filters := ports.IncapacidadFilters{
-		IncludeDeleted: false,
-		Page:           page,
-		Limit:          limit,
+		IncludeDeleted:      false,
+		EstadoTranscripcion: estado,
+		Page:                page,
+		Limit:               limit,
 	}
 
 	return uc.repo.List(ctx, filters)

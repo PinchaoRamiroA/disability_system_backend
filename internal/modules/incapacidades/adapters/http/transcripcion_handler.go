@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log/slog"
 	"strconv"
+	"time"
 
 	"disability_system_backend/internal/modules/incapacidades/dto"
 	"disability_system_backend/internal/modules/incapacidades/usecase"
@@ -53,18 +54,32 @@ func (h *TranscripcionHandler) Transcribir(c *gin.Context) {
 		return
 	}
 
-	incapacidad, err := h.useCase.Transcribir(c.Request.Context(), id, actor, req.ObservacionesTranscripcion)
+	obs := req.ObservacionesTranscripcion
+	if obs == nil && req.Observaciones != nil {
+		obs = req.Observaciones
+	}
+	if req.NumeroRadicado != nil && *req.NumeroRadicado != "" {
+		radicadoNote := "Radicado: " + *req.NumeroRadicado
+		if obs != nil && *obs != "" {
+			combined := radicadoNote + " | " + *obs
+			obs = &combined
+		} else {
+			obs = &radicadoNote
+		}
+	}
+
+	incapacidad, err := h.useCase.Transcribir(c.Request.Context(), id, actor, obs)
 	if err != nil {
 		handleError(c, err)
 		return
 	}
 
 	response.Success(c, gin.H{
-		"id_incapacidad":           incapacidad.IDIncapacidad,
-		"estado_transcripcion":      incapacidad.EstadoTranscripcion,
-		"fecha_transcripcion":      incapacidad.FechaTranscripcion,
-		"transcrito_por":            incapacidad.TranscritoPor,
-		"observaciones":            incapacidad.ObservacionesTranscripcion,
+		"id_incapacidad":       incapacidad.IDIncapacidad,
+		"estado_transcripcion": incapacidad.EstadoTranscripcion,
+		"fecha_transcripcion":  incapacidad.FechaTranscripcion,
+		"transcrito_por":       incapacidad.TranscritoPor,
+		"observaciones":        incapacidad.ObservacionesTranscripcion,
 	}, "transcripción registrada exitosamente")
 }
 
@@ -112,7 +127,7 @@ func (h *TranscripcionHandler) MarcarEnProceso(c *gin.Context) {
 	}
 
 	response.Success(c, gin.H{
-		"id_incapacidad":      incapacidad.IDIncapacidad,
+		"id_incapacidad":       incapacidad.IDIncapacidad,
 		"estado_transcripcion": incapacidad.EstadoTranscripcion,
 	}, "estado de transcripción actualizado")
 }
@@ -162,12 +177,64 @@ func (h *TranscripcionHandler) ListarPendientes(c *gin.Context) {
 		if item.FechaLimiteTranscripcion != nil {
 			fechaLimite = item.FechaLimiteTranscripcion.Format("2006-01-02")
 		}
+
+		var entidadData gin.H
+		if item.Entidad != nil {
+			entidadData = gin.H{
+				"id_entidad":               item.Entidad.IDEntidad,
+				"nombre":                   item.Entidad.Nombre,
+				"tipo":                     item.Entidad.Tipo,
+				"plazo_transcripcion_dias": item.Entidad.PlazoTranscripcionDias,
+				"tiempo_maximo_pago_dias":  item.Entidad.TiempoMaximoPagoDias,
+				"requiere_transcripcion":   item.Entidad.RequiereTranscripcion,
+			}
+		}
+		var tipoData gin.H
+		if item.Tipo != nil {
+			tipoData = gin.H{
+				"id_tipo": item.Tipo.IDTipo,
+				"nombre":  item.Tipo.Nombre,
+				"origen":  item.Tipo.Origen,
+			}
+		}
+		var estadoData gin.H
+		if item.Estado != nil {
+			estadoData = gin.H{
+				"id_estado": item.Estado.IDEstado,
+				"nombre":    item.Estado.Nombre,
+			}
+		}
+
+		var diasRestantes *int
+		if item.FechaLimiteTranscripcion != nil {
+			dr := int(time.Until(*item.FechaLimiteTranscripcion).Hours() / 24)
+			diasRestantes = &dr
+		}
+		fechaFinStr := ""
+		if item.FechaFin != nil {
+			fechaFinStr = item.FechaFin.Format("2006-01-02")
+		}
+		fechaRadicacionStr := ""
+		if item.FechaRadicacion != nil {
+			fechaRadicacionStr = item.FechaRadicacion.Format("2006-01-02")
+		}
+
 		results = append(results, gin.H{
 			"id_incapacidad":              item.IDIncapacidad,
-			"titulo":                     item.Titulo,
+			"id_usuario":                  item.IDUsuario,
+			"titulo":                      item.Titulo,
+			"origen":                      item.Origen,
+			"fecha_inicio":                item.FechaInicio.Format("2006-01-02"),
+			"fecha_fin":                   fechaFinStr,
+			"fecha_radicacion":            fechaRadicacionStr,
 			"estado_transcripcion":        item.EstadoTranscripcion,
 			"fecha_limite_transcripcion":  fechaLimite,
+			"dias_restantes":              diasRestantes,
 			"alerta_vencimiento":          alerta,
+			"observaciones_transcripcion": item.ObservacionesTranscripcion,
+			"entidad":                     entidadData,
+			"tipo":                        tipoData,
+			"estado":                      estadoData,
 		})
 	}
 
