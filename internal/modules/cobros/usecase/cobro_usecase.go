@@ -363,7 +363,15 @@ func normalizeEstadoPago(value string) (string, error) {
 }
 
 func normalizeTipoSeguimiento(value string) (string, error) {
-	tipo := shareddomain.TipoSeguimiento(strings.TrimSpace(value))
+	trimmed := strings.TrimSpace(value)
+	if strings.EqualFold(trimmed, "Cobro persuasivo") {
+		trimmed = string(shareddomain.TipoSegPersuasivo)
+	} else if strings.EqualFold(trimmed, "Cobro jurídico") || strings.EqualFold(trimmed, "Cobro juridico") {
+		trimmed = string(shareddomain.TipoSegJuridico)
+	} else if strings.EqualFold(trimmed, "Cobro preventivo") {
+		trimmed = string(shareddomain.TipoSegPreventivo)
+	}
+	tipo := shareddomain.TipoSeguimiento(trimmed)
 	if !tipo.IsValid() {
 		return "", apperrors.ErrValidation.WithMessage("tipo_seguimiento inválido")
 	}
@@ -371,7 +379,13 @@ func normalizeTipoSeguimiento(value string) (string, error) {
 }
 
 func normalizeResultadoSeguimiento(value string) (string, error) {
-	resultado := shareddomain.ResultadoSeguimiento(strings.TrimSpace(value))
+	trimmed := strings.TrimSpace(value)
+	if strings.EqualFold(trimmed, "Favorable") {
+		trimmed = string(shareddomain.ResultadoAprobado)
+	} else if strings.EqualFold(trimmed, "Acuerdo de pago") {
+		trimmed = string(shareddomain.ResultadoPagoProgramado)
+	}
+	resultado := shareddomain.ResultadoSeguimiento(trimmed)
 	if !resultado.IsValid() {
 		return "", apperrors.ErrValidation.WithMessage("resultado de seguimiento inválido")
 	}
